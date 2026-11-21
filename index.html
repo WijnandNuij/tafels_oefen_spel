@@ -12,7 +12,6 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
-            touch-action: none;
         }
         body, html {
             margin: 0;
@@ -44,24 +43,29 @@
             display: block;
             width: 100%;
             height: 100%;
+            touch-action: none;
         }
 
-        /* Overlay schermen */
+        /* Overlay schermen (scrollbaar op mobiel!) */
         .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: fixed;
+            inset: 0;
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, #74b9ff, #55efc4);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 10;
+            z-index: 20;
             color: #2d3436;
-            padding: 16px;
+            padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)) 16px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+        .overlay * {
+            touch-action: pan-y;
         }
 
         /* Instellingen / Menu */
@@ -70,10 +74,10 @@
             border: 6px solid #e17055;
             border-radius: 24px;
             padding: 16px 30px;
-            width: 92%;
+            width: 100%;
             max-width: 860px;
-            max-height: 95%;
-            overflow-y: auto;
+            margin: auto;
+            flex-shrink: 0;
             box-shadow: 0 12px 24px rgba(0,0,0,0.22);
             text-align: center;
         }
@@ -279,9 +283,11 @@
             align-items: flex-end;
             padding: 20px;
             z-index: 5;
+            touch-action: none;
         }
         .touch-btn {
             pointer-events: auto;
+            touch-action: none;
             width: 85px;
             height: 85px;
             background: rgba(255, 255, 255, 0.45);
@@ -327,8 +333,10 @@
             border: 8px solid #ffb142;
             border-radius: 28px;
             padding: 24px 28px;
-            width: 90%;
+            width: 92%;
             max-width: 650px;
+            margin: auto;
+            flex-shrink: 0;
             text-align: center;
             box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             transform: scale(0.9);
@@ -399,8 +407,10 @@
             border: 10px solid #d63031;
             border-radius: 30px;
             padding: 28px;
-            width: 90%;
+            width: 92%;
             max-width: 680px;
+            margin: auto;
+            flex-shrink: 0;
             text-align: center;
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
@@ -422,6 +432,34 @@
             justify-content: center;
             gap: 14px;
             margin-top: 18px;
+        }
+
+        /* Mobiele scherm-aanpassingen (portret & landschap) */
+        @media (max-width: 640px) {
+            .overlay { padding: max(10px, env(safe-area-inset-top)) 10px max(20px, env(safe-area-inset-bottom)) 10px; }
+            .menu-card { padding: 12px 12px; border-width: 4px; }
+            .menu-section { flex: 1 1 100%; }
+            .character-select { gap: 8px; flex-wrap: wrap; }
+            h1 { font-size: 1.3rem; }
+            h2 { font-size: 0.95rem; }
+            .lvl-btn { width: 32px; height: 30px; font-size: 0.88rem; }
+            .table-grid { grid-template-columns: repeat(2, 1fr); }
+            .char-btn { padding: 6px 10px; font-size: 0.9rem; }
+            .start-btn { font-size: 1.25rem; padding: 10px 26px; }
+            .quiz-card { padding: 16px 14px; border-width: 6px; }
+            .quiz-math { font-size: 2.3rem; padding: 10px; }
+            .answer-btn { font-size: 1.5rem; padding: 12px; }
+        }
+        @media (max-height: 500px) {
+            .overlay { padding: 8px 12px 16px 12px; }
+            .menu-card { padding: 10px 16px; border-width: 4px; }
+            h1 { font-size: 1.35rem; margin-bottom: 4px; }
+            h2 { font-size: 0.92rem; margin: 5px 0 3px 0; }
+            .table-grid { margin: 5px 0 8px 0; }
+            .start-btn { font-size: 1.25rem; padding: 8px 28px; }
+            .quiz-card { padding: 12px 16px; }
+            .quiz-math { font-size: 2.1rem; padding: 8px; margin: 8px 0; }
+            .answer-btn { font-size: 1.4rem; padding: 10px; }
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
