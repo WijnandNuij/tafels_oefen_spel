@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>De Grote Klus- &amp; Bak-Bouwer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #1b2a4a;
+            font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 16:9 TV & Chromecast speelveld */
+        #game-stage {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background: #dff6ff;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+            overflow: hidden;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Bovenste helft: live geanimeerde cartoon bouw-/bakscène */
+        #scene-wrap {
+            position: relative;
+            flex: 0 0 52%;
+            width: 100%;
+            overflow: hidden;
+        }
+        #sceneCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        /* HUD bovenop de scène */
+        #hud-top {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            pointer-events: none;
+            z-index: 4;
+        }
+        .hud-pill {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.92);
+            border: 3px solid #2d3436;
+            border-radius: 999px;
+            padding: 4px 14px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.8rem, 1.55vw, 1.18rem);
+            color: #2d3436;
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hud-btn {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .hud-btn:active { transform: scale(0.92); }
+
+        #progress-track {
+            flex: 1;
+            max-width: 340px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 3px solid #2d3436;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+        }
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f);
+            transition: width 0.35s ease;
+        }
+        #progress-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 900;
+            color: #2d3436;
+        }
+
+        /* Onderste helft: spraakballon + 4 grote keuze-kaarten */
+        #quiz-panel {
+            flex: 1;
+            background: linear-gradient(180deg, #fffdf5 0%, #fff4dc 100%);
+            border-top: 5px solid #e17055;
+            padding: 1.2% 2.2% 1.6% 2.2%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        #prompt-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 4px solid #ffb142;
+            border-radius: 18px;
+            padding: 8px 14px;
+            box-shadow: 0 4px 0 rgba(225, 112, 85, 0.22);
+            min-height: 0;
+        }
+        #prompt-badge {
+            flex-shrink: 0;
+            background: #ff793f;
+            color: #fff;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.75rem, 1.4vw, 1.02rem);
+            padding: 5px 11px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+        #prompt-text {
+            flex: 1;
+            font-size: clamp(0.95rem, 2.05vw, 1.52rem);
+            font-weight: 900;
+            color: #2d3436;
+            line-height: 1.22;
+        }
+        #prompt-hint {
+            flex-shrink: 0;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: clamp(0.75rem, 1.3vw, 0.95rem);
+            font-weight: 900;
+            background: #ffeaa7;
+            border: 2px solid #fdcb6e;
+            border-radius: 12px;
+            padding: 4px 10px;
+            color: #6c4600;
+        }
+        .swatch-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #2d3436;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        #speak-btn {
+            flex-shrink: 0;
+            width: clamp(42px, 5vw, 54px);
+            height: clamp(42px, 5vw, 54px);
+            border-radius: 50%;
+            border: 3px solid #0984e3;
+            background: #dff3ff;
+            font-size: clamp(1.2rem, 2.1vw, 1.6rem);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 #0984e3;
+            transition: transform 0.1s;
+        }
+        #speak-btn:active { transform: translateY(2px); }
+
+        #choices-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            min-height: 0;
+        }
+        .choice-btn {
+            background: #ffffff;
+            border: 4px solid #74b9ff;
+            border-radius: 18px;
+            padding: 8px 14px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: clamp(0.86rem, 1.72vw, 1.34rem);
+            color: #2d3436;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            line-height: 1.18;
+            box-shadow: 0 5px 0 #0984e3;
+            transition: transform 0.1s, background-color 0.12s, border-color 0.12s;
+            touch-action: manipulation;
+        }
+        .choice-btn:hover { background: #f2f9ff; }
+        .choice-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0984e3; }
+        .choice-btn.is-word {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(1.05rem, 2.1vw, 1.65rem);
+            justify-content: flex-start;
+        }
+        .choice-num {
+            flex-shrink: 0;
+            width: clamp(28px, 3.2vw, 36px);
+            height: clamp(28px, 3.2vw, 36px);
+            border-radius: 10px;
+            background: #74b9ff;
+            color: #fff;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.85rem, 1.5vw, 1.15rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .choice-icon {
+            font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+            flex-shrink: 0;
+        }
+        .choice-btn.correct {
+            background: #2ecc71 !important;
+            border-color: #1e8449 !important;
+            box-shadow: 0 4px 0 #1e8449 !important;
+            color: #fff !important;
+            transform: scale(1.02);
+        }
+        .choice-btn.correct .choice-num { background: #1e8449; }
+        .choice-btn.wrong {
+            background: #ffe0e0 !important;
+            border-color: #e17055 !important;
+            box-shadow: 0 4px 0 #d63031 !important;
+            animation: shake 0.35s ease;
+        }
+
+        /* Overlays (scrollbaar op mobiel!) */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)) 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+        .overlay * { touch-action: pan-y; }
+
+        #menu-overlay {
+            background: linear-gradient(145deg, #ff9f43 0%, #ee5253 50%, #54a0ff 100%);
+        }
+        #win-overlay {
+            display: none;
+            background: linear-gradient(145deg, #ffeaa7 0%, #55efc4 100%);
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.97);
+            border: 6px solid #ff9f43;
+            border-radius: 28px;
+            padding: 18px 24px 22px 24px;
+            width: 100%;
+            max-width: 860px;
+            margin: auto;
+            flex-shrink: 0;
+            text-align: center;
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
+        }
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dfe6e9;
+            color: #2d3436;
+            text-decoration: none;
+            border: 3px solid #b2bec3;
+            border-radius: 14px;
+            padding: 6px 14px;
+            font-weight: 900;
+            font-size: 0.92rem;
+            box-shadow: 0 3px 0 #b2bec3;
+        }
+        .home-link:hover { background: #ffeaa7; border-color: #fdcb6e; }
+
+        h1 {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            color: #e67e22;
+            margin: 4px 0 4px 0;
+            font-size: clamp(1.5rem, 3.8vw, 2.4rem);
+            text-shadow: 2px 2px 0 #ffeaa7;
+        }
+        .subtitle {
+            margin: 0 0 14px 0;
+            font-size: clamp(0.92rem, 1.8vw, 1.12rem);
+            font-weight: 800;
+            color: #57606f;
+        }
+        h2 {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.05rem;
+            color: #2d3436;
+            margin: 10px 0 8px 0;
+        }
+
+        .episode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .ep-btn {
+            border: 4px solid #ced6e0;
+            border-radius: 18px;
+            background: #f8f9fa;
+            padding: 10px 14px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.15s;
+        }
+        .ep-btn.selected {
+            border-color: #2ecc71;
+            background: #e9fbf0;
+            box-shadow: 0 5px 12px rgba(46, 204, 113, 0.3);
+            transform: scale(1.02);
+        }
+        .ep-emoji { font-size: 2rem; flex-shrink: 0; }
+        .ep-title {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.06rem;
+            color: #2d3436;
+        }
+        .ep-sub {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #636e72;
+        }
+        .ep-stars {
+            margin-left: auto;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .mode-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .mode-btn {
+            border: 3px solid #ced6e0;
+            border-radius: 14px;
+            background: #f1f2f6;
+            padding: 7px 14px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #2d3436;
+        }
+        .mode-btn.selected {
+            border-color: #ff9f43;
+            background: #fff2d6;
+            color: #c25e00;
+        }
+
+        .start-btn {
+            background: #2ecc71;
+            color: #fff;
+            border: none;
+            border-radius: 22px;
+            padding: 12px 42px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(1.25rem, 2.8vw, 1.7rem);
+            cursor: pointer;
+            box-shadow: 0 6px 0 #27ae60, 0 10px 18px rgba(0, 0, 0, 0.18);
+            transition: transform 0.1s;
+        }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #27ae60; }
+
+        /* Mobiel portret: gebruik het hele telefoonscherm (geen knijpende 16:9 strook!) */
+        @media (orientation: portrait) {
+            #game-stage {
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                max-width: 100vw;
+                max-height: 100dvh;
+                border-radius: 0;
+            }
+            #scene-wrap { flex: 0 0 32%; }
+            #quiz-panel {
+                padding: 10px 12px max(12px, env(safe-area-inset-bottom)) 12px;
+                gap: 10px;
+                overflow-y: auto;
+            }
+            #prompt-bar {
+                flex-wrap: wrap;
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            #prompt-text { font-size: 1.05rem; }
+            #choices-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .choice-btn {
+                padding: 10px 12px;
+                font-size: 0.96rem;
+                min-height: 56px;
+            }
+            .choice-btn.is-word { font-size: 1.12rem; }
+        }
+
+        /* Telefoon landschap (bijv. 844×390 Chromecast): compact zodat rij 2 nooit afknipt */
+        @media (max-height: 460px) and (orientation: landscape) {
+            #scene-wrap { flex: 0 0 38%; }
+            #hud-top { top: 4px; left: 6px; right: 6px; }
+            .hud-pill { padding: 2px 9px; font-size: 0.74rem; border-width: 2px; }
+            #progress-track { height: 17px; border-width: 2px; }
+            #progress-label { font-size: 0.68rem; }
+            #quiz-panel { padding: 5px 10px 7px 10px; gap: 5px; border-top-width: 3px; }
+            #prompt-bar { padding: 4px 10px; border-width: 3px; border-radius: 13px; gap: 7px; }
+            #prompt-badge { padding: 3px 8px; font-size: 0.68rem; }
+            #prompt-text { font-size: 0.88rem; line-height: 1.15; }
+            #speak-btn { width: 34px; height: 34px; font-size: 1rem; border-width: 2px; }
+            #choices-grid { gap: 6px; }
+            .choice-btn {
+                padding: 5px 10px;
+                border-width: 3px;
+                border-radius: 13px;
+                box-shadow: 0 3px 0 #0984e3;
+                font-size: 0.82rem;
+                line-height: 1.12;
+                gap: 7px;
+            }
+            .choice-btn.is-word { font-size: 0.98rem; }
+            .choice-num { width: 24px; height: 24px; font-size: 0.78rem; border-radius: 7px; }
+            .choice-icon { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 640px) {
+            .episode-grid { grid-template-columns: 1fr; }
+            .menu-card { padding: 14px 14px 18px 14px; }
+        }
+        @media (max-height: 480px) {
+            .menu-card { padding: 10px 16px 14px 16px; border-width: 4px; }
+            .subtitle { margin-bottom: 8px; }
+            h2 { margin: 6px 0 4px 0; font-size: 0.92rem; }
+            .ep-btn { padding: 6px 10px; }
+            .ep-emoji { font-size: 1.5rem; }
+            .ep-title { font-size: 0.92rem; }
+            .mode-row { margin-bottom: 8px; }
+            .start-btn { padding: 8px 30px; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-7px); }
+            75% { transform: translateX(7px); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-stage">
+    <!-- Bovenste helft: Live geanimeerde bouw-/bakscène -->
+    <div id="scene-wrap">
+        <canvas id="sceneCanvas" width="1280" height="374"></canvas>
+        <div id="hud-top">
+            <button class="hud-pill hud-btn" onclick="openMenu()">📋 Menu</button>
+            <div id="progress-track">
+                <div id="progress-fill"></div>
+                <div id="progress-label">0 / 12</div>
+            </div>
+            <div class="hud-pill" id="streak-pill">⭐ 0</div>
+        </div>
+    </div>
+
+    <!-- Onderste helft: Exacte themawoord-opdracht + 4 grote knoppen -->
+    <div id="quiz-panel">
+        <div id="prompt-bar">
+            <span id="prompt-badge">KLUS-KEES VRAAGT</span>
+            <div id="prompt-text">Laden...</div>
+            <div id="prompt-hint"></div>
+            <button id="speak-btn" title="Lees voor" aria-label="Lees vraag voor" onclick="speakCurrentPrompt()">🔊</button>
+        </div>
+        <div id="choices-grid"></div>
+    </div>
+</div>
+
+<!-- Start Menu -->
+<div id="menu-overlay" class="overlay">
+    <div class="menu-card">
+        <div class="top-row">
+            <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+            <span style="font-weight:900; font-size:0.9rem; color:#636e72;" id="total-mastered-badge">⭐ 0 / 36 woorden</span>
+        </div>
+
+        <h1>🏗️ De Grote Klus- &amp; Bak-Bouwer 🧁</h1>
+        <p class="subtitle">Bouw het droomhuis, run de bouwplaats en bak de reuzentaart door de juiste themawoorden te kiezen!</p>
+
+        <h2>Kies je aflevering:</h2>
+        <div class="episode-grid">
+            <button class="ep-btn selected" id="ep-0" onclick="selectEpisode(0)">
+                <span class="ep-emoji">🏠</span>
+                <div>
+                    <div class="ep-title">1. Het Klushuis</div>
+                    <div class="ep-sub">Blad 1 · 12 woorden (meubilair, wand, gips…)</div>
+                </div>
+                <span class="ep-stars" id="stars-0">☆☆☆</span>
+            </button>
+            <button class="ep-btn" id="ep-1" onclick="selectEpisode(1)">
+                <span class="ep-emoji">🚧</span>
+                <div>
+                    <div class="ep-title">2. Bouwplaats &amp; Afval</div>
+                    <div class="ep-sub">Blad 2 · 12 woorden (vuilnis, rolmaat, plattegrond…)</div>
+                </div>
+                <span class="ep-stars" id="stars-1">☆☆☆</span>
+            </button>
+            <button class="ep-btn" id="ep-2" onclick="selectEpisode(2)">
+                <span class="ep-emoji">🧁</span>
+                <div>
+                    <div class="ep-title">3. De Superbakkerij</div>
+                    <div class="ep-sub">Blad 3 · 12 woorden (kaneel, deeg, recept…)</div>
+                </div>
+                <span class="ep-stars" id="stars-2">☆☆☆</span>
+            </button>
+            <button class="ep-btn" id="ep-3" onclick="selectEpisode(3)">
+                <span class="ep-emoji">🌟</span>
+                <div>
+                    <div class="ep-title">4. Mega-Avontuur!</div>
+                    <div class="ep-sub">Alle 36 woorden door elkaar</div>
+                </div>
+                <span class="ep-stars" id="stars-3">☆☆☆</span>
+            </button>
+        </div>
+
+        <h2>Speelrichting:</h2>
+        <div class="mode-row">
+            <button class="mode-btn selected" id="dir-mixed" onclick="selectDir('mixed')">🔀 Gemengd (leukst!)</button>
+            <button class="mode-btn" id="dir-d2w" onclick="selectDir('d2w')">💬 Omschrijving → Woord</button>
+            <button class="mode-btn" id="dir-w2d" onclick="selectDir('w2d')">📖 Woord → Omschrijving</button>
+            <button class="mode-btn selected" id="voice-toggle" onclick="toggleAutoVoice()">🔊 Voorlezen: AAN</button>
+        </div>
+
+        <button class="start-btn" onclick="startEpisode()">BOUWEN MAAR! 🚀</button>
+    </div>
+</div>
+
+<!-- Eindscherm / Trofee -->
+<div id="win-overlay" class="overlay">
+    <div class="menu-card" style="border-color: #2ecc71; max-width: 660px;">
+        <h1 style="color:#27ae60;">🏆 MEESTERBOUWER! 🏆</h1>
+        <div style="font-size: 3rem; margin: 4px 0;" id="win-stars">⭐⭐⭐</div>
+        <p style="font-size: 1.25rem; font-weight: 900; color: #2d3436; margin: 8px 0;" id="win-msg">Fantastisch gebouwd!</p>
+        <p style="font-size: 1.05rem; font-weight: 800; color: #57606f; margin: 0 0 18px 0;" id="win-stats"></p>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px;">
+            <button class="start-btn" onclick="nextOrReplay()">VOLGENDE AFLEVERING ▶</button>
+            <button class="mode-btn" style="font-size:1.05rem; padding:12px 20px;" onclick="openMenu()">📋 Kies aflevering</button>
+            <a class="home-link" style="font-size:1rem; padding:10px 18px;" href="index.html">🏠 Alle spellen</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================================
+// EXACTE THEMAWOORDEN (alle 36 woorden + omschrijvingen van het blad)
+// ============================================================================
+const WORDS = [
+    // --- KOLOM 1: Het Klushuis ---
+    { id: 1, col: 0, group: 'kamer', icon: '🪑', word: 'het meubilair', desc: 'Alle meubels bij elkaar, bijvoorbeeld alle stoelen, kasten en tafels.' },
+    { id: 2, col: 0, group: 'kamer', icon: '🛋️', word: 'inrichten', desc: 'Alle spullen in een kamer op de goede plek neerzetten.' },
+    { id: 3, col: 0, group: 'kamer', icon: '📐', word: 'passen en meten (uitdrukking)', desc: 'Uitproberen of iets ergens in, op of tussen past.' },
+    { id: 4, col: 0, group: 'gevoel', icon: '🥱', word: 'saai', desc: 'Iets is steeds hetzelfde, je verveelt je erbij.' },
+    { id: 5, col: 0, group: 'gevoel', icon: '🎢', word: 'afwisselend', desc: 'Iets is steeds anders, je verveelt je niet.' },
+    { id: 6, col: 0, group: 'klus', icon: '💡', word: 'het idee', desc: 'Iets wat je bedenkt.' },
+    { id: 7, col: 0, group: 'huis', icon: '🧱', word: 'de wand', desc: 'Een muur.' },
+    { id: 8, col: 0, group: 'gevoel', icon: '✨', word: 'fraai', desc: 'Mooi.' },
+    { id: 9, col: 0, group: 'been', icon: '🩹', word: 'het gips', desc: 'Verband dat heel hard wordt. De dokter doet gips om je been als het gebroken is.' },
+    { id: 10, col: 0, group: 'klus', icon: '🔨', word: 'het karwei', desc: 'Een klus, werk dat je moet doen.' },
+    { id: 11, col: 0, group: 'been', icon: '🦯', word: 'de krukken', desc: 'Stokken waar je op kunt steunen als je moeilijk kunt lopen, bijvoorbeeld als je been gebroken is.' },
+    { id: 12, col: 0, group: 'huis', icon: '🚪', word: 'het luik', desc: 'Een soort deurtje van hout dat aan de buitenkant van een raam zit.' },
+
+    // --- KOLOM 2: De Bouwplaats & Afvalstraat ---
+    { id: 13, col: 1, group: 'afval', icon: '🛋️', word: 'het grofvuil', desc: 'Alles wat je weggooit en niet in de vuilnisbak past.' },
+    { id: 14, col: 1, group: 'afval', icon: '🗑️', word: 'het vuilnis', desc: 'Dingen die je niet meer gebruikt en weggooit, zoals lege melkpakken.' },
+    { id: 15, col: 1, group: 'afval', icon: '🍎', word: 'het gft', desc: 'Een afkorting van groente-, fruit- en tuinafval.' },
+    { id: 16, col: 1, group: 'afval', icon: '⛰️', word: 'het puin', desc: 'Brokken steen die je weggooit.' },
+    { id: 17, col: 1, group: 'meten', icon: '📏', word: 'het meetinstrument', desc: 'Gereedschap waarmee je kunt meten.' },
+    { id: 18, col: 1, group: 'meten', icon: '📐', word: 'de duimstok', desc: 'Een liniaal die je kunt opvouwen.' },
+    { id: 19, col: 1, group: 'meten', icon: '🧵', word: 'het meetlint', desc: 'Een stuk slappe stof of slap plastic waarmee je kunt meten.' },
+    { id: 20, col: 1, group: 'meten', icon: '📟', word: 'de rolmaat', desc: 'Een liniaal die je kunt oprollen.' },
+    { id: 21, col: 1, group: 'huis', icon: '💡', word: 'de lampenkap', desc: 'Een kap die om de lamp zit.' },
+    { id: 22, col: 1, group: 'been', icon: '🦘', word: 'hinken', desc: 'Met kleine schokjes lopen, bijvoorbeeld doordat je voet pijn doet.' },
+    { id: 23, col: 1, group: 'plan', icon: '🗺️', word: 'de plattegrond', desc: 'Een tekening waarop je een stad of gebied van bovenaf ziet.' },
+    { id: 24, col: 1, group: 'plan', icon: '✏️', word: 'ontwerpen', desc: 'Iets bedenken en op papier tekenen.' },
+
+    // --- KOLOM 3: De Superbakkerij ---
+    { id: 25, col: 2, group: 'kruiden', icon: '🌶️', word: 'de specerijen', desc: 'Gedroogde, fijngemalen delen van planten die het eten smaak geven.' },
+    { id: 26, col: 2, group: 'kruiden', icon: '🟤', word: 'het kaneel', desc: 'Een lichtbruin specerij.', swatch: '#c68b59', swatchLabel: 'lichtbruin' },
+    { id: 27, col: 2, group: 'kruiden', icon: '🟡', word: 'de kerrie', desc: 'Een donkergeel specerij.', swatch: '#d4a017', swatchLabel: 'donkergeel' },
+    { id: 28, col: 2, group: 'kruiden', icon: '🌰', word: 'de nootmuskaat', desc: 'Een donkerbruin specerij.', swatch: '#5c3a21', swatchLabel: 'donkerbruin' },
+    { id: 29, col: 2, group: 'deeg', icon: '🌾', word: 'het bakmeel', desc: 'Poeder (van graan) waarmee je bijvoorbeeld een taart of een brood kunt bakken.' },
+    { id: 30, col: 2, group: 'deeg', icon: '🥣', word: 'het deeg', desc: 'Bakmeel dat is vermengd met water, boter en suiker. Deeg moet je kneden.' },
+    { id: 31, col: 2, group: 'deeg', icon: '👐', word: 'kneden', desc: 'Steeds in het deeg knijpen om het soepel te maken.' },
+    { id: 32, col: 2, group: 'deeg', icon: '⬆️', word: 'rijzen', desc: 'Omhoogkomen van deeg. Dat komt omdat er meer lucht in komt.' },
+    { id: 33, col: 2, group: 'bakken', icon: '🔥', word: 'bakken', desc: 'In de pan of de oven gaar laten worden.' },
+    { id: 34, col: 2, group: 'recept', icon: '👩‍🍳', word: 'de bereidingswijze', desc: 'De manier (wijze) hoe je het eten kunt klaarmaken (bereiden).' },
+    { id: 35, col: 2, group: 'recept', icon: '🥚', word: 'de ingrediënten', desc: 'De dingen waarvan het eten gemaakt is.' },
+    { id: 36, col: 2, group: 'recept', icon: '📜', word: 'het recept', desc: 'Een tekst waarop de ingrediënten en de bereidingswijze van een gerecht staan.' }
+];
+
+// --- Web Audio Geluidjes ---
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function playTone(freq, dur = 0.16, type = 'sine', vol = 0.12, delay = 0) {
+    try {
+        if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const t = audioCtx.currentTime + delay;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(vol, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(t); osc.stop(t + dur + 0.02);
+    } catch (e) {}
+}
+function sfxBuild() {
+    [440, 554.37, 659.25, 880].forEach((f, i) => playTone(f, 0.2, 'triangle', 0.13, i * 0.065));
+}
+function sfxWrong() {
+    playTone(230, 0.14, 'sine', 0.12, 0);
+    playTone(185, 0.22, 'sine', 0.12, 0.1);
+}
+function sfxWin() {
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => playTone(f, 0.3, 'triangle', 0.14, i * 0.09));
+}
+
+// --- Nederlandse stem ---
+let nlVoice = null;
+function loadVoice() {
+    if (!('speechSynthesis' in window)) return;
+    const vs = window.speechSynthesis.getVoices();
+    nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+           || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
+}
+if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
+function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'nl-NL';
+        if (nlVoice) u.voice = nlVoice;
+        u.rate = 0.96;
+        u.pitch = 1.05;
+        window.speechSynthesis.speak(u);
+    } catch (e) {}
+}
+
+// --- Voortgang opslaan ---
+const STORAGE_KEY = 'klus_bak_bouwer_v1';
+function loadSave() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { stars: [0,0,0,0], mastered: [] }; }
+    catch { return { stars: [0,0,0,0], mastered: [] }; }
+}
+function writeSave(data) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+let saveData = loadSave();
+
+// --- Spelstatus ---
+let selectedEpisode = 0; // 0=Klushuis, 1=Bouwplaats, 2=Bakkerij, 3=Alle 36
+let selectedDir = 'mixed'; // 'mixed' | 'd2w' | 'w2d'
+let autoVoice = true;
+
+let queue = [];
+let builtIds = new Set();
+let totalSteps = 12;
+let currentItem = null;
+let currentQType = 'd2w'; // 'd2w' (desc->word) of 'w2d' (word->desc)
+let mistakesThisEpisode = 0;
+let streak = 0;
+let locked = false;
+let wrongOnCurrent = false;
+let currentChoices = [];
+
+// Live scène animatie status
+const canvas = document.getElementById('sceneCanvas');
+const ctx = canvas.getContext('2d');
+let sceneTime = 0;
+let celebratePopTimer = 0;
+let lastBuiltWord = null;
+let sceneParticles = [];
+let characterMood = 'normal'; // 'normal' | 'happy' | 'oops'
+let moodTimer = 0;
+
+function updateMenuBadges() {
+    for (let i = 0; i < 4; i++) {
+        const s = saveData.stars[i] || 0;
+        document.getElementById(`stars-${i}`).textContent = '⭐'.repeat(s) + '☆'.repeat(3 - s);
+    }
+    document.getElementById('total-mastered-badge').textContent = `⭐ ${saveData.mastered.length} / 36 woorden`;
+}
+updateMenuBadges();
+
+function selectEpisode(ep) {
+    selectedEpisode = ep;
+    for (let i = 0; i < 4; i++) document.getElementById(`ep-${i}`).classList.toggle('selected', i === ep);
+    playTone(420 + ep * 45, 0.08, 'sine', 0.09);
+}
+function selectDir(dir) {
+    selectedDir = dir;
+    ['mixed', 'd2w', 'w2d'].forEach(d => document.getElementById(`dir-${d}`).classList.toggle('selected', d === dir));
+    playTone(460, 0.08, 'sine', 0.09);
+}
+function toggleAutoVoice() {
+    autoVoice = !autoVoice;
+    const btn = document.getElementById('voice-toggle');
+    btn.classList.toggle('selected', autoVoice);
+    btn.textContent = autoVoice ? '🔊 Voorlezen: AAN' : '🔇 Voorlezen: UIT';
+    playTone(500, 0.08, 'sine', 0.09);
+}
+
+function openMenu() {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    updateMenuBadges();
+    document.getElementById('win-overlay').style.display = 'none';
+    document.getElementById('menu-overlay').style.display = 'flex';
+}
+
+function startEpisode() {
+    document.getElementById('menu-overlay').style.display = 'none';
+    document.getElementById('win-overlay').style.display = 'none';
+
+    const pool = selectedEpisode === 3 ? [...WORDS] : WORDS.filter(w => w.col === selectedEpisode);
+    // Shuffle zodat het steeds afwisselend blijft
+    queue = pool.sort(() => Math.random() - 0.5);
+    totalSteps = pool.length;
+    builtIds = new Set();
+    mistakesThisEpisode = 0;
+    streak = 0;
+    lastBuiltWord = null;
+    updateHUD();
+    nextQuestion();
+}
+
+function nextOrReplay() {
+    if (selectedEpisode < 3) selectEpisode(selectedEpisode + 1);
+    startEpisode();
+}
+
+function updateHUD() {
+    const done = builtIds.size;
+    const pct = Math.round((done / Math.max(1, totalSteps)) * 100);
+    document.getElementById('progress-fill').style.width = `${pct}%`;
+    document.getElementById('progress-label').textContent = `${done} / ${totalSteps} gebouwd`;
+    document.getElementById('streak-pill').textContent = streak >= 3 ? `🔥 ${streak}×` : `⭐ ${streak}`;
+}
+
+function pickDistractors(target) {
+    // Kies slimme afleiders uit dezelfde groep (bijv. duimstok/meetlint/rolmaat of kaneel/kerrie/nootmuskaat)
+    const sameGroup = WORDS.filter(w => w.id !== target.id && w.group === target.group).sort(() => Math.random() - 0.5);
+    const sameCol = WORDS.filter(w => w.id !== target.id && w.col === target.col && w.group !== target.group).sort(() => Math.random() - 0.5);
+    const others = WORDS.filter(w => w.id !== target.id && w.col !== target.col).sort(() => Math.random() - 0.5);
+    const picked = [];
+    for (const src of [sameGroup, sameCol, others]) {
+        for (const item of src) {
+            if (picked.length < 3) picked.push(item);
+        }
+    }
+    return [target, ...picked].sort(() => Math.random() - 0.5);
+}
+
+function nextQuestion() {
+    if (queue.length === 0) {
+        finishEpisode();
+        return;
+    }
+    locked = false;
+    wrongOnCurrent = false;
+    currentItem = queue.shift();
+
+    if (selectedDir === 'mixed') {
+        currentQType = Math.random() < 0.62 ? 'd2w' : 'w2d';
+    } else {
+        currentQType = selectedDir;
+    }
+
+    const badge = document.getElementById('prompt-badge');
+    const pText = document.getElementById('prompt-text');
+    const hintBox = document.getElementById('prompt-hint');
+    hintBox.style.display = 'none';
+    hintBox.innerHTML = '';
+
+    const themeNames = ['KLUS-KEES', 'BOUW-BRAM', 'BAKKER-LOTJE'];
+    const speakerName = themeNames[currentItem.col];
+
+    if (currentQType === 'd2w') {
+        badge.textContent = `${speakerName} ZOEKT`;
+        badge.style.background = ['#e67e22', '#0984e3', '#e84393'][currentItem.col];
+        pText.textContent = `“${currentItem.desc}”`;
+        if (currentItem.swatch) {
+            hintBox.style.display = 'inline-flex';
+            hintBox.innerHTML = `<span class="swatch-dot" style="background:${currentItem.swatch}"></span> kleur-tip`;
+        }
+    } else {
+        badge.textContent = `WAT BETEKENT`;
+        badge.style.background = '#6c5ce7';
+        pText.textContent = `${currentItem.icon}  ${currentItem.word}`;
+    }
+
+    currentChoices = pickDistractors(currentItem);
+    const grid = document.getElementById('choices-grid');
+    grid.innerHTML = '';
+
+    currentChoices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn' + (currentQType === 'd2w' ? ' is-word' : '');
+        btn.dataset.idx = idx;
+        if (currentQType === 'd2w') {
+            btn.innerHTML = `<span class="choice-num">${idx + 1}</span><span class="choice-icon">${choice.icon}</span><span>${choice.word}</span>`;
+        } else {
+            btn.innerHTML = `<span class="choice-num">${idx + 1}</span><span>${choice.desc}</span>`;
+        }
+        btn.onclick = () => checkAnswer(choice, btn);
+        grid.appendChild(btn);
+    });
+
+    if (autoVoice) speakCurrentPrompt();
+}
+
+function speakCurrentPrompt() {
+    if (!currentItem) return;
+    if (currentQType === 'd2w') {
+        speak(currentItem.desc);
+    } else {
+        speak(`Wat betekent ${currentItem.word.replace('(uitdrukking)', '')}?`);
+    }
+}
+
+function checkAnswer(choice, btn) {
+    if (locked) return;
+
+    if (choice.id === currentItem.id) {
+        locked = true;
+        btn.classList.add('correct');
+        sfxBuild();
+        builtIds.add(currentItem.id);
+        lastBuiltWord = currentItem;
+        celebratePopTimer = 1.4;
+        characterMood = 'happy';
+        moodTimer = 1.3;
+        streak++;
+
+        if (!saveData.mastered.includes(currentItem.id)) {
+            saveData.mastered.push(currentItem.id);
+            writeSave(saveData);
+        }
+
+        // Vonken & sterren op de bouwscène
+        spawnSceneParticles(640, 190, ['#ffd32a', '#2ecc71', '#ff6b81', '#54a0ff'], 34);
+        updateHUD();
+
+        setTimeout(() => {
+            nextQuestion();
+        }, 950);
+    } else {
+        btn.classList.add('wrong');
+        sfxWrong();
+        streak = 0;
+        characterMood = 'oops';
+        moodTimer = 0.9;
+        updateHUD();
+
+        if (!wrongOnCurrent) {
+            wrongOnCurrent = true;
+            mistakesThisEpisode++;
+            // Slimme herhaling: dit woord komt later nog een keer rustig terug!
+            const insertAt = Math.min(queue.length, 3);
+            queue.splice(insertAt, 0, currentItem);
+        }
+
+        // Toon vriendelijke hint over het fout gekozen woord zodat hij direct leert!
+        const hintBox = document.getElementById('prompt-hint');
+        hintBox.style.display = 'inline-flex';
+        hintBox.textContent = `💡 Tip: ${choice.word} = ${choice.desc.slice(0, 42)}${choice.desc.length > 42 ? '…' : ''}`;
+
+        setTimeout(() => btn.classList.remove('wrong'), 480);
+    }
+}
+
+function finishEpisode() {
+    sfxWin();
+    const stars = mistakesThisEpisode <= 1 ? 3 : (mistakesThisEpisode <= 4 ? 2 : 1);
+    if (stars > (saveData.stars[selectedEpisode] || 0)) {
+        saveData.stars[selectedEpisode] = stars;
+        writeSave(saveData);
+    }
+    const epNames = ['Het Klushuis', 'De Bouwplaats & Afvalstraat', 'De Superbakkerij', 'Het Mega-Avontuur'];
+    document.getElementById('win-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+    document.getElementById('win-msg').textContent = `${epNames[selectedEpisode]} is helemaal klaar!`;
+    document.getElementById('win-stats').textContent = `Alle ${totalSteps} themawoorden gebouwd · Foutjes: ${mistakesThisEpisode}`;
+    document.getElementById('win-overlay').style.display = 'flex';
+    if (autoVoice) speak(`Geweldig! ${epNames[selectedEpisode]} is helemaal klaar!`);
+}
+
+window.addEventListener('keydown', (e) => {
+    if (document.getElementById('menu-overlay').style.display !== 'none') return;
+    if (document.getElementById('win-overlay').style.display === 'flex') return;
+    if (['1', '2', '3', '4'].includes(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        const btn = document.querySelector(`.choice-btn[data-idx="${idx}"]`);
+        if (btn && currentChoices[idx]) checkAnswer(currentChoices[idx], btn);
+    }
+});
+
+// ============================================================================
+// LIVE GEANIMEERDE CARTOON SCÈNE (bouwt zichtbaar op bij elk goed woord!)
+// ============================================================================
+function spawnSceneParticles(x, y, colors, count) {
+    for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = 2.5 + Math.random() * 7;
+        sceneParticles.push({
+            x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2.5,
+            size: 6 + Math.random() * 8,
+            color: colors[i % colors.length],
+            life: 1, decay: 0.02 + Math.random() * 0.015
+        });
+    }
+}
+
+function drawHeroCharacter(x, y, hatColor, mood) {
+    const bounce = mood === 'happy' ? Math.abs(Math.sin(sceneTime * 14)) * 18 : Math.sin(sceneTime * 3) * 3;
+    ctx.save();
+    ctx.translate(x, y - bounce);
+    // Lijfje
+    ctx.fillStyle = hatColor;
+    ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.roundRect(-24, -44, 48, 52, 16); ctx.fill(); ctx.stroke();
+    // Hoofdje
+    ctx.fillStyle = '#ffe0bd';
+    ctx.beginPath(); ctx.arc(0, -68, 28, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Pet / Koksmuts
+    ctx.fillStyle = hatColor;
+    ctx.beginPath(); ctx.arc(0, -76, 28, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillRect(-32, -78, 64, 8);
+    // Oogjes
+    ctx.fillStyle = '#2d3436';
+    ctx.beginPath(); ctx.arc(-9, -68, 4, 0, Math.PI * 2); ctx.arc(9, -68, 4, 0, Math.PI * 2); ctx.fill();
+    // Mondje
+    ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    if (mood === 'happy') ctx.arc(0, -61, 10, 0, Math.PI);
+    else if (mood === 'oops') ctx.arc(0, -56, 6, 0, Math.PI * 2);
+    else ctx.arc(0, -62, 8, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawActiveScene() {
+    const W = canvas.width, H = canvas.height;
+    const theme = currentItem ? currentItem.col : (selectedEpisode < 3 ? selectedEpisode : 0);
+
+    // 1. Achtergrond per wereld
+    if (theme === 0) {
+        // HET KLUSHUIS (kamer die steeds mooier wordt!)
+        ctx.fillStyle = builtIds.has(8) ? '#fff6d6' : '#dfe6e9'; // fraai -> warme muurkleur
+        ctx.fillRect(0, 0, W, H);
+        // Bakstenen wand (de wand = id 7)
+        if (builtIds.has(7)) {
+            ctx.fillStyle = '#e17055';
+            ctx.fillRect(40, 48, 300, 240);
+            ctx.strokeStyle = '#fab1a0'; ctx.lineWidth = 3;
+            for (let r = 0; r < 8; r++) {
+                ctx.beginPath(); ctx.moveTo(40, 48 + r * 30); ctx.lineTo(340, 48 + r * 30); ctx.stroke();
+            }
+        }
+        // Vloer
+        ctx.fillStyle = '#c49a6c';
+        ctx.fillRect(0, 285, W, H - 285);
+        ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(0, 285); ctx.lineTo(W, 285); ctx.stroke();
+
+        // Raam + houten luiken (het luik = id 12)
+        ctx.fillStyle = '#74b9ff';
+        ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 5;
+        ctx.fillRect(540, 72, 200, 145); ctx.strokeRect(540, 72, 200, 145);
+        ctx.beginPath(); ctx.moveTo(640, 72); ctx.lineTo(640, 217); ctx.moveTo(540, 144); ctx.lineTo(740, 144); ctx.stroke();
+        if (builtIds.has(12)) {
+            ctx.fillStyle = '#a0522d';
+            ctx.fillRect(492, 72, 48, 145); ctx.strokeRect(492, 72, 48, 145);
+            ctx.fillRect(740, 72, 48, 145); ctx.strokeRect(740, 72, 48, 145);
+        }
+
+        // Meubilair & inrichten (id 1 & 2)
+        if (builtIds.has(1) || builtIds.has(2)) {
+            // Kast
+            ctx.fillStyle = '#d35400'; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 4;
+            ctx.fillRect(880, 130, 120, 155); ctx.strokeRect(880, 130, 120, 155);
+            // Bank
+            ctx.fillStyle = '#00b894';
+            ctx.beginPath(); ctx.roundRect(520, 232, 240, 56, 16); ctx.fill(); ctx.stroke();
+        }
+        if (builtIds.has(3)) { // passen en meten -> schilderij past precies!
+            ctx.fillStyle = '#ffeaa7'; ctx.strokeStyle = '#d63031'; ctx.lineWidth = 5;
+            ctx.fillRect(1040, 96, 120, 88); ctx.strokeRect(1040, 96, 120, 88);
+            ctx.font = '38px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🖼️', 1100, 152);
+        }
+        if (builtIds.has(5) || builtIds.has(8)) { // afwisselend / fraai -> vrolijke slingers
+            const cols = ['#ff4757', '#ffd32a', '#1e90ff', '#2ed573', '#ff6b9d'];
+            for (let i = 0; i < 12; i++) {
+                ctx.fillStyle = cols[i % cols.length];
+                ctx.beginPath();
+                ctx.moveTo(80 + i * 95, 52); ctx.lineTo(125 + i * 95, 52); ctx.lineTo(102 + i * 95, 86);
+                ctx.closePath(); ctx.fill();
+            }
+        }
+        if (builtIds.has(6)) { // het idee -> gloeilampje boven Kees
+            ctx.font = '46px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('💡', 240, 140 + Math.sin(sceneTime * 5) * 6);
+        }
+        if (builtIds.has(9) || builtIds.has(11)) { // gips & krukken badge naast Kees
+            ctx.font = '42px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(builtIds.has(11) ? '🩹🦯' : '🩹', 325, 270);
+        }
+
+        drawHeroCharacter(240, 295, '#ff9f43', characterMood);
+    } else if (theme === 1) {
+        // DE BOUWPLAATS & AFVALSTRAAT
+        const sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#74b9ff'); sky.addColorStop(1, '#dff9fb');
+        ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+        // Grond / asfalt
+        ctx.fillStyle = '#636e72'; ctx.fillRect(0, 272, W, H - 272);
+        ctx.fillStyle = '#ffeaa7';
+        for (let x = 20; x < W; x += 90) ctx.fillRect(x, 322, 48, 8);
+
+        // Afvalbakken (vuilnis=14, gft=15, grofvuil=13, puin=16)
+        const bins = [
+            { id: 14, x: 430, label: 'VUILNIS', col: '#2d3436', icon: '🗑️' },
+            { id: 15, x: 580, label: 'GFT', col: '#27ae60', icon: '🍎' },
+            { id: 13, x: 730, label: 'GROFVUIL', col: '#e67e22', icon: '🛋️' },
+            { id: 16, x: 880, label: 'PUIN', col: '#7f8c8d', icon: '⛰️' }
+        ];
+        bins.forEach(b => {
+            const active = builtIds.has(b.id);
+            ctx.save();
+            ctx.globalAlpha = active ? 1 : 0.35;
+            ctx.fillStyle = b.col; ctx.strokeStyle = '#1e272e'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.roundRect(b.x, 185, 118, 92, 12); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = '900 17px "Fredoka One", sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(b.label, b.x + 59, 258);
+            ctx.font = '34px sans-serif'; ctx.fillText(b.icon, b.x + 59, 228);
+            ctx.restore();
+        });
+
+        // Werkbank met meetinstrumenten (17,18,19,20) + plattegrond (23,24)
+        ctx.fillStyle = '#d35400'; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 4;
+        ctx.fillRect(1040, 210, 200, 68); ctx.strokeRect(1040, 210, 200, 68);
+        let toolsTxt = '';
+        if (builtIds.has(17) || builtIds.has(18)) toolsTxt += '📐';
+        if (builtIds.has(19)) toolsTxt += '🧵';
+        if (builtIds.has(20)) toolsTxt += '📏';
+        if (builtIds.has(23) || builtIds.has(24)) toolsTxt += '🗺️';
+        if (toolsTxt) {
+            ctx.font = '38px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(toolsTxt, 1140, 198);
+        }
+        if (builtIds.has(21)) {
+            ctx.font = '44px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('💡', 1140, 108);
+        }
+
+        drawHeroCharacter(210, 290, '#0984e3', characterMood);
+    } else {
+        // DE SUPERBAKKERIJ
+        ctx.fillStyle = '#fff0f6'; ctx.fillRect(0, 0, W, H);
+        // Tegeltjes
+        ctx.fillStyle = '#ffe3f0';
+        for (let x = 0; x < W; x += 64) {
+            for (let y = 0; y < 240; y += 64) {
+                if (((x / 64) + (y / 64)) % 2 === 0) ctx.fillRect(x, y, 64, 64);
+            }
+        }
+        // Aanrecht
+        ctx.fillStyle = '#f8c291'; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 5;
+        ctx.fillRect(0, 250, W, H - 250); ctx.beginPath(); ctx.moveTo(0, 250); ctx.lineTo(W, 250); ctx.stroke();
+
+        // Oven rechts
+        ctx.fillStyle = '#b2bec3'; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.roundRect(960, 130, 190, 145, 16); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = builtIds.has(33) ? '#ff9f43' : '#636e72'; // bakken -> gloeiende oven!
+        ctx.beginPath(); ctx.roundRect(985, 165, 140, 88, 10); ctx.fill(); ctx.stroke();
+        if (builtIds.has(33)) {
+            ctx.font = '48px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🎂', 1055, 226);
+        }
+
+        // Specerijen-plank bovenin (kaneel=26, kerrie=27, nootmuskaat=28)
+        ctx.fillStyle = '#a0522d'; ctx.fillRect(420, 118, 390, 14);
+        [
+            { id: 26, x: 485, col: '#c68b59', label: 'kaneel' },
+            { id: 27, x: 615, col: '#d4a017', label: 'kerrie' },
+            { id: 28, x: 745, col: '#5c3a21', label: 'nootmuskaat' }
+        ].forEach(sp => {
+            const on = builtIds.has(sp.id) || builtIds.has(25);
+            ctx.save();
+            ctx.globalAlpha = on ? 1 : 0.3;
+            ctx.fillStyle = sp.col; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.roundRect(sp.x - 24, 62, 48, 56, 10); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#2d3436'; ctx.font = '900 13px Nunito, sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(sp.label, sp.x, 146);
+            ctx.restore();
+        });
+
+        // Grote beslagkom + groeiend deeg / taart in het midden!
+        const doughRise = builtIds.has(32) ? 26 + Math.sin(sceneTime * 4) * 5 : (builtIds.has(30) || builtIds.has(31) ? 10 : 0);
+        if (builtIds.has(29) || builtIds.has(30) || builtIds.has(31) || builtIds.has(32)) {
+            ctx.fillStyle = '#ffeaa7'; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(615, 224 - doughRise * 0.5, 58 + doughRise * 0.4, Math.PI, 0); ctx.fill(); ctx.stroke();
+        }
+        ctx.fillStyle = '#ff6b9d'; ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.arc(615, 222, 74, 0, Math.PI); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        // Receptboek links op aanrecht
+        if (builtIds.has(34) || builtIds.has(35) || builtIds.has(36)) {
+            ctx.font = '46px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('📜🥚', 415, 245);
+        }
+
+        drawHeroCharacter(210, 275, '#e84393', characterMood);
+    }
+
+    // Pop-up badge van laatst gebouwde woord!
+    if (celebratePopTimer > 0 && lastBuiltWord) {
+        const s = 1 + Math.sin(celebratePopTimer * 8) * 0.06;
+        ctx.save();
+        ctx.translate(W / 2, 175);
+        ctx.scale(s, s);
+        ctx.fillStyle = 'rgba(46, 204, 113, 0.95)';
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.roundRect(-220, -34, 440, 68, 22); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 30px "Fredoka One", sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(`✅ ${lastBuiltWord.icon} ${lastBuiltWord.word}!`, 0, 2);
+        ctx.restore();
+    }
+
+    // Partikels
+    sceneParticles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    });
+}
+
+let lastFrame = 0;
+function tick(ts) {
+    const dt = Math.min(0.05, (ts - lastFrame) / 1000 || 0.016);
+    lastFrame = ts;
+    sceneTime += dt;
+    if (celebratePopTimer > 0) celebratePopTimer = Math.max(0, celebratePopTimer - dt);
+    if (moodTimer > 0) {
+        moodTimer = Math.max(0, moodTimer - dt);
+        if (moodTimer === 0) characterMood = 'normal';
+    }
+    for (let i = sceneParticles.length - 1; i >= 0; i--) {
+        const p = sceneParticles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= p.decay;
+        if (p.life <= 0) sceneParticles.splice(i, 1);
+    }
+    drawActiveScene();
+    requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

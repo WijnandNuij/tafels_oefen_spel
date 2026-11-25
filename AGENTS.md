@@ -94,4 +94,7 @@ This document describes the purpose, architecture, and strict requirements for b
 | Side / Age | Title | File | Learning Focus |
 | :--- | :--- | :--- | :--- |
 | Left — 7 jaar | Boerderij Reken-Avontuur | `boerderij-reken-avontuur.html` | Tafels van 1 t/m 10 (8-level platformspel) |
+| Left — 7 jaar | De Grote Klus- & Bak-Bouwer | `klus-en-bak-bouwer.html` | 36 themawoorden & betekenissen (interactieve bouw-, afval- en bakwereld) |
+| Left — 7 jaar | Woorden-Kanon | `woorden-kanon.html` | 36 themawoorden & betekenissen (arcade kanon-schietspel met combo's & upgrades) |
+| Left — 7 jaar | Woord-Detective: Kraak de Kluis! | `woord-detective.html` | 36 themawoorden & betekenissen (mysterie met spoor-scanner & laser-koppelkluis) |
 | Right — 3 jaar | Kleuren Mandjes | `kleuren-mandjes.html` | Kleuren herkennen & sorteren (slepen of tikken, Nederlandse stem, ballonnenfeest) |

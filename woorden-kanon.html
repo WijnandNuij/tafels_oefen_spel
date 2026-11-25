@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Woorden-Kanon — Themawoorden Arcade!</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #0d1329;
+            font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 16:9 TV & Chromecast speelveld */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background: #1a2a6c;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        /* Top HUD & Missie-balk (scherpe leesbare tekst voor op de TV!) */
+        #top-hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px 0 12px;
+            z-index: 6;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .hud-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .hud-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pill {
+            pointer-events: auto;
+            background: rgba(15, 23, 52, 0.85);
+            border: 3px solid #70a1ff;
+            color: #ffffff;
+            border-radius: 999px;
+            padding: 4px 13px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.75rem, 1.45vw, 1.1rem);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .pill-btn { cursor: pointer; }
+        .pill-btn:active { transform: scale(0.92); }
+
+        #mission-box {
+            pointer-events: auto;
+            margin: 0 auto;
+            width: 96%;
+            max-width: 1120px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 4px solid #ff9f43;
+            border-radius: 20px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+        }
+        #mission-tag {
+            flex-shrink: 0;
+            background: #ff6b6b;
+            color: #fff;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.72rem, 1.3vw, 0.98rem);
+            padding: 5px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+        #mission-text {
+            flex: 1;
+            font-size: clamp(0.9rem, 2vw, 1.48rem);
+            font-weight: 900;
+            color: #1e272e;
+            line-height: 1.2;
+        }
+        #mission-speak {
+            flex-shrink: 0;
+            width: clamp(38px, 4.6vw, 50px);
+            height: clamp(38px, 4.6vw, 50px);
+            border-radius: 50%;
+            border: 3px solid #1e90ff;
+            background: #dff2ff;
+            font-size: clamp(1.1rem, 2vw, 1.45rem);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 #1e90ff;
+        }
+        #mission-speak:active { transform: translateY(2px); }
+
+        /* Leertip banner onderin bij een misser */
+        #tip-toast {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 7;
+            background: rgba(255, 243, 205, 0.96);
+            border: 4px solid #ffa502;
+            color: #2f3542;
+            border-radius: 18px;
+            padding: 7px 18px;
+            font-weight: 900;
+            font-size: clamp(0.8rem, 1.55vw, 1.15rem);
+            max-width: 88%;
+            text-align: center;
+            display: none;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+        }
+
+        /* Overlays */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)) 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+        .overlay * { touch-action: pan-y; }
+
+        #menu-overlay {
+            background: linear-gradient(155deg, #0f2027 0%, #203a43 45%, #2c5364 100%);
+        }
+        #end-overlay, #shield-overlay {
+            display: none;
+            background: rgba(13, 19, 41, 0.82);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.97);
+            border: 6px solid #1e90ff;
+            border-radius: 28px;
+            padding: 18px 24px 22px 24px;
+            width: 100%;
+            max-width: 840px;
+            margin: auto;
+            flex-shrink: 0;
+            text-align: center;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+        }
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dfe6e9;
+            color: #2d3436;
+            text-decoration: none;
+            border: 3px solid #b2bec3;
+            border-radius: 14px;
+            padding: 6px 14px;
+            font-weight: 900;
+            font-size: 0.92rem;
+            box-shadow: 0 3px 0 #b2bec3;
+        }
+        .home-link:hover { background: #ffeaa7; border-color: #fdcb6e; }
+
+        h1 {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            color: #1e3799;
+            margin: 4px 0;
+            font-size: clamp(1.55rem, 3.8vw, 2.5rem);
+            text-shadow: 2px 2px 0 #dff9fb;
+        }
+        .subtitle {
+            margin: 0 0 12px 0;
+            font-size: clamp(0.9rem, 1.8vw, 1.12rem);
+            font-weight: 800;
+            color: #57606f;
+        }
+        h2 {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.02rem;
+            color: #2d3436;
+            margin: 10px 0 6px 0;
+        }
+        .opt-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .opt-btn {
+            border: 3px solid #ced6e0;
+            background: #f1f2f6;
+            border-radius: 14px;
+            padding: 8px 14px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.92rem;
+            cursor: pointer;
+            color: #2d3436;
+            transition: all 0.12s;
+        }
+        .opt-btn.selected {
+            border-color: #1e90ff;
+            background: #dff2ff;
+            color: #0c4a99;
+            transform: scale(1.03);
+        }
+
+        .start-btn {
+            margin-top: 6px;
+            background: linear-gradient(180deg, #ff7f50 0%, #ff4757 100%);
+            color: #fff;
+            border: none;
+            border-radius: 22px;
+            padding: 12px 42px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(1.25rem, 2.8vw, 1.7rem);
+            cursor: pointer;
+            box-shadow: 0 6px 0 #c0392b, 0 10px 18px rgba(0, 0, 0, 0.22);
+        }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #c0392b; }
+
+        @media (max-height: 480px) {
+            .card { padding: 10px 16px 14px 16px; border-width: 4px; }
+            .subtitle { margin-bottom: 6px; }
+            h2 { margin: 6px 0 4px 0; font-size: 0.9rem; }
+            .opt-btn { padding: 5px 10px; font-size: 0.84rem; }
+            .start-btn { padding: 8px 30px; }
+            #top-hud { padding: 4px 8px 0 8px; gap: 4px; }
+            .pill { padding: 2px 9px; font-size: 0.72rem; border-width: 2px; }
+            #mission-box { padding: 4px 10px; border-width: 3px; border-radius: 14px; gap: 7px; }
+            #mission-tag { padding: 3px 8px; font-size: 0.68rem; }
+            #mission-text { font-size: 0.88rem; line-height: 1.15; }
+            #mission-speak { width: 32px; height: 32px; font-size: 0.95rem; border-width: 2px; }
+        }
+
+        /* Mobiel portret: HUD boven het speelveld (nooit over de ballonnen heen!) */
+        @media (orientation: portrait) {
+            #game-container {
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                max-width: 100vw;
+                max-height: 100dvh;
+                border-radius: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background: linear-gradient(180deg, #0f1b4c 0%, #1d397d 55%, #192a56 100%);
+            }
+            #top-hud {
+                position: relative;
+                padding: max(8px, env(safe-area-inset-top)) 10px 8px 10px;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+            .hud-row { flex-wrap: wrap; justify-content: center; gap: 6px; }
+            .pill { font-size: 0.78rem; padding: 3px 10px; border-width: 2px; }
+            #mission-box { width: 100%; padding: 8px 10px; flex-wrap: wrap; gap: 6px; }
+            #mission-text { font-size: 0.98rem; }
+            canvas {
+                width: 100%;
+                height: auto;
+                max-height: 62dvh;
+                aspect-ratio: 16 / 9;
+                margin: auto 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="top-hud">
+        <div class="hud-row">
+            <div class="hud-group">
+                <button class="pill pill-btn" onclick="openMenu()">📋 Menu</button>
+                <span class="pill" id="hud-progress">🎯 0 / 12</span>
+                <span class="pill" id="hud-cannon">🎯 Basis-Kanon</span>
+            </div>
+            <div class="hud-group">
+                <span class="pill" id="hud-combo" style="border-color:#ffa502;">🔥 0×</span>
+                <span class="pill" id="hud-score" style="border-color:#2ed573;">⭐ 0</span>
+                <span class="pill" id="hud-shields" style="border-color:#ff6b81;">🛡️🛡️🛡️</span>
+            </div>
+        </div>
+        <div id="mission-box">
+            <span id="mission-tag">SCHIET HET WOORD</span>
+            <div id="mission-text">Tik op de juiste ballon om te schieten!</div>
+            <button id="mission-speak" title="Lees voor" aria-label="Lees opdracht voor" onclick="speakPrompt()">🔊</button>
+        </div>
+    </div>
+
+    <div id="tip-toast"></div>
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+</div>
+
+<!-- Start Menu -->
+<div id="menu-overlay" class="overlay">
+    <div class="card">
+        <div class="top-row">
+            <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+            <span style="font-weight:900; color:#57606f; font-size:0.92rem;" id="best-score-badge">🏆 Record: 0</span>
+        </div>
+
+        <h1>🚀 Woorden-Kanon 🎯</h1>
+        <p class="subtitle">Lees (of luister naar) de missie en tik op de juiste zwevende ballon om hem kapot te schieten! Verdien punten voor betere kanonnen!</p>
+
+        <h2>Welk themawoorden-blad wil je spelen?</h2>
+        <div class="opt-row">
+            <button class="opt-btn selected" id="col-0" onclick="pickCol(0)">🏠 Blad 1: Klushuis (12)</button>
+            <button class="opt-btn" id="col-1" onclick="pickCol(1)">🚧 Blad 2: Bouw &amp; Afval (12)</button>
+            <button class="opt-btn" id="col-2" onclick="pickCol(2)">🧁 Blad 3: Bakkerij (12)</button>
+            <button class="opt-btn" id="col-3" onclick="pickCol(3)">🌟 Alle 36 woorden!</button>
+        </div>
+
+        <h2>Speelrichting &amp; snelheid:</h2>
+        <div class="opt-row">
+            <button class="opt-btn selected" id="dir-d2w" onclick="pickDir('d2w')">💬 Omschrijving → Schiet woord</button>
+            <button class="opt-btn" id="dir-mixed" onclick="pickDir('mixed')">🔀 Gemengd</button>
+            <button class="opt-btn" id="dir-w2d" onclick="pickDir('w2d')">📖 Woord → Schiet omschrijving</button>
+        </div>
+        <div class="opt-row">
+            <button class="opt-btn selected" id="spd-calm" onclick="pickSpeed('calm')">🐢 Rustig zweven</button>
+            <button class="opt-btn" id="spd-normal" onclick="pickSpeed('normal')">🚀 Actie-snelheid</button>
+            <button class="opt-btn selected" id="voice-btn" onclick="toggleVoice()">🔊 Voorlezen: AAN</button>
+        </div>
+
+        <button class="start-btn" onclick="startGame()">VUUREN MAAR! 💥</button>
+    </div>
+</div>
+
+<!-- Schild Oplader (bij 0 schilden, nooit game-over!) -->
+<div id="shield-overlay" class="overlay">
+    <div class="card" style="max-width: 560px; border-color: #ffa502;">
+        <h1 style="color:#e67e22;">🛡️ Schilden leeg!</h1>
+        <p class="subtitle" style="margin-bottom:14px;">Geen zorgen! Laad je schilden op en knal direct verder met dezelfde score!</p>
+        <button class="start-btn" style="background:linear-gradient(180deg,#2ed573,#20bf6b); box-shadow:0 6px 0 #168f4d;" onclick="rechargeShields()">⚡ SCHILDEN OPLADEN (+3 🛡️)</button>
+    </div>
+</div>
+
+<!-- Eindscherm -->
+<div id="end-overlay" class="overlay">
+    <div class="card" style="max-width: 640px; border-color: #2ed573;">
+        <h1 style="color:#27ae60;">🏆 MISSIE VOLTOOID! 🚀</h1>
+        <div style="font-size:2.8rem; margin:4px 0;" id="end-rank">🌈 Regenboog-Laser</div>
+        <p style="font-size:1.3rem; font-weight:900; color:#2d3436; margin:8px 0;" id="end-score">Score: 0</p>
+        <p style="font-size:1rem; font-weight:800; color:#57606f; margin:0 0 16px 0;" id="end-stats"></p>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px;">
+            <button class="start-btn" onclick="startGame()">NOG EEN RONDE 🔁</button>
+            <button class="opt-btn" style="font-size:1rem; padding:12px 20px;" onclick="openMenu()">📋 Ander blad</button>
+            <a class="home-link" style="font-size:1rem; padding:10px 18px;" href="index.html">🏠 Alle spellen</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================================
+// EXACTE THEMAWOORDEN (alle 36 woorden + omschrijvingen van het blad)
+// ============================================================================
+const WORDS = [
+    { id: 1, col: 0, group: 'kamer', icon: '🪑', word: 'het meubilair', desc: 'Alle meubels bij elkaar, bijvoorbeeld alle stoelen, kasten en tafels.' },
+    { id: 2, col: 0, group: 'kamer', icon: '🛋️', word: 'inrichten', desc: 'Alle spullen in een kamer op de goede plek neerzetten.' },
+    { id: 3, col: 0, group: 'kamer', icon: '📐', word: 'passen en meten (uitdrukking)', desc: 'Uitproberen of iets ergens in, op of tussen past.' },
+    { id: 4, col: 0, group: 'gevoel', icon: '🥱', word: 'saai', desc: 'Iets is steeds hetzelfde, je verveelt je erbij.' },
+    { id: 5, col: 0, group: 'gevoel', icon: '🎢', word: 'afwisselend', desc: 'Iets is steeds anders, je verveelt je niet.' },
+    { id: 6, col: 0, group: 'klus', icon: '💡', word: 'het idee', desc: 'Iets wat je bedenkt.' },
+    { id: 7, col: 0, group: 'huis', icon: '🧱', word: 'de wand', desc: 'Een muur.' },
+    { id: 8, col: 0, group: 'gevoel', icon: '✨', word: 'fraai', desc: 'Mooi.' },
+    { id: 9, col: 0, group: 'been', icon: '🩹', word: 'het gips', desc: 'Verband dat heel hard wordt. De dokter doet gips om je been als het gebroken is.' },
+    { id: 10, col: 0, group: 'klus', icon: '🔨', word: 'het karwei', desc: 'Een klus, werk dat je moet doen.' },
+    { id: 11, col: 0, group: 'been', icon: '🦯', word: 'de krukken', desc: 'Stokken waar je op kunt steunen als je moeilijk kunt lopen, bijvoorbeeld als je been gebroken is.' },
+    { id: 12, col: 0, group: 'huis', icon: '🚪', word: 'het luik', desc: 'Een soort deurtje van hout dat aan de buitenkant van een raam zit.' },
+
+    { id: 13, col: 1, group: 'afval', icon: '🛋️', word: 'het grofvuil', desc: 'Alles wat je weggooit en niet in de vuilnisbak past.' },
+    { id: 14, col: 1, group: 'afval', icon: '🗑️', word: 'het vuilnis', desc: 'Dingen die je niet meer gebruikt en weggooit, zoals lege melkpakken.' },
+    { id: 15, col: 1, group: 'afval', icon: '🍎', word: 'het gft', desc: 'Een afkorting van groente-, fruit- en tuinafval.' },
+    { id: 16, col: 1, group: 'afval', icon: '⛰️', word: 'het puin', desc: 'Brokken steen die je weggooit.' },
+    { id: 17, col: 1, group: 'meten', icon: '📏', word: 'het meetinstrument', desc: 'Gereedschap waarmee je kunt meten.' },
+    { id: 18, col: 1, group: 'meten', icon: '📐', word: 'de duimstok', desc: 'Een liniaal die je kunt opvouwen.' },
+    { id: 19, col: 1, group: 'meten', icon: '🧵', word: 'het meetlint', desc: 'Een stuk slappe stof of slap plastic waarmee je kunt meten.' },
+    { id: 20, col: 1, group: 'meten', icon: '📟', word: 'de rolmaat', desc: 'Een liniaal die je kunt oprollen.' },
+    { id: 21, col: 1, group: 'huis', icon: '💡', word: 'de lampenkap', desc: 'Een kap die om de lamp zit.' },
+    { id: 22, col: 1, group: 'been', icon: '🦘', word: 'hinken', desc: 'Met kleine schokjes lopen, bijvoorbeeld doordat je voet pijn doet.' },
+    { id: 23, col: 1, group: 'plan', icon: '🗺️', word: 'de plattegrond', desc: 'Een tekening waarop je een stad of gebied van bovenaf ziet.' },
+    { id: 24, col: 1, group: 'plan', icon: '✏️', word: 'ontwerpen', desc: 'Iets bedenken en op papier tekenen.' },
+
+    { id: 25, col: 2, group: 'kruiden', icon: '🌶️', word: 'de specerijen', desc: 'Gedroogde, fijngemalen delen van planten die het eten smaak geven.' },
+    { id: 26, col: 2, group: 'kruiden', icon: '🟤', word: 'het kaneel', desc: 'Een lichtbruin specerij.', swatch: '#c68b59' },
+    { id: 27, col: 2, group: 'kruiden', icon: '🟡', word: 'de kerrie', desc: 'Een donkergeel specerij.', swatch: '#d4a017' },
+    { id: 28, col: 2, group: 'kruiden', icon: '🌰', word: 'de nootmuskaat', desc: 'Een donkerbruin specerij.', swatch: '#5c3a21' },
+    { id: 29, col: 2, group: 'deeg', icon: '🌾', word: 'het bakmeel', desc: 'Poeder (van graan) waarmee je bijvoorbeeld een taart of een brood kunt bakken.' },
+    { id: 30, col: 2, group: 'deeg', icon: '🥣', word: 'het deeg', desc: 'Bakmeel dat is vermengd met water, boter en suiker. Deeg moet je kneden.' },
+    { id: 31, col: 2, group: 'deeg', icon: '👐', word: 'kneden', desc: 'Steeds in het deeg knijpen om het soepel te maken.' },
+    { id: 32, col: 2, group: 'deeg', icon: '⬆️', word: 'rijzen', desc: 'Omhoogkomen van deeg. Dat komt omdat er meer lucht in komt.' },
+    { id: 33, col: 2, group: 'bakken', icon: '🔥', word: 'bakken', desc: 'In de pan of de oven gaar laten worden.' },
+    { id: 34, col: 2, group: 'recept', icon: '👩‍🍳', word: 'de bereidingswijze', desc: 'De manier (wijze) hoe je het eten kunt klaarmaken (bereiden).' },
+    { id: 35, col: 2, group: 'recept', icon: '🥚', word: 'de ingrediënten', desc: 'De dingen waarvan het eten gemaakt is.' },
+    { id: 36, col: 2, group: 'recept', icon: '📜', word: 'het recept', desc: 'Een tekst waarop de ingrediënten en de bereidingswijze van een gerecht staan.' }
+];
+
+// --- Web Audio ---
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function tone(f, d = 0.14, type = 'sine', v = 0.12, delay = 0) {
+    try {
+        if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const t = audioCtx.currentTime + delay;
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = type; o.frequency.setValueAtTime(f, t);
+        g.gain.setValueAtTime(v, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + d + 0.02);
+    } catch {}
+}
+function sfxShoot() { tone(520, 0.08, 'triangle', 0.12); tone(260, 0.12, 'square', 0.08, 0.03); }
+function sfxHit() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.2, 'triangle', 0.13, i * 0.055)); }
+function sfxMiss() { tone(240, 0.15, 'sine', 0.12); tone(180, 0.22, 'sine', 0.11, 0.09); }
+function sfxWin() { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, 0.28, 'triangle', 0.14, i * 0.085)); }
+
+// --- Nederlandse stem ---
+let nlVoice = null;
+function loadVoice() {
+    if (!('speechSynthesis' in window)) return;
+    const vs = window.speechSynthesis.getVoices();
+    nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+           || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
+}
+if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
+function speak(txt) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(txt);
+        u.lang = 'nl-NL';
+        if (nlVoice) u.voice = nlVoice;
+        u.rate = 0.96; u.pitch = 1.08;
+        window.speechSynthesis.speak(u);
+    } catch {}
+}
+
+// --- Instellingen & Record ---
+let selectedCol = 0;
+let selectedDir = 'd2w';
+let speedMode = 'calm';
+let autoVoice = true;
+const BEST_KEY = 'woorden_kanon_best_v1';
+let bestScore = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0;
+document.getElementById('best-score-badge').textContent = `🏆 Record: ${bestScore}`;
+
+function pickCol(c) {
+    selectedCol = c;
+    [0,1,2,3].forEach(i => document.getElementById(`col-${i}`).classList.toggle('selected', i === c));
+    tone(420 + c * 40, 0.07);
+}
+function pickDir(d) {
+    selectedDir = d;
+    ['d2w','mixed','w2d'].forEach(k => document.getElementById(`dir-${k}`).classList.toggle('selected', k === d));
+    tone(460, 0.07);
+}
+function pickSpeed(s) {
+    speedMode = s;
+    ['calm','normal'].forEach(k => document.getElementById(`spd-${k}`).classList.toggle('selected', k === s));
+    tone(480, 0.07);
+}
+function toggleVoice() {
+    autoVoice = !autoVoice;
+    const b = document.getElementById('voice-btn');
+    b.classList.toggle('selected', autoVoice);
+    b.textContent = autoVoice ? '🔊 Voorlezen: AAN' : '🔇 Voorlezen: UIT';
+    tone(500, 0.07);
+}
+
+// --- Canvas & Spelstatus ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 1280, H = 720;
+
+let running = false;
+let time = 0;
+let queue = [];
+let clearedCount = 0;
+let totalWords = 12;
+let score = 0;
+let combo = 0;
+let maxCombo = 0;
+let shields = 3;
+let misses = 0;
+let currentWord = null;
+let currentMode = 'd2w';
+let waveLocked = false;
+let missedCurrentOnce = false;
+
+let targets = [];
+let projectiles = [];
+let particles = [];
+let floats = [];
+let starsBg = Array.from({ length: 55 }, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    r: 1.2 + Math.random() * 2.4, p: Math.random() * Math.PI * 2
+}));
+
+const cannon = { x: W / 2, y: H - 46, angle: -Math.PI / 2, targetAngle: -Math.PI / 2, recoil: 0 };
+
+function getCannonTier() {
+    if (score >= 1200) return { name: '🌈 Regenboog-Laser', color: '#ff66a6', glow: '#ffd32a', level: 3 };
+    if (score >= 500) return { name: '⭐ Sterren-Kanon', color: '#1e90ff', glow: '#70a1ff', level: 2 };
+    return { name: '🎯 Basis-Kanon', color: '#e67e22', glow: '#ffa502', level: 1 };
+}
+
+function openMenu() {
+    running = false;
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.getElementById('best-score-badge').textContent = `🏆 Record: ${bestScore}`;
+    document.getElementById('end-overlay').style.display = 'none';
+    document.getElementById('shield-overlay').style.display = 'none';
+    document.getElementById('menu-overlay').style.display = 'flex';
+}
+
+function startGame() {
+    document.getElementById('menu-overlay').style.display = 'none';
+    document.getElementById('end-overlay').style.display = 'none';
+    document.getElementById('shield-overlay').style.display = 'none';
+    document.getElementById('tip-toast').style.display = 'none';
+
+    const pool = selectedCol === 3 ? [...WORDS] : WORDS.filter(w => w.col === selectedCol);
+    queue = pool.sort(() => Math.random() - 0.5);
+    totalWords = pool.length;
+    clearedCount = 0;
+    score = 0;
+    combo = 0;
+    maxCombo = 0;
+    shields = 3;
+    misses = 0;
+    projectiles = [];
+    particles = [];
+    floats = [];
+    running = true;
+    updateHUD();
+    spawnWave();
+}
+
+function rechargeShields() {
+    shields = 3;
+    document.getElementById('shield-overlay').style.display = 'none';
+    running = true;
+    updateHUD();
+    sfxHit();
+}
+
+function updateHUD() {
+    document.getElementById('hud-progress').textContent = `🎯 ${clearedCount} / ${totalWords}`;
+    document.getElementById('hud-cannon').textContent = getCannonTier().name;
+    document.getElementById('hud-combo').textContent = `🔥 ${combo}×`;
+    document.getElementById('hud-score').textContent = `⭐ ${score}`;
+    document.getElementById('hud-shields').textContent = '🛡️'.repeat(shields) + '🖤'.repeat(Math.max(0, 3 - shields));
+}
+
+function pickChoices(target) {
+    const sameG = WORDS.filter(w => w.id !== target.id && w.group === target.group).sort(() => Math.random() - 0.5);
+    const sameC = WORDS.filter(w => w.id !== target.id && w.col === target.col && w.group !== target.group).sort(() => Math.random() - 0.5);
+    const rest = WORDS.filter(w => w.id !== target.id && w.col !== target.col).sort(() => Math.random() - 0.5);
+    const out = [];
+    for (const s of [sameG, sameC, rest]) {
+        for (const x of s) if (out.length < 3) out.push(x);
+    }
+    return [target, ...out].sort(() => Math.random() - 0.5);
+}
+
+const BALLOON_COLORS = [
+    { fill: '#ff5252', border: '#b33939' },
+    { fill: '#2ed573', border: '#1e8449' },
+    { fill: '#3742fa', border: '#1e2799' },
+    { fill: '#ffa502', border: '#cc7a00' }
+];
+
+function spawnWave() {
+    if (queue.length === 0) {
+        finishGame();
+        return;
+    }
+    waveLocked = false;
+    missedCurrentOnce = false;
+    currentWord = queue.shift();
+    currentMode = selectedDir === 'mixed' ? (Math.random() < 0.65 ? 'd2w' : 'w2d') : selectedDir;
+
+    const tag = document.getElementById('mission-tag');
+    const txt = document.getElementById('mission-text');
+    if (currentMode === 'd2w') {
+        tag.textContent = '🎯 SCHIET HET WOORD';
+        tag.style.background = '#ff4757';
+        txt.textContent = currentWord.desc;
+    } else {
+        tag.textContent = '🎯 SCHIET DE BETEKENIS';
+        tag.style.background = '#5352ed';
+        txt.textContent = `${currentWord.icon}  ${currentWord.word}`;
+    }
+
+    const choices = pickChoices(currentWord);
+    const isWordCards = currentMode === 'd2w';
+    const cardW = isWordCards ? 276 : 292;
+    const cardH = isWordCards ? 116 : 158;
+    const xs = [176, 484, 796, 1104];
+    const baseYs = [375, 435, 375, 435];
+
+    targets = choices.map((item, idx) => ({
+        item,
+        idx,
+        x: xs[idx],
+        baseX: xs[idx],
+        y: baseYs[idx],
+        baseY: baseYs[idx],
+        w: cardW,
+        h: cardH,
+        color: BALLOON_COLORS[idx % 4],
+        phase: idx * 1.55,
+        alive: true,
+        hitScale: 1
+    }));
+
+    if (autoVoice) speakPrompt();
+}
+
+function speakPrompt() {
+    if (!currentWord) return;
+    if (currentMode === 'd2w') speak(currentWord.desc);
+    else speak(`Wat betekent ${currentWord.word.replace('(uitdrukking)', '')}?`);
+}
+
+function showTip(msg) {
+    const el = document.getElementById('tip-toast');
+    el.textContent = msg;
+    el.style.display = 'block';
+    clearTimeout(showTip._t);
+    showTip._t = setTimeout(() => { el.style.display = 'none'; }, 3800);
+}
+
+function fireAtTarget(target) {
+    if (!running || waveLocked || !target || !target.alive) return;
+    const dx = target.x - cannon.x;
+    const dy = target.y - cannon.y;
+    cannon.targetAngle = Math.atan2(dy, dx);
+    cannon.angle = cannon.targetAngle;
+    cannon.recoil = 14;
+    sfxShoot();
+
+    const tier = getCannonTier();
+    projectiles.push({
+        x: cannon.x + Math.cos(cannon.angle) * 58,
+        y: cannon.y + Math.sin(cannon.angle) * 58,
+        target,
+        speed: 1450,
+        color: tier.color,
+        glow: tier.glow
+    });
+}
+
+function handleImpact(target) {
+    if (!target.alive) return;
+    target.alive = false;
+
+    if (target.item.id === currentWord.id) {
+        waveLocked = true;
+        sfxHit();
+        clearedCount++;
+        combo++;
+        if (combo > maxCombo) maxCombo = combo;
+        const pts = 100 + Math.min(combo - 1, 5) * 25;
+        score += pts;
+        if (combo % 3 === 0 && shields < 3) shields++;
+        if (score > bestScore) {
+            bestScore = score;
+            try { localStorage.setItem(BEST_KEY, String(bestScore)); } catch {}
+        }
+
+        spawnExplosion(target.x, target.y, ['#ffd32a', '#2ed573', '#ff6b81', '#70a1ff', '#ffffff'], 42);
+        floats.push({ x: target.x, y: target.y - 20, text: combo >= 2 ? `+${pts} 🔥${combo}×` : `+${pts} ⭐`, color: '#ffd32a', life: 1.2 });
+        updateHUD();
+
+        setTimeout(() => {
+            if (running) spawnWave();
+        }, 720);
+    } else {
+        sfxMiss();
+        combo = 0;
+        misses++;
+        shields = Math.max(0, shields - 1);
+        spawnExplosion(target.x, target.y, ['#ced6e0', '#ff6b81'], 18);
+        floats.push({ x: target.x, y: target.y, text: 'Oeps! Probeer nog eens!', color: '#ff9f43', life: 1.2 });
+        showTip(`💡 ${target.item.word} = ${target.item.desc}`);
+
+        if (!missedCurrentOnce) {
+            missedCurrentOnce = true;
+            const at = Math.min(queue.length, 3);
+            queue.splice(at, 0, currentWord);
+        }
+        updateHUD();
+
+        if (shields === 0) {
+            running = false;
+            setTimeout(() => { document.getElementById('shield-overlay').style.display = 'flex'; }, 450);
+        }
+    }
+}
+
+function finishGame() {
+    running = false;
+    sfxWin();
+    const tier = getCannonTier();
+    document.getElementById('end-rank').textContent = tier.name;
+    document.getElementById('end-score').textContent = `⭐ Score: ${score}  (Record: ${bestScore})`;
+    document.getElementById('end-stats').textContent = `Alle ${totalWords} themawoorden geraakt · Hoogste combo: ${maxCombo}× · Missers: ${misses}`;
+    document.getElementById('end-overlay').style.display = 'flex';
+    if (autoVoice) speak(`Hoera! Missie voltooid met ${score} punten!`);
+}
+
+function spawnExplosion(x, y, colors, n) {
+    for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = 2.5 + Math.random() * 8.5;
+        particles.push({
+            x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.5,
+            r: 4 + Math.random() * 7,
+            color: colors[i % colors.length],
+            life: 1, decay: 0.02 + Math.random() * 0.018
+        });
+    }
+}
+
+// --- Touch / Klik / Toetsenbord ---
+canvas.addEventListener('pointerdown', (e) => {
+    if (!running || waveLocked) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = ((e.clientX - rect.left) / rect.width) * W;
+    const my = ((e.clientY - rect.top) / rect.height) * H;
+
+    for (const t of targets) {
+        if (!t.alive) continue;
+        if (mx >= t.x - t.w / 2 - 14 && mx <= t.x + t.w / 2 + 14 &&
+            my >= t.y - t.h / 2 - 44 && my <= t.y + t.h / 2 + 14) {
+            fireAtTarget(t);
+            return;
+        }
+    }
+});
+
+window.addEventListener('keydown', (e) => {
+    if (!running || waveLocked) return;
+    if (['1', '2', '3', '4'].includes(e.key)) {
+        const t = targets[parseInt(e.key, 10) - 1];
+        if (t && t.alive) fireAtTarget(t);
+    }
+});
+
+// --- Tekenfuncties ---
+function wrapLines(text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for (const w of words) {
+        const test = line ? `${line} ${w}` : w;
+        if (ctx.measureText(test).width > maxWidth && line) {
+            lines.push(line);
+            line = w;
+        } else {
+            line = test;
+        }
+    }
+    if (line) lines.push(line);
+    return lines;
+}
+
+function drawTarget(t) {
+    if (!t.alive) return;
+    ctx.save();
+    ctx.translate(t.x, t.y);
+
+    // Ballon boven de kaart
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-26, -t.h / 2); ctx.lineTo(-10, -t.h / 2 - 36);
+    ctx.moveTo(26, -t.h / 2); ctx.lineTo(10, -t.h / 2 - 36);
+    ctx.stroke();
+
+    ctx.fillStyle = t.color.fill;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.ellipse(0, -t.h / 2 - 52, 34, 28, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // Nummer-badge op ballon (1-4)
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 22px "Fredoka One", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(t.idx + 1), 0, -t.h / 2 - 51);
+
+    // Kaart
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = t.color.fill;
+    ctx.lineWidth = 6;
+    ctx.shadowColor = 'rgba(0,0,0,0.32)';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.roundRect(-t.w / 2, -t.h / 2, t.w, t.h, 20);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    // Inhoud (woord of omschrijving)
+    ctx.fillStyle = '#1e272e';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    if (currentMode === 'd2w') {
+        // Icoon + groot leesbaar woord
+        ctx.font = '32px sans-serif';
+        ctx.fillText(t.item.icon, 0, -24);
+        ctx.font = '900 24px "Fredoka One", sans-serif';
+        const lines = wrapLines(t.item.word, t.w - 28);
+        const startY = lines.length > 1 ? 14 : 24;
+        lines.forEach((ln, i) => ctx.fillText(ln, 0, startY + i * 26));
+    } else {
+        ctx.font = '900 18px "Nunito", sans-serif';
+        const lines = wrapLines(t.item.desc, t.w - 24);
+        const lineH = 22;
+        const startY = -((lines.length - 1) * lineH) / 2;
+        lines.forEach((ln, i) => ctx.fillText(ln, 0, startY + i * lineH));
+    }
+    ctx.restore();
+}
+
+function drawCannon() {
+    const tier = getCannonTier();
+    ctx.save();
+    ctx.translate(cannon.x, cannon.y);
+
+    // Loop
+    ctx.save();
+    ctx.rotate(cannon.angle);
+    const rx = -cannon.recoil;
+    ctx.fillStyle = tier.color;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.roundRect(rx, -20, 74, 40, 14);
+    ctx.fill(); ctx.stroke();
+    // Monding
+    ctx.fillStyle = tier.glow;
+    ctx.fillRect(rx + 60, -22, 16, 44);
+    ctx.restore();
+
+    // Basis koepel
+    ctx.fillStyle = '#2f3542';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(0, 8, 46, Math.PI, 0);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = tier.glow;
+    ctx.beginPath();
+    ctx.arc(0, 0, 16, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+let lastTs = 0;
+function loop(ts) {
+    const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0.016);
+    lastTs = ts;
+    time += dt;
+
+    // Achtergrond (ruimte-hemel)
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0f1b4c');
+    g.addColorStop(0.7, '#224694');
+    g.addColorStop(1, '#3b73d1');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // Sterretjes
+    starsBg.forEach(s => {
+        ctx.fillStyle = `rgba(255,255,255,${0.35 + 0.55 * Math.abs(Math.sin(time * 1.8 + s.p))})`;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // Platform onderaan
+    ctx.fillStyle = '#192a56';
+    ctx.fillRect(0, H - 40, W, 40);
+    ctx.fillStyle = '#48dbfb';
+    ctx.fillRect(0, H - 42, W, 4);
+
+    // Update targets (rustig zweven zonder overlap!)
+    const ampX = speedMode === 'normal' ? 24 : 10;
+    const ampY = speedMode === 'normal' ? 22 : 11;
+    const spd = speedMode === 'normal' ? 2.1 : 1.15;
+    targets.forEach(t => {
+        if (!t.alive) return;
+        t.x = t.baseX + Math.sin(time * spd + t.phase) * ampX;
+        t.y = t.baseY + Math.cos(time * (spd * 0.85) + t.phase) * ampY;
+        drawTarget(t);
+    });
+
+    // Update projectielen
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        const p = projectiles[i];
+        const dx = p.target.x - p.x;
+        const dy = p.target.y - p.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 34) {
+            handleImpact(p.target);
+            projectiles.splice(i, 1);
+            continue;
+        }
+        p.x += (dx / dist) * p.speed * dt;
+        p.y += (dy / dist) * p.speed * dt;
+        // Lichtspoor
+        ctx.save();
+        ctx.fillStyle = p.glow;
+        ctx.shadowColor = p.glow; ctx.shadowBlur = 18;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    }
+
+    if (cannon.recoil > 0) cannon.recoil = Math.max(0, cannon.recoil - 65 * dt);
+    drawCannon();
+
+    // Partikels & zwevende teksten
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.life -= p.decay;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    }
+    for (let i = floats.length - 1; i >= 0; i--) {
+        const f = floats[i];
+        f.y -= 48 * dt; f.life -= dt;
+        if (f.life <= 0) { floats.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, f.life);
+        ctx.font = '900 32px "Fredoka One", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#1e272e'; ctx.lineWidth = 6;
+        ctx.strokeText(f.text, f.x, f.y);
+        ctx.fillStyle = f.color;
+        ctx.fillText(f.text, f.x, f.y);
+        ctx.restore();
+    }
+
+    requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

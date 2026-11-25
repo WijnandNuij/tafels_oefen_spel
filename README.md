@@ -12,6 +12,12 @@ Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
 ### 🚀 7 jaar (links)
 - **[Boerderij Reken-Avontuur](boerderij-reken-avontuur.html)** 🚜🌾  
   Een kindvriendelijk 2D-platformspel met 8 unieke boerderijlevels om de tafels van 1 t/m 10 te oefenen. Met kiesbare boer (Boer Teun / Boerin Saar), instelbare tafels en moeilijkheidsgraad, bonus `?-kisten`, hartjes met reddings-som en grote knoppen voor telefoon & TV.
+- **[De Grote Klus- & Bak-Bouwer](klus-en-bak-bouwer.html)** 🏗️🧁  
+  Bouw live op het scherm het Klushuis, de Bouwplaats & Afvalstraat en de Superbakkerij terwijl je spelenderwijs alle 36 themawoorden en exacte omschrijvingen oefent (per blad of alles door elkaar, met voorleesknop).
+- **[Woorden-Kanon](woorden-kanon.html)** 🚀🎯  
+  Arcade schietspel met de 36 themawoorden: tik op de juiste zwevende ballon om hem kapot te schieten, bouw combo's op en speel betere kanonnen vrij (*Houten Kanon* → *Sterren-Kanon* → *Regenboog-Laser*).
+- **[Woord-Detective: Kraak de Kluis!](woord-detective.html)** 🕵️🔐  
+  Kraak de 3 kluizen van Karel de Knoeier met de spoor-scanner én de laser-koppelkluis (3 woorden tegelijk koppelen aan hun exacte omschrijving).
 
 ### 🦄 3 jaar (rechts)
 - **[Kleuren Mandjes](kleuren-mandjes.html)** 🧺🌈  
