@@ -102,3 +102,5 @@ This document describes the purpose, architecture, and strict requirements for b
 | Left — 7 jaar | Woorden-Kanon | `woorden-kanon.html` | 36 themawoorden & betekenissen (arcade kanon-schietspel met combo's & upgrades) |
 | Left — 7 jaar | Woord-Detective: Kraak de Kluis! | `woord-detective.html` | 36 themawoorden & betekenissen (mysterie met spoor-scanner & laser-koppelkluis) |
 | Right — 3 jaar | Kleuren Mandjes | `kleuren-mandjes.html` | Kleuren herkennen & sorteren (slepen of tikken, Nederlandse stem, ballonnenfeest) |
+| Right — 3 jaar | De Kleuren-Trein | `kleuren-trein.html` | Kleurpatronen herkennen & afmaken (ABAB, AABB, ABC, ritmische Nederlandse stem, regenboog-feesttrein) |
+| Right — 3 jaar | Kleur & Vorm Kroon-Maker | `kleur-en-vorm-kroon.html` | Kleur én vorm combineren met slimme afleiders (prinsessenkroon versieren, Nederlandse stem, 3 niveaus) |

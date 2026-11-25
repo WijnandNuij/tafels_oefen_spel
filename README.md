@@ -22,6 +22,10 @@ Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
 ### 🦄 3 jaar (rechts)
 - **[Kleuren Mandjes](kleuren-mandjes.html)** 🧺🌈  
   Een vrolijk kleurensorteerspel speciaal voor peuters (geen lezen nodig!). Sleep of tik schattige gekleurde plaatjes (aardbei, sterretje, walvis, kikker, bloem en meer) naar het juiste levende kleuren-mandje. Met Nederlandse stem, groeiende regenboog, eenhoorn-feestje met ballonnen om kapot te tikken en ouder-instellingen (3, 4 of 6 kleuren).
+- **[De Kleuren-Trein](kleuren-trein.html)** 🚂🌈  
+  Kleurpatronen afmaken (`ABAB`, `AABB`, `ABC` en gat in het midden): de trein zegt het patroon ritmisch voor, jij sleept of tikt de juiste wagon eraan voor een vrolijk *TOET TOET!*-feestje en de regenboog-feesttrein.
+- **[Kleur & Vorm Kroon-Maker](kleur-en-vorm-kroon.html)** 👑✨  
+  Combineer **kleur én vorm** tegelijk (bijv. *de blauwe ster* tussen een *rode ster* en een *blauw hartje*) om de gouden prinsessenkroon met 6 glinsterende juwelen te versieren — met 3 moeilijkheidsniveaus in het oudermenu.
 
 ## Spelen (Tip voor Android + Chromecast naar TV!)
 Open [`index.html`](index.html) direct in je browser, of activeer **GitHub Pages** in de repository-instellingen om alle spellen direct online op telefoon en Chromecast/TV te spelen.

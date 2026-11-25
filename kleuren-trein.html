@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>De Kleuren-Trein — Kleurpatronen Leren!</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1e3c72">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚂</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-height: 100dvh;
+            max-width: 177.78vh;
+            max-width: 177.78dvh;
+            background: #7ad7ff;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        :fullscreen #game-container {
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        #parent-gear-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(4px);
+            font-size: 1.45rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+            touch-action: manipulation;
+        }
+
+        #parent-gear-btn:active {
+            transform: scale(0.9);
+        }
+
+        @media (max-width: 520px) {
+            #parent-gear-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.05rem;
+                top: 6px;
+                right: 6px;
+                border-width: 2px;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)) 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+
+        .overlay * {
+            touch-action: pan-y;
+        }
+
+        #start-overlay {
+            background: linear-gradient(155deg, #48dbfb 0%, #55efc4 48%, #feca57 100%);
+        }
+
+        #settings-overlay {
+            display: none;
+            background: rgba(24, 34, 68, 0.74);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            border: 7px solid #ff9f43;
+            border-radius: 32px;
+            padding: 20px 26px 24px 26px;
+            width: 100%;
+            max-width: 740px;
+            margin: auto;
+            flex-shrink: 0;
+            text-align: center;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f2f6;
+            color: #2d3436;
+            text-decoration: none;
+            border: 3px solid #ced6e0;
+            border-radius: 16px;
+            padding: 7px 14px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            box-shadow: 0 3px 0 #ced6e0;
+        }
+
+        .home-link:hover {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+        }
+
+        .small-gear {
+            background: #fff3e0;
+            color: #c25e00;
+            border: 3px solid #ffb142;
+            border-radius: 16px;
+            padding: 7px 13px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #ffb142;
+        }
+
+        .hero-train {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0 10px 0;
+        }
+
+        .hero-car {
+            width: 56px;
+            height: 46px;
+            border-radius: 14px;
+            border: 4px solid #2d3436;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.5rem;
+            color: #fff;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.16);
+            animation: chug 1.6s ease-in-out infinite;
+        }
+
+        .hero-car:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .hero-car:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .hero-car:nth-child(4) {
+            animation-delay: 0.45s;
+        }
+
+        .hero-car:nth-child(5) {
+            animation-delay: 0.6s;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', 'Trebuchet MS', cursive, sans-serif;
+            color: #e67e22;
+            margin: 6px 0 4px 0;
+            font-size: clamp(1.9rem, 4.6vw, 3rem);
+            text-shadow: 2px 3px 0 #ffeaa7;
+        }
+
+        .subtitle {
+            margin: 0 0 18px 0;
+            font-size: clamp(1rem, 2.2vw, 1.24rem);
+            font-weight: 800;
+            color: #57606f;
+        }
+
+        .big-play-btn {
+            background: linear-gradient(180deg, #2ed573 0%, #20bf6b 100%);
+            color: #fff;
+            border: 5px solid #fff;
+            border-radius: 30px;
+            padding: 18px 54px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(1.7rem, 4vw, 2.5rem);
+            cursor: pointer;
+            box-shadow: 0 9px 0 #168f4d, 0 14px 26px rgba(32, 191, 107, 0.42);
+            letter-spacing: 1px;
+        }
+
+        .big-play-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #168f4d;
+        }
+
+        .settings-title {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            color: #e67e22;
+            font-size: 1.65rem;
+            margin: 4px 0 10px 0;
+        }
+
+        .setting-group {
+            margin: 11px 0;
+            text-align: center;
+        }
+
+        .setting-label {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.06rem;
+            color: #2d3436;
+            margin: 0 0 7px 0;
+        }
+
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .opt-btn {
+            border: 3px solid #ced6e0;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 9px 15px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.94rem;
+            color: #2d3436;
+            cursor: pointer;
+        }
+
+        .opt-btn.selected {
+            border-color: #ff9f43;
+            background: #fff3d6;
+            color: #b35900;
+            transform: scale(1.03);
+        }
+
+        .close-settings-btn {
+            margin-top: 14px;
+            background: #2ed573;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 34px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.35rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #168f4d;
+        }
+
+        @media (max-height: 480px) {
+            .card {
+                padding: 12px 18px 16px 18px;
+                border-width: 5px;
+                border-radius: 24px;
+            }
+
+            .hero-car {
+                width: 44px;
+                height: 36px;
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            .subtitle {
+                font-size: 0.92rem;
+                margin-bottom: 10px;
+            }
+
+            .big-play-btn {
+                padding: 11px 38px;
+                font-size: 1.55rem;
+            }
+        }
+
+        @keyframes chug {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-container">
+        <button id="parent-gear-btn" aria-label="Ouder-instellingen" onclick="openSettings()">⚙️</button>
+
+        <!-- Startscherm -->
+        <div id="start-overlay" class="overlay">
+            <div class="card">
+                <div class="top-bar">
+                    <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button class="small-gear" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
+                        <button class="small-gear" onclick="openSettings()">⚙️ Ouders</button>
+                    </div>
+                </div>
+
+                <div class="hero-train" aria-hidden="true">
+                    <span class="hero-car" style="background:#2d3436;">🚂</span>
+                    <span class="hero-car" style="background:#ff3b4e;">🍓</span>
+                    <span class="hero-car" style="background:#ffd000;">⭐</span>
+                    <span class="hero-car" style="background:#ff3b4e;">🍓</span>
+                    <span class="hero-car" style="background:#ffffff; color:#e67e22; border-style:dashed;">?</span>
+                </div>
+
+                <h1>🚂 De Kleuren-Trein 🌈</h1>
+                <p class="subtitle">Welke kleur wagon hoort er bij het patroon? Maak de trein helemaal af!</p>
+
+                <button class="big-play-btn" onclick="startGame()">▶ SPEEL!</button>
+            </div>
+        </div>
+
+        <!-- Ouder-instellingen -->
+        <div id="settings-overlay" class="overlay">
+            <div class="card" style="border-color:#48dbfb;">
+                <div class="top-bar">
+                    <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                    <button class="small-gear" onclick="closeSettings()">✕ Sluiten</button>
+                </div>
+
+                <h2 class="settings-title">⚙️ Instellingen voor ouders</h2>
+
+                <div class="setting-group">
+                    <p class="setting-label">Hoe moeilijk zijn de kleurpatronen?</p>
+                    <div class="option-row">
+                        <button class="opt-btn" id="lvl-easy" onclick="setLevel('easy')">🌱 Makkelijk (ABAB)</button>
+                        <button class="opt-btn selected" id="lvl-smart" onclick="setLevel('smart')">🌟 Slim (ABAB · AABB
+                            · ABC)</button>
+                        <button class="opt-btn" id="lvl-super" onclick="setLevel('super')">🚀 Super-Slim (+ gat in
+                            midden)</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <p class="setting-label">Nederlandse stem:</p>
+                    <div class="option-row">
+                        <button class="opt-btn selected" id="voice-on" onclick="setVoice(true)">🔊 Stem aan</button>
+                        <button class="opt-btn" id="voice-off" onclick="setVoice(false)">🔇 Alleen geluidjes</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <p class="setting-label">Feesttrein na hoeveel treinen?</p>
+                    <div class="option-row">
+                        <button class="opt-btn selected" id="cnt-5" onclick="setRoundCount(5)">🚂 5 treinen</button>
+                        <button class="opt-btn" id="cnt-7" onclick="setRoundCount(7)">🌈 7 treinen</button>
+                    </div>
+                </div>
+
+                <button class="close-settings-btn" onclick="applyAndResume()">VERDER SPELEN ▶</button>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    </div>
+
+    <script>
+        // ============================================================================
+        // DE KLEUREN-TREIN — Kleurpatronen leren voor een 3-jarig meisje
+        // ============================================================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 1280, H = 720;
+
+        const COLORS = [
+            { id: 'rood', name: 'ROOD', spoken: 'rood', main: '#ff3b4e', light: '#ff8a96', dark: '#b81d2c', icon: '🍓' },
+            { id: 'geel', name: 'GEEL', spoken: 'geel', main: '#ffd000', light: '#fff08a', dark: '#c79300', icon: '⭐' },
+            { id: 'blauw', name: 'BLAUW', spoken: 'blauw', main: '#1e90ff', light: '#74b9ff', dark: '#0c5bb5', icon: '🐳' },
+            { id: 'groen', name: 'GROEN', spoken: 'groen', main: '#26cc67', light: '#7bed9f', dark: '#148f44', icon: '🐸' },
+            { id: 'roze', name: 'ROZE', spoken: 'roze', main: '#ff66a6', light: '#ffa8cc', dark: '#c43670', icon: '🌸' },
+            { id: 'paars', name: 'PAARS', spoken: 'paars', main: '#9b59ff', light: '#c7a4ff', dark: '#6729c9', icon: '🍇' },
+            { id: 'oranje', name: 'ORANJE', spoken: 'oranje', main: '#ff8c1a', light: '#ffc285', dark: '#c45b00', icon: '🍊' }
+        ];
+
+        // --- Instellingen ---
+        let levelMode = 'smart'; // 'easy' | 'smart' | 'super'
+        let voiceEnabled = true;
+        let roundTarget = 5;
+        let gameStarted = false;
+        let settingsOpen = false;
+
+        // --- Volledig scherm ondersteuning ---
+        function isStandaloneApp() {
+            return window.matchMedia('(display-mode: fullscreen)').matches
+                || window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone === true;
+        }
+        function enterFullscreen() {
+            if (isStandaloneApp()) return;
+            const el = document.documentElement;
+            const req = el.requestFullscreen || el.webkitRequestFullscreen;
+            if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+                Promise.resolve(req.call(el)).catch(() => { });
+            }
+        }
+        function toggleFullscreen() {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            if (fsEl) {
+                const ex = document.exitFullscreen || document.webkitExitFullscreen;
+                if (ex) Promise.resolve(ex.call(document)).catch(() => { });
+            } else {
+                enterFullscreen();
+            }
+        }
+        function updateFsBtn() {
+            const b = document.getElementById('fs-btn');
+            if (!b) return;
+            const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+            if (isStandaloneApp() || !canFs) { b.style.display = 'none'; return; }
+            const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            b.textContent = active ? '✕ ⛶' : '⛶ Volledig scherm';
+        }
+        document.addEventListener('fullscreenchange', updateFsBtn);
+        document.addEventListener('webkitfullscreenchange', updateFsBtn);
+        updateFsBtn();
+
+        // --- Web Audio API (vrolijke trein-fluit, klik & belletjes!) ---
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        function ensureAudio() {
+            if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
+        }
+        function playNote(freq, dur = 0.2, type = 'sine', vol = 0.13, delay = 0) {
+            try {
+                ensureAudio();
+                if (!audioCtx) return;
+                const t = audioCtx.currentTime + delay;
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = type; o.frequency.setValueAtTime(freq, t);
+                g.gain.setValueAtTime(0.001, t);
+                g.gain.linearRampToValueAtTime(vol, t + 0.02);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t + dur + 0.03);
+            } catch { }
+        }
+        function soundToetToet() {
+            // Twee vrolijke zachte trein-fluitjes!
+            [523.25, 659.25].forEach(f => playNote(f, 0.22, 'triangle', 0.11, 0));
+            [523.25, 659.25].forEach(f => playNote(f, 0.34, 'triangle', 0.12, 0.24));
+        }
+        function soundClick() {
+            playNote(480, 0.09, 'sine', 0.11, 0);
+            playNote(640, 0.12, 'triangle', 0.11, 0.04);
+        }
+        function soundGentleWrong() {
+            playNote(300, 0.16, 'sine', 0.11, 0);
+            playNote(250, 0.22, 'sine', 0.1, 0.1);
+        }
+        function soundPop() {
+            playNote(720, 0.08, 'sine', 0.13, 0);
+            playNote(1020, 0.11, 'triangle', 0.11, 0.03);
+        }
+        function soundParty() {
+            [523.25, 659.25, 783.99, 1046.5, 880, 1046.5].forEach((f, i) => playNote(f, 0.3, 'triangle', 0.13, i * 0.1));
+        }
+
+        // --- Nederlandse stem ---
+        let nlVoice = null;
+        function loadVoice() {
+            if (!('speechSynthesis' in window)) return;
+            const vs = window.speechSynthesis.getVoices();
+            nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+                || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
+        }
+        if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
+        function speakDutch(txt) {
+            if (!voiceEnabled || !('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'nl-NL';
+                if (nlVoice) u.voice = nlVoice;
+                u.rate = 0.9;
+                u.pitch = 1.15;
+                window.speechSynthesis.speak(u);
+            } catch { }
+        }
+
+        // --- Speltoestand ---
+        // phase: 'enter' | 'play' | 'snap' | 'depart' | 'celebrate'
+        let phase = 'enter';
+        let time = 0;
+        let trainsDone = 0;
+        let sessionId = 0;
+        let wrongCount = 0;
+
+        let trainOffsetX = 1100; // Animatie voor binnenrijden & wegrijden
+        let wagons = [];         // [{ color, missing, filled, bounce, highlight }]
+        let missingIndex = 0;
+        let targetColor = null;
+        let choices = [];        // [{ color, x, y, homeX, homeY, w, h, wiggle }]
+        let flyingWagon = null;
+        let chantTimer = 0;
+        let chantStep = -1;
+
+        let smokePuffs = [];
+        let particles = [];
+        let partyBubbles = [];
+        let partyTrainX = -600;
+        let bannerText = '';
+        let bannerColor = '#ff9f43';
+
+        // Slepen of tikken
+        let dragChoice = null;
+        let dragOffsetX = 0, dragOffsetY = 0;
+        let pointerId = null;
+
+        const speakerBtn = { x: 1125, y: 125, r: 44 };
+        const speakerBtn = { x: 1185, y: 186, r: 44 };
+        const replayBtn = { x: W / 2 - 210, y: 540, w: 420, h: 100 };
+        const homeBtn = { x: 34, y: 26, w: 230, h: 64 };
+
+        // --- Patroon generator (ABAB, AABB, ABC) ---
+        function pickDistinctColors(n) {
+            return [...COLORS].sort(() => Math.random() - 0.5).slice(0, n);
+        }
+
+        function buildPatternForTurn(turnIdx) {
+            let patternType = 'ABAB';
+            if (levelMode === 'easy') {
+                patternType = 'ABAB';
+            } else if (levelMode === 'smart') {
+                const order = ['ABAB', 'ABAB', 'AABB', 'ABC', 'ABC', 'AABB', 'ABC'];
+                patternType = order[turnIdx % order.length];
+            } else {
+                const order = ['ABAB', 'ABC', 'AABB', 'ABC', 'ABAB_MID', 'ABC_MID', 'AABB'];
+                patternType = order[turnIdx % order.length];
+            }
+
+            let seq = [];
+            let holeIdx = 0;
+
+            if (patternType === 'ABAB' || patternType === 'ABAB_MID') {
+                const [A, B] = pickDistinctColors(2);
+                seq = [A, B, A, B];
+                holeIdx = patternType === 'ABAB_MID' ? 2 : 3;
+            } else if (patternType === 'AABB') {
+                const [A, B] = pickDistinctColors(2);
+                seq = [A, A, B, B];
+                holeIdx = 3;
+            } else { // ABC or ABC_MID
+                const [A, B, C] = pickDistinctColors(3);
+                seq = [A, B, C, A, B, C];
+                holeIdx = patternType === 'ABC_MID' ? 4 : 5;
+            }
+
+            return { seq, holeIdx };
+        }
+
+        function getWagonLayout() {
+            const count = wagons.length;
+            const locoW = 195;
+            const gap = 16;
+            const wagonW = count <= 4 ? 175 : 138;
+            const wagonH = 122;
+            const totalW = locoW + gap + count * wagonW + (count - 1) * gap;
+            const startX = (W - totalW) / 2;
+            const railY = 398;
+            return { locoW, gap, wagonW, wagonH, startX, railY };
+        }
+
+        function getMissingSlotRect() {
+            const L = getWagonLayout();
+            const x = L.startX + trainOffsetX + L.locoW + L.gap + missingIndex * (L.wagonW + L.gap);
+            const y = L.railY - L.wagonH - 22;
+            return { x, y, w: L.wagonW, h: L.wagonH, cx: x + L.wagonW / 2, cy: y + L.wagonH / 2 };
+        }
+
+        function spawnNextTrain() {
+            const { seq, holeIdx } = buildPatternForTurn(trainsDone);
+            missingIndex = holeIdx;
+            targetColor = seq[holeIdx];
+            wrongCount = 0;
+            flyingWagon = null;
+            dragChoice = null;
+
+            wagons = seq.map((c, i) => ({
+                color: c,
+                missing: i === holeIdx,
+                filled: i !== holeIdx,
+                bounce: 0,
+                highlight: 0
+            }));
+
+            // 4 (of 5 bij super) grote keuze-wagons onderaan
+            const choiceCount = levelMode === 'super' ? 5 : 4;
+            const usedInPattern = [...new Set(seq)];
+            const extras = COLORS.filter(c => !usedInPattern.includes(c)).sort(() => Math.random() - 0.5);
+            let pool = [targetColor];
+            usedInPattern.forEach(c => { if (c.id !== targetColor.id && pool.length < choiceCount) pool.push(c); });
+            extras.forEach(c => { if (pool.length < choiceCount) pool.push(c); });
+            pool = pool.sort(() => Math.random() - 0.5);
+
+            const cw = choiceCount === 5 ? 188 : 225;
+            const ch = 128;
+            const cgap = choiceCount === 5 ? 28 : 42;
+            const totalCW = choiceCount * cw + (choiceCount - 1) * cgap;
+            const sx = (W - totalCW) / 2;
+            const cy = 540;
+
+            choices = pool.map((color, idx) => ({
+                color,
+                x: sx + idx * (cw + cgap),
+                y: cy,
+                homeX: sx + idx * (cw + cgap),
+                homeY: cy,
+                w: cw,
+                h: ch,
+                wiggle: 0
+            }));
+
+            trainOffsetX = W + 80;
+            phase = 'enter';
+            bannerText = '🚂 Daar komt de kleuren-trein!';
+            bannerColor = '#ff9f43';
+            soundClick();
+        }
+
+        function startPatternChant() {
+            chantStep = 0;
+            chantTimer = 0.05;
+            const patternWords = wagons.map(w => w.missing ? 'vraagteken' : w.color.spoken).join(', ');
+            bannerText = wagons.map(w => w.missing ? '❓' : w.color.name).join(' · ');
+            bannerColor = '#1e90ff';
+            speakDutch(`${patternWords}. Welke kleur komt daar?`);
+        }
+
+        function startNewRound() {
+            sessionId++;
+            trainsDone = 0;
+            smokePuffs = [];
+            particles = [];
+            partyBubbles = [];
+            spawnNextTrain();
+        }
+
+        function spawnSparkles(x, y, col, n = 26) {
+            for (let i = 0; i < n; i++) {
+                const a = (Math.PI * 2 * i) / n + Math.random() * 0.3;
+                const sp = 3 + Math.random() * 7;
+                particles.push({
+                    x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2.5,
+                    size: 8 + Math.random() * 10,
+                    color: i % 3 === 0 ? '#ffffff' : (i % 4 === 0 ? '#ffd000' : col),
+                    life: 1, decay: 0.016 + Math.random() * 0.014, g: 0.16
+                });
+            }
+        }
+
+        function spawnPartyBubbles() {
+            partyBubbles = [];
+            for (let i = 0; i < 10; i++) {
+                const c = COLORS[i % COLORS.length];
+                partyBubbles.push({
+                    x: 110 + i * 116 + (Math.random() - 0.5) * 30,
+                    y: H + 70 + Math.random() * 260,
+                    r: 48 + (i % 3) * 8,
+                    color: c,
+                    vy: 1.2 + Math.random() * 0.8,
+                    sway: Math.random() * Math.PI * 2,
+                    popped: false
+                });
+            }
+        }
+
+        function tryChoice(ch, fromDrag) {
+            if (phase !== 'play') return;
+            if (ch.color.id === targetColor.id) {
+                const slot = getMissingSlotRect();
+                flyingWagon = {
+                    color: ch.color,
+                    sx: ch.x, sy: ch.y,
+                    tx: slot.x, ty: slot.y,
+                    w: slot.w, h: slot.h,
+                    t: 0, dur: fromDrag ? 0.2 : 0.42
+                };
+                phase = 'snap';
+                soundClick();
+                bannerText = `🚂 TOET TOET! ${ch.color.name}! 🎉`;
+                bannerColor = ch.color.main;
+            } else {
+                wrongCount++;
+                ch.wiggle = 0.55;
+                soundGentleWrong();
+                bannerText = `Dat is ${ch.color.spoken}! Kijk goed naar het patroon!`;
+                bannerColor = ch.color.main;
+                const patternWords = wagons.map(w => w.missing ? 'en dan?' : w.color.spoken).join(', ');
+                speakDutch(`Dat is ${ch.color.spoken}. Luister goed: ${patternWords}`);
+                chantStep = 0;
+                chantTimer = 0.2;
+            }
+        }
+
+        function onWagonSnapped() {
+            wagons[missingIndex].filled = true;
+            wagons[missingIndex].missing = false;
+            wagons[missingIndex].bounce = 1;
+            wagons.forEach((w, i) => setTimeout(() => { w.bounce = 0.8; }, i * 80));
+
+            const slot = getMissingSlotRect();
+            spawnSparkles(slot.cx, slot.cy, targetColor.main, 34);
+            soundToetToet();
+            speakDutch(`Toet toet! ${targetColor.spoken}! Super knap!`);
+            trainsDone++;
+
+            const sid = sessionId;
+            setTimeout(() => {
+                if (!gameStarted || sid !== sessionId) return;
+                phase = 'depart';
+            }, 950);
+        }
+
+        function startCelebration() {
+            phase = 'celebrate';
+            partyTrainX = -750;
+            soundParty();
+            spawnPartyBubbles();
+            bannerText = '🎉 HOERA! DE REGENBOOG-FEESTTREIN! 🚂🌈';
+            bannerColor = '#ff66a6';
+            speakDutch('Hoera! Wat heb jij alle kleuren-treinen knap afgemaakt! Tik maar op de gekleurde bellen!');
+        }
+
+        // --- Pointer / Touch / Muis ---
+        function getPos(cx, cy) {
+            const r = canvas.getBoundingClientRect();
+            return { x: ((cx - r.left) / r.width) * W, y: ((cy - r.top) / r.height) * H };
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (!gameStarted || settingsOpen) return;
+            e.preventDefault();
+            ensureAudio();
+            const pos = getPos(e.clientX, e.clientY);
+
+            if (phase === 'celebrate') {
+                if (pos.x >= homeBtn.x && pos.x <= homeBtn.x + homeBtn.w && pos.y >= homeBtn.y && pos.y <= homeBtn.y + homeBtn.h) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                if (pos.x >= replayBtn.x && pos.x <= replayBtn.x + replayBtn.w && pos.y >= replayBtn.y && pos.y <= replayBtn.y + replayBtn.h) {
+                    soundClick();
+                    startNewRound();
+                    return;
+                }
+                for (const b of partyBubbles) {
+                    if (b.popped) continue;
+                    const bx = b.x + Math.sin(time * 2.4 + b.sway) * 16;
+                    if (Math.hypot(pos.x - bx, pos.y - b.y) <= b.r + 22) {
+                        b.popped = true;
+                        soundPop();
+                        spawnSparkles(bx, b.y, b.color.main, 22);
+                        speakDutch(b.color.spoken);
+                        return;
+                    }
+                }
+                spawnSparkles(pos.x, pos.y, '#ffd000', 14);
+                soundPop();
+                return;
+            }
+
+            if (phase !== 'play') return;
+
+            // Luidspreker-knop of locomotief -> herhaal patroon!
+            const L = getWagonLayout();
+            const locoX = L.startX + trainOffsetX;
+            if (Math.hypot(pos.x - speakerBtn.x, pos.y - speakerBtn.y) <= speakerBtn.r + 14 ||
+                (pos.x >= locoX && pos.x <= locoX + L.locoW && pos.y >= L.railY - 170 && pos.y <= L.railY)) {
+                soundToetToet();
+                startPatternChant();
+                return;
+            }
+
+            // Check keuze-wagons (slepen of tikken!)
+            for (const ch of choices) {
+                if (pos.x >= ch.x - 10 && pos.x <= ch.x + ch.w + 10 && pos.y >= ch.y - 10 && pos.y <= ch.y + ch.h + 16) {
+                    dragChoice = ch;
+                    pointerId = e.pointerId;
+                    dragOffsetX = ch.x - pos.x;
+                    dragOffsetY = ch.y - pos.y;
+                    soundClick();
+                    canvas.setPointerCapture?.(e.pointerId);
+                    return;
+                }
+            }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!dragChoice || phase !== 'play') return;
+            if (pointerId !== null && e.pointerId !== pointerId) return;
+            e.preventDefault();
+            const pos = getPos(e.clientX, e.clientY);
+            dragChoice.x = pos.x + dragOffsetX;
+            dragChoice.y = pos.y + dragOffsetY;
+        });
+
+        canvas.addEventListener('pointerup', (e) => {
+            if (!dragChoice) return;
+            if (pointerId !== null && e.pointerId !== pointerId) return;
+            const ch = dragChoice;
+            dragChoice = null;
+            pointerId = null;
+
+            const moved = Math.hypot(ch.x - ch.homeX, ch.y - ch.homeY);
+            const slot = getMissingSlotRect();
+            const nearSlot = Math.hypot((ch.x + ch.w / 2) - slot.cx, (ch.y + ch.h / 2) - slot.cy) < 165;
+
+            if (moved < 30 || nearSlot) {
+                tryChoice(ch, moved >= 30);
+            }
+            ch.x = ch.homeX;
+            ch.y = ch.homeY;
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (!gameStarted || settingsOpen) return;
+            if (phase === 'play' && ['1', '2', '3', '4', '5'].includes(e.key)) {
+                const ch = choices[parseInt(e.key, 10) - 1];
+                if (ch) tryChoice(ch, false);
+            } else if (phase === 'celebrate' && (e.key === ' ' || e.key === 'Enter')) {
+                e.preventDefault();
+                startNewRound();
+            }
+        });
+
+        // --- UI / Instellingen ---
+        function startGame() {
+            ensureAudio();
+            enterFullscreen();
+            soundToetToet();
+            document.getElementById('start-overlay').style.display = 'none';
+            document.getElementById('parent-gear-btn').style.display = 'flex';
+            gameStarted = true;
+            startNewRound();
+        }
+        function openSettings() { settingsOpen = true; document.getElementById('settings-overlay').style.display = 'flex'; }
+        function closeSettings() { settingsOpen = false; document.getElementById('settings-overlay').style.display = 'none'; }
+        function setLevel(m) {
+            levelMode = m;
+            ['easy', 'smart', 'super'].forEach(k => document.getElementById(`lvl-${k}`).classList.toggle('selected', k === m));
+            soundClick();
+        }
+        function setVoice(on) {
+            voiceEnabled = on;
+            document.getElementById('voice-on').classList.toggle('selected', on);
+            document.getElementById('voice-off').classList.toggle('selected', !on);
+            soundClick();
+        }
+        function setRoundCount(n) {
+            roundTarget = n;
+            [5, 7].forEach(k => document.getElementById(`cnt-${k}`).classList.toggle('selected', k === n));
+            soundClick();
+        }
+        function applyAndResume() {
+            closeSettings();
+            if (!gameStarted) startGame();
+            else startNewRound();
+        }
+
+        // ============================================================================
+        // TEKENFUNCTIES
+        // ============================================================================
+        function drawStar(cx, cy, rOut, rIn) {
+            let rot = (Math.PI / 2) * 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - rOut);
+            for (let i = 0; i < 5; i++) {
+                ctx.lineTo(cx + Math.cos(rot) * rOut, cy + Math.sin(rot) * rOut);
+                rot += Math.PI / 5;
+                ctx.lineTo(cx + Math.cos(rot) * rIn, cy + Math.sin(rot) * rIn);
+                rot += Math.PI / 5;
+            }
+            ctx.closePath();
+        }
+
+        function drawBackground() {
+            // Lucht
+            const sky = ctx.createLinearGradient(0, 0, 0, H);
+            sky.addColorStop(0, '#5ec8ff');
+            sky.addColorStop(0.58, '#c9f0ff');
+            sky.addColorStop(1, '#e8ffd6');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, W, H);
+
+            // Lachende zon linksboven
+            ctx.save();
+            ctx.translate(108, 105);
+            ctx.fillStyle = '#ffe066';
+            ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#ffbe0b'; ctx.lineWidth = 6;
+            for (let i = 0; i < 10; i++) {
+                const a = (Math.PI * 2 * i) / 10 + time * 0.25;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(a) * 56, Math.sin(a) * 56);
+                ctx.lineTo(Math.cos(a) * 72, Math.sin(a) * 72);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Groene heuvels
+            ctx.fillStyle = '#7bed9f';
+            ctx.beginPath();
+            ctx.moveTo(0, 385);
+            ctx.quadraticCurveTo(320, 315, 650, 375);
+            ctx.quadraticCurveTo(980, 320, W, 385);
+            ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+            ctx.fill();
+
+            // Spoorbed & spoorbielzen
+            ctx.fillStyle = '#d1ccc0';
+            ctx.fillRect(0, 398, W, 36);
+            ctx.fillStyle = '#8d6e63';
+            for (let x = 10; x < W; x += 48) {
+                ctx.fillRect(x, 404, 24, 16);
+            }
+            ctx.fillStyle = '#636e72';
+            ctx.fillRect(0, 398, W, 8);
+            ctx.fillRect(0, 418, W, 7);
+
+            // Stations-perron onderin (voor de keuze-wagons)
+            ctx.fillStyle = '#fff5e4';
+            ctx.fillRect(0, 468, W, H - 468);
+            ctx.fillStyle = '#ffb142';
+            ctx.fillRect(0, 468, W, 12);
+        }
+
+        function drawProgressStars() {
+            const startX = W / 2 - ((roundTarget - 1) * 54) / 2;
+            const y = 42;
+            ctx.save();
+            ctx.fillStyle = 'rgba(255,255,255,0.88)';
+            ctx.beginPath(); ctx.roundRect(startX - 42, y - 26, (roundTarget - 1) * 54 + 84, 52, 26); ctx.fill();
+            ctx.strokeStyle = '#ff9f43'; ctx.lineWidth = 4; ctx.stroke();
+
+            for (let i = 0; i < roundTarget; i++) {
+                const filled = i < trainsDone;
+                ctx.fillStyle = filled ? '#ffd000' : '#dfe6e9';
+                ctx.strokeStyle = filled ? '#e67e22' : '#b2bec3';
+                ctx.lineWidth = 3;
+                drawStar(startX + i * 54, y, filled ? 19 : 15, filled ? 9 : 7);
+                ctx.fill(); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawBanner() {
+            if (!bannerText) return;
+            ctx.save();
+            ctx.font = '900 32px "Fredoka One", "Trebuchet MS", sans-serif';
+            const tw = ctx.measureText(bannerText).width;
+            const pw = Math.min(W - 220, Math.max(380, tw + 70));
+            const px = (W - pw) / 2, py = 86;
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.strokeStyle = bannerColor;
+            ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.roundRect(px, py, pw, 58, 28); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#2d3436';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(bannerText, W / 2, py + 31);
+            ctx.restore();
+
+            if (phase === 'play') {
+                ctx.save();
+                const s = 1 + Math.sin(time * 3.8) * 0.05;
+                ctx.translate(speakerBtn.x, speakerBtn.y);
+                ctx.scale(s, s);
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#1e90ff';
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.arc(0, 0, speakerBtn.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.font = '36px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('🔊', 0, 2);
+                ctx.restore();
+            }
+        }
+
+        function drawWheel(x, y, r, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#2d3436';
+            ctx.strokeStyle = '#ffd000';
+            ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(-r + 5, 0); ctx.lineTo(r - 5, 0); ctx.moveTo(0, -r + 5); ctx.lineTo(0, r - 5); ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawLocomotive(x, railY, wheelAngle) {
+            const y = railY - 142;
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Schoorsteen
+            ctx.fillStyle = '#2d3436'; ctx.strokeStyle = '#1e272e'; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.roundRect(22, -32, 34, 48, 8); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#ff9f43';
+            ctx.beginPath(); ctx.roundRect(14, -40, 50, 16, 8); ctx.fill(); ctx.stroke();
+
+            // Koeienvanger vooraan
+            ctx.fillStyle = '#ff4757';
+            ctx.beginPath(); ctx.moveTo(0, 120); ctx.lineTo(-28, 120); ctx.lineTo(0, 84); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            // Ketel (voorkant)
+            ctx.fillStyle = '#2f3542';
+            ctx.beginPath(); ctx.roundRect(0, 34, 118, 86, 18); ctx.fill(); ctx.stroke();
+            // Gouden band
+            ctx.fillStyle = '#ffd000'; ctx.fillRect(62, 36, 16, 82);
+
+            // Cabine (achterkant)
+            ctx.fillStyle = '#ff4757';
+            ctx.beginPath(); ctx.roundRect(96, -10, 98, 130, 16); ctx.fill(); ctx.stroke();
+            // Dak
+            ctx.fillStyle = '#ffd000';
+            ctx.beginPath(); ctx.roundRect(86, -24, 118, 22, 10); ctx.fill(); ctx.stroke();
+            // Raampje met vrolijk gezichtje!
+            ctx.fillStyle = '#dff9fb';
+            ctx.beginPath(); ctx.roundRect(112, 8, 66, 52, 12); ctx.fill(); ctx.stroke();
+            ctx.font = '38px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('🐻', 145, 37);
+
+            // Wielen
+            drawWheel(36, 122, 22, wheelAngle);
+            drawWheel(96, 122, 22, wheelAngle);
+            drawWheel(156, 122, 26, wheelAngle);
+            ctx.restore();
+        }
+
+        function drawWagon(x, y, w, h, color, opts = {}) {
+            const bounceY = opts.bounce ? Math.sin(opts.bounce * Math.PI) * 24 : 0;
+            const wiggleX = opts.wiggle ? Math.sin(opts.wiggle * 44) * 10 : 0;
+            const scale = opts.highlight ? 1.08 : (opts.hintPulse ? 1 + Math.sin(time * 7) * 0.06 : 1);
+
+            ctx.save();
+            ctx.translate(x + w / 2 + wiggleX, y + h / 2 - bounceY);
+            ctx.scale(scale, scale);
+
+            if (opts.hintPulse) {
+                ctx.fillStyle = color.light;
+                ctx.globalAlpha = 0.5;
+                ctx.beginPath(); ctx.roundRect(-w / 2 - 14, -h / 2 - 14, w + 28, h + 28, 28); ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+
+            // Koppeling links
+            if (opts.coupled) {
+                ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 8;
+                ctx.beginPath(); ctx.moveTo(-w / 2 - 18, 16); ctx.lineTo(-w / 2, 16); ctx.stroke();
+            }
+
+            // Wagon lijf
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = '#2d3436';
+            ctx.lineWidth = 5.5;
+            ctx.beginPath();
+            ctx.roundRect(-w / 2, -h / 2, w, h - 10, 22);
+            ctx.fill();
+            ctx.stroke();
+
+            // Lichte glansstreep bovenin
+            ctx.fillStyle = color.light;
+            ctx.beginPath();
+            ctx.roundRect(-w / 2 + 12, -h / 2 + 10, w - 24, 18, 9);
+            ctx.fill();
+
+            // Groot herkenbaar icoontje + kleurnaam pil
+            ctx.font = `${Math.round(h * 0.4)}px sans-serif`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(color.icon, 0, -6);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.beginPath(); ctx.roundRect(-w * 0.38, h / 2 - 40, w * 0.76, 26, 13); ctx.fill();
+            ctx.fillStyle = '#2d3436';
+            ctx.font = '900 17px "Fredoka One", sans-serif';
+            ctx.fillText(color.name, 0, h / 2 - 26);
+
+            // Wielen
+            const wa = opts.wheelAngle || 0;
+            drawWheel(-w * 0.28, h / 2 - 4, 18, wa);
+            drawWheel(w * 0.28, h / 2 - 4, 18, wa);
+
+            ctx.restore();
+        }
+
+        function drawMissingSlot(x, y, w, h) {
+            const pulse = 1 + Math.sin(time * 5) * 0.05;
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+            ctx.scale(pulse, pulse);
+
+            // Koppeling
+            ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 8;
+            ctx.beginPath(); ctx.moveTo(-w / 2 - 18, 16); ctx.lineTo(-w / 2, 16); ctx.stroke();
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.strokeStyle = '#ff9f43';
+            ctx.lineWidth = 6;
+            ctx.setLineDash([14, 10]);
+            ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h - 10, 22); ctx.fill(); ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#ff9f43';
+            ctx.font = '900 62px "Fredoka One", sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('?', 0, -2);
+            ctx.restore();
+        }
+
+        function drawCelebration() {
+            // Regenboog-feesttrein rijdt door het beeld!
+            const wa = -time * 6;
+            drawLocomotive(partyTrainX, 398, wa);
+            COLORS.forEach((c, i) => {
+                drawWagon(partyTrainX + 210 + i * 155, 398 - 122 - 22, 138, 122, c, { coupled: true, wheelAngle: wa, bounce: Math.abs(Math.sin(time * 4 + i)) * 0.3 });
+            });
+
+            // Bellen om kapot te tikken
+            partyBubbles.forEach(b => {
+                if (b.popped) return;
+                const bx = b.x + Math.sin(time * 2.4 + b.sway) * 16;
+                ctx.save();
+                ctx.fillStyle = b.color.main;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.arc(bx, b.y, b.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = 'rgba(255,255,255,0.45)';
+                ctx.beginPath(); ctx.arc(bx - b.r * 0.28, b.y - b.r * 0.28, b.r * 0.2, 0, Math.PI * 2); ctx.fill();
+                ctx.font = '34px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(b.color.icon, bx, b.y + 2);
+                ctx.restore();
+            });
+
+            // Grote NOG EEN KEER knop
+            const p = 1 + Math.sin(time * 4.5) * 0.04;
+            ctx.save();
+            ctx.translate(replayBtn.x + replayBtn.w / 2, replayBtn.y + replayBtn.h / 2);
+            ctx.scale(p, p);
+            ctx.fillStyle = '#26cc67'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.roundRect(-replayBtn.w / 2, -replayBtn.h / 2, replayBtn.w, replayBtn.h, 34); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 42px "Fredoka One", sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('▶ NOG EEN KEER!', 0, 3);
+            ctx.restore();
+
+            // Terug naar alle spellen
+            ctx.save();
+            ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.strokeStyle = '#ced6e0'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.roundRect(homeBtn.x, homeBtn.y, homeBtn.w, homeBtn.h, 20); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#2d3436'; ctx.font = '900 24px Nunito, sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('← 🏠 Alle spellen', homeBtn.x + homeBtn.w / 2, homeBtn.y + homeBtn.h / 2 + 1);
+            ctx.restore();
+        }
+
+        // ============================================================================
+        // HOOFDLUS
+        // ============================================================================
+        let lastTs = 0;
+        function loop(ts) {
+            const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0.016);
+            lastTs = ts;
+            time += dt;
+
+            // Trein fases updaten
+            if (phase === 'enter') {
+                trainOffsetX -= 920 * dt;
+                if (Math.random() < 0.25) {
+                    const L = getWagonLayout();
+                    smokePuffs.push({ x: L.startX + trainOffsetX + 38, y: 220, r: 16, col: '#ffffff', life: 1 });
+                }
+                if (trainOffsetX <= 0) {
+                    trainOffsetX = 0;
+                    phase = 'play';
+                    startPatternChant();
+                }
+            } else if (phase === 'play') {
+                // Ritmisch oplichten tijdens patroon opzeggen
+                if (chantStep >= 0) {
+                    chantTimer -= dt;
+                    if (chantTimer <= 0) {
+                        wagons.forEach(w => w.highlight = 0);
+                        if (chantStep < wagons.length) {
+                            wagons[chantStep].highlight = 1;
+                            wagons[chantStep].bounce = 0.65;
+                            chantStep++;
+                            chantTimer = 0.55;
+                        } else {
+                            chantStep = -1;
+                        }
+                    }
+                }
+            } else if (phase === 'snap' && flyingWagon) {
+                flyingWagon.t += dt / flyingWagon.dur;
+                const p = Math.min(1, flyingWagon.t);
+                const ease = 1 - Math.pow(1 - p, 3);
+                flyingWagon.cx = flyingWagon.sx + (flyingWagon.tx - flyingWagon.sx) * ease;
+                flyingWagon.cy = flyingWagon.sy + (flyingWagon.ty - flyingWagon.sy) * ease - Math.sin(p * Math.PI) * 110;
+                if (p >= 1) {
+                    flyingWagon = null;
+                    onWagonSnapped();
+                }
+            } else if (phase === 'depart') {
+                trainOffsetX -= 760 * dt;
+                if (Math.random() < 0.35) {
+                    const L = getWagonLayout();
+                    const rc = COLORS[Math.floor(Math.random() * COLORS.length)].main;
+                    smokePuffs.push({ x: L.startX + trainOffsetX + 38, y: 220, r: 18, col: rc, life: 1 });
+                }
+                if (trainOffsetX < -W - 220) {
+                    if (trainsDone >= roundTarget) startCelebration();
+                    else spawnNextTrain();
+                }
+            } else if (phase === 'celebrate') {
+                partyTrainX += 210 * dt;
+                if (partyTrainX > W + 200) partyTrainX = -1350;
+                partyBubbles.forEach(b => {
+                    if (b.popped) return;
+                    b.y -= b.vy * 60 * dt;
+                    if (b.y < -90) b.y = H + 90;
+                });
+            }
+
+            wagons.forEach(w => { if (w.bounce > 0) w.bounce = Math.max(0, w.bounce - dt * 2.2); });
+            choices.forEach(c => { if (c.wiggle > 0) c.wiggle = Math.max(0, c.wiggle - dt); });
+
+            // Rook & partikels
+            for (let i = smokePuffs.length - 1; i >= 0; i--) {
+                const s = smokePuffs[i];
+                s.y -= 55 * dt; s.x += 22 * dt; s.r += 18 * dt; s.life -= dt * 0.9;
+                if (s.life <= 0) smokePuffs.splice(i, 1);
+            }
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life -= p.decay;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            // --- TEKENEN ---
+            drawBackground();
+            drawProgressStars();
+            drawBanner();
+
+            // Rook
+            smokePuffs.forEach(s => {
+                ctx.save(); ctx.globalAlpha = Math.max(0, s.life * 0.75);
+                ctx.fillStyle = s.col;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            });
+
+            if (phase !== 'celebrate') {
+                const L = getWagonLayout();
+                const wa = (phase === 'enter' || phase === 'depart') ? trainOffsetX * 0.04 : 0;
+                drawLocomotive(L.startX + trainOffsetX, L.railY, wa);
+
+                wagons.forEach((w, i) => {
+                    const wx = L.startX + trainOffsetX + L.locoW + L.gap + i * (L.wagonW + L.gap);
+                    const wy = L.railY - L.wagonH - 22;
+                    if (w.missing && !w.filled) {
+                        drawMissingSlot(wx, wy, L.wagonW, L.wagonH);
+                    } else {
+                        drawWagon(wx, wy, L.wagonW, L.wagonH, w.color, { coupled: true, wheelAngle: wa, bounce: w.bounce, highlight: w.highlight });
+                    }
+                });
+
+                // Keuze-wagons op het perron (niet-gesleepte eerst)
+                choices.forEach(ch => {
+                    if (ch === dragChoice) return;
+                    const hint = phase === 'play' && wrongCount >= 2 && ch.color.id === targetColor.id;
+                    drawWagon(ch.x, ch.y, ch.w, ch.h, ch.color, { wiggle: ch.wiggle, hintPulse: hint });
+                });
+                if (dragChoice) {
+                    drawWagon(dragChoice.x, dragChoice.y, dragChoice.w, dragChoice.h, dragChoice.color, { highlight: 1 });
+                }
+                if (flyingWagon) {
+                    drawWagon(flyingWagon.cx, flyingWagon.cy, flyingWagon.w, flyingWagon.h, flyingWagon.color, { highlight: 1 });
+                }
+            } else {
+                drawCelebration();
+            }
+
+            particles.forEach(p => {
+                ctx.save(); ctx.globalAlpha = Math.max(0, p.life);
+                ctx.fillStyle = p.color;
+                drawStar(p.x, p.y, p.size, p.size * 0.45); ctx.fill();
+                ctx.restore();
+            });
+
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+
+</html>

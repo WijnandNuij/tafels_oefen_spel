@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kleur &amp; Vorm Kroon-Maker — Kleur én Vorm Leren!</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#3c1b6e">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: linear-gradient(135deg, #2c1254, #5b247a);
+            font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-height: 100dvh;
+            max-width: 177.78vh;
+            max-width: 177.78dvh;
+            background: #2e1758;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        :fullscreen #game-container { border-radius: 0; box-shadow: none; }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        #parent-gear-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(4px);
+            font-size: 1.45rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+            touch-action: manipulation;
+        }
+        #parent-gear-btn:active { transform: scale(0.9); }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)) 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+        .overlay * { touch-action: pan-y; }
+
+        #start-overlay {
+            background: linear-gradient(155deg, #ff79b0 0%, #9b59ff 52%, #ffd000 100%);
+        }
+        #settings-overlay {
+            display: none;
+            background: rgba(34, 16, 66, 0.78);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            border: 7px solid #ffd000;
+            border-radius: 32px;
+            padding: 20px 26px 24px 26px;
+            width: 100%;
+            max-width: 740px;
+            margin: auto;
+            flex-shrink: 0;
+            text-align: center;
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f2f6;
+            color: #2d3436;
+            text-decoration: none;
+            border: 3px solid #ced6e0;
+            border-radius: 16px;
+            padding: 7px 14px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            box-shadow: 0 3px 0 #ced6e0;
+        }
+        .home-link:hover { background: #ffeaa7; border-color: #fdcb6e; }
+        .small-gear {
+            background: #f3e8ff;
+            color: #6c2bd9;
+            border: 3px solid #c7a4ff;
+            border-radius: 16px;
+            padding: 7px 13px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #c7a4ff;
+        }
+
+        .hero-jewels {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 8px 0 10px 0;
+            font-size: clamp(2.4rem, 6vw, 3.4rem);
+            line-height: 1;
+        }
+        .hero-gem {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 68px;
+            height: 68px;
+            border-radius: 22px;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.16);
+            animation: sparkleBob 2.2s ease-in-out infinite;
+        }
+        .hero-gem:nth-child(2) { animation-delay: 0.25s; }
+        .hero-gem:nth-child(3) { animation-delay: 0.5s; }
+        .hero-gem:nth-child(4) { animation-delay: 0.75s; }
+
+        h1 {
+            font-family: 'Fredoka One', 'Trebuchet MS', cursive, sans-serif;
+            color: #7e22ce;
+            margin: 6px 0 4px 0;
+            font-size: clamp(1.85rem, 4.5vw, 2.9rem);
+            text-shadow: 2px 3px 0 #fef08a;
+        }
+        .subtitle {
+            margin: 0 0 18px 0;
+            font-size: clamp(1rem, 2.2vw, 1.24rem);
+            font-weight: 800;
+            color: #57606f;
+        }
+
+        .big-play-btn {
+            background: linear-gradient(180deg, #ff66a6 0%, #e84393 100%);
+            color: #fff;
+            border: 5px solid #fff;
+            border-radius: 30px;
+            padding: 18px 54px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(1.7rem, 4vw, 2.5rem);
+            cursor: pointer;
+            box-shadow: 0 9px 0 #b82563, 0 14px 26px rgba(232, 67, 147, 0.42);
+            letter-spacing: 1px;
+        }
+        .big-play-btn:active { transform: translateY(5px); box-shadow: 0 3px 0 #b82563; }
+
+        .settings-title {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            color: #7e22ce;
+            font-size: 1.65rem;
+            margin: 4px 0 10px 0;
+        }
+        .setting-group { margin: 11px 0; text-align: center; }
+        .setting-label {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.06rem;
+            color: #2d3436;
+            margin: 0 0 7px 0;
+        }
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        .opt-btn {
+            border: 3px solid #ced6e0;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 9px 15px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.94rem;
+            color: #2d3436;
+            cursor: pointer;
+        }
+        .opt-btn.selected {
+            border-color: #9b59ff;
+            background: #f3e8ff;
+            color: #5b21b6;
+            transform: scale(1.03);
+        }
+        .close-settings-btn {
+            margin-top: 14px;
+            background: #2ed573;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 34px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.35rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #168f4d;
+        }
+
+        @media (max-height: 480px) {
+            .card { padding: 12px 18px 16px 18px; border-width: 5px; border-radius: 24px; }
+            .hero-gem { width: 52px; height: 52px; font-size: 1.85rem; }
+            h1 { font-size: 1.65rem; }
+            .subtitle { font-size: 0.92rem; margin-bottom: 10px; }
+            .big-play-btn { padding: 11px 38px; font-size: 1.55rem; }
+        }
+        @keyframes sparkleBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <button id="parent-gear-btn" aria-label="Ouder-instellingen" onclick="openSettings()">⚙️</button>
+
+    <!-- Startscherm -->
+    <div id="start-overlay" class="overlay">
+        <div class="card">
+            <div class="top-bar">
+                <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="small-gear" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
+                    <button class="small-gear" onclick="openSettings()">⚙️ Ouders</button>
+                </div>
+            </div>
+
+            <div class="hero-jewels" aria-hidden="true">
+                <span class="hero-gem" style="background:#1e90ff;">⭐</span>
+                <span class="hero-gem" style="background:#ff3b4e;">❤️</span>
+                <span class="hero-gem" style="background:#ffd000;">🌙</span>
+                <span class="hero-gem" style="background:#ff66a6;">🌸</span>
+            </div>
+
+            <h1>👑 Kleur &amp; Vorm Kroon-Maker ✨</h1>
+            <p class="subtitle">Luister goed naar de kleur én de vorm en versier de gouden prinsessenkroon!</p>
+
+            <button class="big-play-btn" onclick="startGame()">▶ SPEEL!</button>
+        </div>
+    </div>
+
+    <!-- Ouder-instellingen -->
+    <div id="settings-overlay" class="overlay">
+        <div class="card" style="border-color:#c7a4ff;">
+            <div class="top-bar">
+                <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                <button class="small-gear" onclick="closeSettings()">✕ Sluiten</button>
+            </div>
+
+            <h2 class="settings-title">⚙️ Instellingen voor ouders</h2>
+
+            <div class="setting-group">
+                <p class="setting-label">Hoe uitdagend mag het zijn?</p>
+                <div class="option-row">
+                    <button class="opt-btn" id="mode-easy" onclick="setDiff('easy')">✨ Makkelijk (4 juwelen + vorm &amp; kleurtip)</button>
+                    <button class="opt-btn selected" id="mode-smart" onclick="setDiff('smart')">👑 Slim (4 juwelen · kleur + vorm)</button>
+                    <button class="opt-btn" id="mode-extra" onclick="setDiff('extra')">🌟 Extra Slim (6 juwelen · puur luisteren)</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <p class="setting-label">Nederlandse stem:</p>
+                <div class="option-row">
+                    <button class="opt-btn selected" id="voice-on" onclick="setVoice(true)">🔊 Stem aan</button>
+                    <button class="opt-btn" id="voice-off" onclick="setVoice(false)">🔇 Alleen geluidjes</button>
+                </div>
+            </div>
+
+            <button class="close-settings-btn" onclick="applyAndResume()">VERDER SPELEN ▶</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+</div>
+
+<script>
+// ============================================================================
+// KLEUR & VORM KROON-MAKER — Kleur én vorm combineren voor een 3-jarig meisje
+// ============================================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 1280, H = 720;
+
+const COLORS = [
+    { id: 'rood',  adjDe: 'rode',   adjHet: 'rode',   indefHet: 'rood',   name: 'ROOD',  main: '#ff3b4e', light: '#ff8a96', dark: '#b31828' },
+    { id: 'geel',  adjDe: 'gele',   adjHet: 'gele',   indefHet: 'geel',   name: 'GEEL',  main: '#ffd000', light: '#fff299', dark: '#c79300' },
+    { id: 'blauw', adjDe: 'blauwe', adjHet: 'blauwe', indefHet: 'blauw',  name: 'BLAUW', main: '#1e90ff', light: '#7ec2ff', dark: '#0c5bb5' },
+    { id: 'groen', adjDe: 'groene', adjHet: 'groene', indefHet: 'groen',  name: 'GROEN', main: '#26cc67', light: '#82f0aa', dark: '#138a40' },
+    { id: 'roze',  adjDe: 'roze',   adjHet: 'roze',   indefHet: 'roze',   name: 'ROZE',  main: '#ff66a6', light: '#ffadd0', dark: '#c43670' },
+    { id: 'paars', adjDe: 'paarse', adjHet: 'paarse', indefHet: 'paars',  name: 'PAARS', main: '#9b59ff', light: '#cca6ff', dark: '#6223c7' }
+];
+
+const SHAPES = [
+    { id: 'ster',     article: 'de',  noun: 'ster' },
+    { id: 'hartje',   article: 'het', noun: 'hartje' },
+    { id: 'bloem',    article: 'de',  noun: 'bloem' },
+    { id: 'rondje',   article: 'het', noun: 'rondje' },
+    { id: 'maantje',  article: 'het', noun: 'maantje' },
+    { id: 'diamant',  article: 'de',  noun: 'diamant' }
+];
+
+function phraseDef(color, shape) {
+    // "de blauwe ster" / "het rode hartje"
+    return `${shape.article} ${shape.article === 'de' ? color.adjDe : color.adjHet} ${shape.noun}`;
+}
+function phraseIndef(color, shape) {
+    // "een blauwe ster" / "een rood hartje"
+    return `een ${shape.article === 'de' ? color.adjDe : color.indefHet} ${shape.noun}`;
+}
+
+// --- Instellingen ---
+let diffMode = 'smart'; // 'easy' | 'smart' | 'extra'
+let voiceEnabled = true;
+let gameStarted = false;
+let settingsOpen = false;
+
+// --- Volledig scherm ondersteuning ---
+function isStandaloneApp() {
+    return window.matchMedia('(display-mode: fullscreen)').matches
+        || window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+}
+function enterFullscreen() {
+    if (isStandaloneApp()) return;
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        Promise.resolve(req.call(el)).catch(() => {});
+    }
+}
+function toggleFullscreen() {
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsEl) {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) Promise.resolve(ex.call(document)).catch(() => {});
+    } else {
+        enterFullscreen();
+    }
+}
+function updateFsBtn() {
+    const b = document.getElementById('fs-btn');
+    if (!b) return;
+    const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+    if (isStandaloneApp() || !canFs) { b.style.display = 'none'; return; }
+    const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    b.textContent = active ? '✕ ⛶' : '⛶ Volledig scherm';
+}
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+updateFsBtn();
+
+// --- Web Audio API (magische harp & belletjes!) ---
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio() {
+    if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+}
+function playNote(freq, dur = 0.25, type = 'sine', vol = 0.12, delay = 0) {
+    try {
+        ensureAudio();
+        if (!audioCtx) return;
+        const t = audioCtx.currentTime + delay;
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = type; o.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.linearRampToValueAtTime(vol, t + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + dur + 0.03);
+    } catch {}
+}
+function soundSparkle() {
+    [587.33, 739.99, 880, 1174.66].forEach((f, i) => playNote(f, 0.28, 'triangle', 0.13, i * 0.065));
+}
+function soundClick() { playNote(520, 0.09, 'sine', 0.11); playNote(700, 0.11, 'sine', 0.1, 0.04); }
+function soundGentleWrong() { playNote(320, 0.15, 'sine', 0.1); playNote(260, 0.22, 'sine', 0.09, 0.09); }
+function soundPop() { playNote(740, 0.08, 'sine', 0.13); playNote(1080, 0.12, 'triangle', 0.11, 0.03); }
+function soundCrownFanfare() {
+    [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98].forEach((f, i) => playNote(f, 0.36, 'triangle', 0.13, i * 0.09));
+}
+
+// --- Nederlandse stem ---
+let nlVoice = null;
+function loadVoice() {
+    if (!('speechSynthesis' in window)) return;
+    const vs = window.speechSynthesis.getVoices();
+    nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+           || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
+}
+if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
+function speakDutch(txt) {
+    if (!voiceEnabled || !('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(txt);
+        u.lang = 'nl-NL';
+        if (nlVoice) u.voice = nlVoice;
+        u.rate = 0.92;
+        u.pitch = 1.15;
+        window.speechSynthesis.speak(u);
+    } catch {}
+}
+
+// --- Kroon juweel-plekken (6 schitterende vakjes op de gouden kroon!) ---
+const CROWN_SOCKETS = [
+    { x: 430, y: 275, r: 34 }, // punt links
+    { x: 640, y: 215, r: 42 }, // hoogste midden-punt!
+    { x: 850, y: 275, r: 34 }, // punt rechts
+    { x: 505, y: 368, r: 36 }, // band links
+    { x: 640, y: 368, r: 40 }, // band midden
+    { x: 775, y: 368, r: 36 }  // band rechts
+];
+
+let phase = 'play'; // 'play' | 'fly' | 'celebrate'
+let time = 0;
+let sessionId = 0;
+let placedJewels = []; // 6 slots: null or { color, shape }
+let activeSocketIdx = 0;
+let targetColor = null;
+let targetShape = null;
+let trayJewels = [];   // [{ color, shape, x, y, homeX, homeY, r, wiggle }]
+let flyingJewel = null;
+let wrongCount = 0;
+let crownBounce = 0;
+let bannerText = '';
+let bannerColor = '#ffd000';
+
+let dragJewel = null;
+let dragOffX = 0, dragOffY = 0;
+let pointerId = null;
+
+let particles = [];
+let partyHearts = [];
+let bgStars = Array.from({ length: 40 }, () => ({
+    x: Math.random() * W, y: Math.random() * 440,
+    s: 4 + Math.random() * 8, p: Math.random() * Math.PI * 2
+}));
+
+const speakerBtn = { x: 1095, y: 260, r: 46 };
+const replayBtn = { x: W / 2 - 220, y: 550, w: 440, h: 98 };
+const homeBtn = { x: 34, y: 26, w: 230, h: 64 };
+
+// --- Ronde & Slimme Afleiders (altijd dezelfde kleur + andere vorm EN zelfde vorm + andere kleur!) ---
+function nextJewelTurn() {
+    if (activeSocketIdx >= CROWN_SOCKETS.length) {
+        triggerCrownCelebration();
+        return;
+    }
+    wrongCount = 0;
+    phase = 'play';
+    dragJewel = null;
+
+    targetColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+    targetShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+
+    const otherColors = COLORS.filter(c => c.id !== targetColor.id).sort(() => Math.random() - 0.5);
+    const otherShapes = SHAPES.filter(s => s.id !== targetShape.id).sort(() => Math.random() - 0.5);
+
+    // Slimme afleiders die ECHT kleur + vorm samen trainen!
+    const list = [
+        { color: targetColor, shape: targetShape },         // 1. Exact goed!
+        { color: otherColors[0], shape: targetShape },      // 2. Zelfde vorm, andere kleur!
+        { color: targetColor, shape: otherShapes[0] },      // 3. Zelfde kleur, andere vorm!
+        { color: otherColors[1], shape: otherShapes[1] }    // 4. Andere kleur & andere vorm!
+    ];
+    if (diffMode === 'extra') {
+        list.push({ color: otherColors[2], shape: targetShape });   // 5. Nog een andere kleur + zelfde vorm
+        list.push({ color: targetColor, shape: otherShapes[2] });   // 6. Zelfde kleur + nog een vorm
+    }
+
+    const shuffled = list.sort(() => Math.random() - 0.5);
+    const count = shuffled.length;
+    const spacing = count === 6 ? 190 : 255;
+    const startX = W / 2 - ((count - 1) * spacing) / 2;
+    const trayY = 585;
+
+    trayJewels = shuffled.map((j, i) => ({
+        color: j.color,
+        shape: j.shape,
+        x: startX + i * spacing,
+        y: trayY,
+        homeX: startX + i * spacing,
+        homeY: trayY,
+        r: count === 6 ? 62 : 74,
+        wiggle: 0
+    }));
+
+    const targetPhrase = phraseDef(targetColor, targetShape);
+    bannerText = `✨ Vind ${targetPhrase}!`;
+    bannerColor = '#ffd000';
+    const sid = sessionId;
+    setTimeout(() => {
+        if (sid === sessionId && phase === 'play') {
+            speakDutch(`Waar is ${targetPhrase}?`);
+        }
+    }, 180);
+}
+
+function startNewCrown() {
+    sessionId++;
+    placedJewels = [null, null, null, null, null, null];
+    activeSocketIdx = 0;
+    flyingJewel = null;
+    partyHearts = [];
+    particles = [];
+    nextJewelTurn();
+}
+
+function spawnSparkles(x, y, col, n = 28) {
+    for (let i = 0; i < n; i++) {
+        const a = (Math.PI * 2 * i) / n + Math.random() * 0.35;
+        const sp = 2.8 + Math.random() * 7.5;
+        particles.push({
+            x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2,
+            size: 8 + Math.random() * 11,
+            color: i % 3 === 0 ? '#ffffff' : (i % 4 === 0 ? '#ffd000' : col),
+            life: 1, decay: 0.015 + Math.random() * 0.014, g: 0.12
+        });
+    }
+}
+
+function tryJewel(j, fromDrag) {
+    if (phase !== 'play') return;
+
+    if (j.color.id === targetColor.id && j.shape.id === targetShape.id) {
+        const sock = CROWN_SOCKETS[activeSocketIdx];
+        flyingJewel = {
+            color: j.color, shape: j.shape,
+            sx: j.x, sy: j.y, tx: sock.x, ty: sock.y,
+            t: 0, dur: fromDrag ? 0.2 : 0.42
+        };
+        phase = 'fly';
+        soundSparkle();
+        bannerText = `🌟 WAUW! ${phraseDef(j.color, j.shape).toUpperCase()}! 🌟`;
+        bannerColor = j.color.main;
+        speakDutch(`Goed zo! Dat is ${phraseDef(j.color, j.shape)}!`);
+    } else {
+        wrongCount++;
+        j.wiggle = 0.55;
+        soundGentleWrong();
+        const tappedStr = phraseIndef(j.color, j.shape);
+        const needStr = phraseDef(targetColor, targetShape);
+        bannerText = `Dat is ${tappedStr}! Zoek ${needStr}!`;
+        bannerColor = '#ff9f43';
+        speakDutch(`Dat is ${tappedStr}. Zoek ${needStr}!`);
+    }
+}
+
+function completeJewelPlacement() {
+    const sock = CROWN_SOCKETS[activeSocketIdx];
+    placedJewels[activeSocketIdx] = { color: targetColor, shape: targetShape };
+    crownBounce = 1;
+    spawnSparkles(sock.x, sock.y, targetColor.main, 36);
+    activeSocketIdx++;
+
+    const sid = sessionId;
+    setTimeout(() => {
+        if (!gameStarted || sid !== sessionId) return;
+        nextJewelTurn();
+    }, 760);
+}
+
+function triggerCrownCelebration() {
+    phase = 'celebrate';
+    soundCrownFanfare();
+    spawnSparkles(W / 2, 290, '#ffd000', 55);
+    bannerText = '👑 HOERA! WAT EEN PRACHTIGE KROON! 🎉';
+    bannerColor = '#ffd000';
+    speakDutch('Hoera! Jouw prinsessenkroon is helemaal klaar! Tik maar op de zwevende hartjes!');
+
+    partyHearts = [];
+    for (let i = 0; i < 10; i++) {
+        const c = COLORS[i % COLORS.length];
+        const s = SHAPES[i % SHAPES.length];
+        partyHearts.push({
+            x: 110 + i * 116 + (Math.random() - 0.5) * 30,
+            y: H + 70 + Math.random() * 260,
+            r: 46,
+            color: c,
+            shape: s,
+            vy: 1.2 + Math.random() * 0.85,
+            sway: Math.random() * Math.PI * 2,
+            popped: false
+        });
+    }
+}
+
+// --- Pointer / Touch / Muis ---
+function getPos(cx, cy) {
+    const r = canvas.getBoundingClientRect();
+    return { x: ((cx - r.left) / r.width) * W, y: ((cy - r.top) / r.height) * H };
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+    if (!gameStarted || settingsOpen) return;
+    e.preventDefault();
+    ensureAudio();
+    const pos = getPos(e.clientX, e.clientY);
+
+    if (phase === 'celebrate') {
+        if (pos.x >= homeBtn.x && pos.x <= homeBtn.x + homeBtn.w && pos.y >= homeBtn.y && pos.y <= homeBtn.y + homeBtn.h) {
+            window.location.href = 'index.html';
+            return;
+        }
+        if (pos.x >= replayBtn.x && pos.x <= replayBtn.x + replayBtn.w && pos.y >= replayBtn.y && pos.y <= replayBtn.y + replayBtn.h) {
+            soundClick();
+            startNewCrown();
+            return;
+        }
+        for (const h of partyHearts) {
+            if (h.popped) continue;
+            const hx = h.x + Math.sin(time * 2.3 + h.sway) * 18;
+            if (Math.hypot(pos.x - hx, pos.y - h.y) <= h.r + 22) {
+                h.popped = true;
+                soundPop();
+                spawnSparkles(hx, h.y, h.color.main, 24);
+                speakDutch(phraseIndef(h.color, h.shape));
+                return;
+            }
+        }
+        spawnSparkles(pos.x, pos.y, '#ffd000', 16);
+        soundPop();
+        return;
+    }
+
+    if (phase !== 'play') return;
+
+    // Luidspreker-knop -> herhaal kleur & vorm!
+    if (Math.hypot(pos.x - speakerBtn.x, pos.y - speakerBtn.y) <= speakerBtn.r + 16) {
+        soundClick();
+        const p = phraseDef(targetColor, targetShape);
+        speakDutch(`Waar is ${p}?`);
+        spawnSparkles(speakerBtn.x, speakerBtn.y, '#ffd000', 12);
+        return;
+    }
+
+    // Check juwelen op het fluwelen kussen (slepen of tikken!)
+    for (const j of trayJewels) {
+        if (Math.hypot(pos.x - j.x, pos.y - j.y) <= j.r + 16) {
+            dragJewel = j;
+            pointerId = e.pointerId;
+            dragOffX = j.x - pos.x;
+            dragOffY = j.y - pos.y;
+            soundClick();
+            canvas.setPointerCapture?.(e.pointerId);
+            return;
+        }
+    }
+});
+
+canvas.addEventListener('pointermove', (e) => {
+    if (!dragJewel || phase !== 'play') return;
+    if (pointerId !== null && e.pointerId !== pointerId) return;
+    e.preventDefault();
+    const pos = getPos(e.clientX, e.clientY);
+    dragJewel.x = pos.x + dragOffX;
+    dragJewel.y = pos.y + dragOffY;
+});
+
+canvas.addEventListener('pointerup', (e) => {
+    if (!dragJewel) return;
+    if (pointerId !== null && e.pointerId !== pointerId) return;
+    const j = dragJewel;
+    dragJewel = null;
+    pointerId = null;
+
+    const moved = Math.hypot(j.x - j.homeX, j.y - j.homeY);
+    const sock = CROWN_SOCKETS[activeSocketIdx];
+    const nearCrown = sock && (Math.hypot(j.x - sock.x, j.y - sock.y) < 180 || j.y < 430);
+
+    if (moved < 30 || nearCrown) {
+        tryJewel(j, moved >= 30);
+    }
+    j.x = j.homeX;
+    j.y = j.homeY;
+});
+
+window.addEventListener('keydown', (e) => {
+    if (!gameStarted || settingsOpen) return;
+    if (phase === 'play' && ['1','2','3','4','5','6'].includes(e.key)) {
+        const j = trayJewels[parseInt(e.key, 10) - 1];
+        if (j) tryJewel(j, false);
+    } else if (phase === 'celebrate' && (e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        startNewCrown();
+    }
+});
+
+// --- UI / Instellingen ---
+function startGame() {
+    ensureAudio();
+    enterFullscreen();
+    soundSparkle();
+    document.getElementById('start-overlay').style.display = 'none';
+    document.getElementById('parent-gear-btn').style.display = 'flex';
+    gameStarted = true;
+    startNewCrown();
+}
+function openSettings() { settingsOpen = true; document.getElementById('settings-overlay').style.display = 'flex'; }
+function closeSettings() { settingsOpen = false; document.getElementById('settings-overlay').style.display = 'none'; }
+function setDiff(m) {
+    diffMode = m;
+    ['easy','smart','extra'].forEach(k => document.getElementById(`mode-${k}`).classList.toggle('selected', k === m));
+    soundClick();
+}
+function setVoice(on) {
+    voiceEnabled = on;
+    document.getElementById('voice-on').classList.toggle('selected', on);
+    document.getElementById('voice-off').classList.toggle('selected', !on);
+    soundClick();
+}
+function applyAndResume() {
+    closeSettings();
+    if (!gameStarted) startGame();
+    else startNewCrown();
+}
+
+// ============================================================================
+// TEKENFUNCTIES (Glanzende juweel-vormen & gouden prinsessenkroon!)
+// ============================================================================
+function drawShapePath(shapeId, cx, cy, r) {
+    ctx.beginPath();
+    if (shapeId === 'ster') {
+        let rot = (Math.PI / 2) * 3;
+        ctx.moveTo(cx, cy - r);
+        for (let i = 0; i < 5; i++) {
+            ctx.lineTo(cx + Math.cos(rot) * r, cy + Math.sin(rot) * r);
+            rot += Math.PI / 5;
+            ctx.lineTo(cx + Math.cos(rot) * (r * 0.48), cy + Math.sin(rot) * (r * 0.48));
+            rot += Math.PI / 5;
+        }
+        ctx.closePath();
+    } else if (shapeId === 'hartje') {
+        const s = r * 1.45;
+        ctx.moveTo(cx, cy + s * 0.48);
+        ctx.bezierCurveTo(cx - s * 0.92, cy - s * 0.1, cx - s * 0.56, cy - s * 0.84, cx, cy - s * 0.28);
+        ctx.bezierCurveTo(cx + s * 0.56, cy - s * 0.84, cx + s * 0.92, cy - s * 0.1, cx, cy + s * 0.48);
+        ctx.closePath();
+    } else if (shapeId === 'bloem') {
+        for (let i = 0; i < 6; i++) {
+            const a = (Math.PI * 2 * i) / 6;
+            const px = cx + Math.cos(a) * (r * 0.52);
+            const py = cy + Math.sin(a) * (r * 0.52);
+            ctx.moveTo(px + r * 0.44, py);
+            ctx.arc(px, py, r * 0.44, 0, Math.PI * 2);
+        }
+        ctx.moveTo(cx + r * 0.4, cy);
+        ctx.arc(cx, cy, r * 0.4, 0, Math.PI * 2);
+    } else if (shapeId === 'rondje') {
+        ctx.arc(cx, cy, r * 0.86, 0, Math.PI * 2);
+    } else if (shapeId === 'maantje') {
+        ctx.arc(cx + r * 0.08, cy, r * 0.86, 0.25 * Math.PI, 1.75 * Math.PI, false);
+        ctx.quadraticCurveTo(cx - r * 0.15, cy, cx + r * 0.08 + Math.cos(0.25 * Math.PI) * r * 0.86, cy + Math.sin(0.25 * Math.PI) * r * 0.86);
+        ctx.closePath();
+    } else { // diamant
+        ctx.moveTo(cx, cy - r * 0.95);
+        ctx.lineTo(cx + r * 0.78, cy);
+        ctx.lineTo(cx, cy + r * 0.95);
+        ctx.lineTo(cx - r * 0.78, cy);
+        ctx.closePath();
+    }
+}
+
+function drawJewel(shapeId, color, x, y, r, opts = {}) {
+    const wiggleX = opts.wiggle ? Math.sin(opts.wiggle * 44) * 10 : 0;
+    const scale = opts.dragging ? 1.15 : (opts.hintPulse ? 1 + Math.sin(time * 7) * 0.08 : 1);
+
+    ctx.save();
+    ctx.translate(x + wiggleX, y);
+    ctx.scale(scale, scale);
+
+    if (opts.hintPulse) {
+        ctx.fillStyle = '#fff59d';
+        ctx.globalAlpha = 0.55;
+        ctx.beginPath(); ctx.arc(0, 0, r + 18, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+
+    // Zachte ronde juweel-tegel als ondergrond op het kussen
+    if (opts.onTray) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+        ctx.strokeStyle = '#ffd000';
+        ctx.lineWidth = 4.5;
+        ctx.shadowColor = 'rgba(0,0,0,0.28)';
+        ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.arc(0, 0, r + 10, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.stroke();
+    }
+
+    // De gekleurde vorm zelf!
+    ctx.fillStyle = color.main;
+    ctx.strokeStyle = '#2d1b4e';
+    ctx.lineWidth = opts.onTray ? 4.5 : 3.5;
+    ctx.lineJoin = 'round';
+    drawShapePath(shapeId, 0, 0, r * 0.85);
+    ctx.fill();
+    ctx.stroke();
+
+    // Glansplekje
+    ctx.fillStyle = color.light;
+    ctx.globalAlpha = 0.75;
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.22, -r * 0.22, r * 0.16, r * 0.1, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Schattig blij gezichtje op de vorm (voor extra herkenbaarheid & plezier!)
+    if (r >= 32) {
+        const s = r / 58;
+        ctx.fillStyle = '#2d1b4e';
+        const ex = shapeId === 'maantje' ? -14 * s : 0;
+        ctx.beginPath();
+        ctx.arc(ex - 11 * s, -2 * s, 4.2 * s, 0, Math.PI * 2);
+        ctx.arc(ex + 11 * s, -2 * s, 4.2 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#2d1b4e';
+        ctx.lineWidth = 3 * s;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(ex, 4 * s, 7.5 * s, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function drawBackground() {
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#3a1c71');
+    bg.addColorStop(0.55, '#6a3093');
+    bg.addColorStop(1, '#a044ff');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Twinkelende sterretjes in het kasteel
+    bgStars.forEach(s => {
+        ctx.save();
+        ctx.globalAlpha = 0.35 + 0.55 * Math.abs(Math.sin(time * 2.2 + s.p));
+        ctx.fillStyle = '#fff59d';
+        drawShapePath('ster', s.x, s.y, s.s);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    // Fluweel-roze koninklijk juwelen-kussen onderaan
+    ctx.fillStyle = '#b82563';
+    ctx.beginPath();
+    ctx.moveTo(0, 488);
+    ctx.quadraticCurveTo(W / 2, 452, W, 488);
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#ffd000';
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(0, 488);
+    ctx.quadraticCurveTo(W / 2, 452, W, 488);
+    ctx.stroke();
+}
+
+function drawCrown() {
+    const bounceY = crownBounce > 0 ? Math.sin(crownBounce * Math.PI) * 20 : 0;
+    const floatY = phase === 'celebrate' ? Math.sin(time * 3.2) * 12 : 0;
+
+    ctx.save();
+    ctx.translate(0, -bounceY + floatY);
+
+    // Gouden gloed achter de kroon
+    const glow = ctx.createRadialGradient(640, 315, 40, 640, 315, 310);
+    glow.addColorStop(0, 'rgba(255, 224, 102, 0.45)');
+    glow.addColorStop(1, 'rgba(255, 224, 102, 0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(640, 315, 310, 0, Math.PI * 2); ctx.fill();
+
+    // Kroon-silhouet (goud!)
+    const goldGrad = ctx.createLinearGradient(0, 165, 0, 430);
+    goldGrad.addColorStop(0, '#fff275');
+    goldGrad.addColorStop(0.5, '#ffd000');
+    goldGrad.addColorStop(1, '#e69500');
+
+    ctx.fillStyle = goldGrad;
+    ctx.strokeStyle = '#5c3300';
+    ctx.lineWidth = 7;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(390, 420);
+    ctx.lineTo(355, 215);
+    ctx.lineTo(500, 305);
+    ctx.lineTo(640, 145);
+    ctx.lineTo(780, 305);
+    ctx.lineTo(925, 215);
+    ctx.lineTo(890, 420);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Kroon-parels op de 3 toppen
+    [[355, 205], [640, 134], [925, 205]].forEach(([px, py]) => {
+        ctx.fillStyle = '#fff9c4';
+        ctx.beginPath(); ctx.arc(px, py, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    });
+
+    // Onderste koninklijke band
+    ctx.fillStyle = '#e69500';
+    ctx.beginPath(); ctx.roundRect(388, 396, 504, 34, 16); ctx.fill(); ctx.stroke();
+
+    // 6 Juweel-vakjes op de kroon
+    CROWN_SOCKETS.forEach((sock, idx) => {
+        const placed = placedJewels[idx];
+        if (placed) {
+            drawJewel(placed.shape.id, placed.color, sock.x, sock.y, sock.r);
+        } else {
+            const isCurrent = phase === 'play' && idx === activeSocketIdx;
+            const pulse = isCurrent ? 1 + Math.sin(time * 5.5) * 0.09 : 1;
+            ctx.save();
+            ctx.translate(sock.x, sock.y);
+            ctx.scale(pulse, pulse);
+
+            ctx.fillStyle = isCurrent ? 'rgba(255, 255, 255, 0.92)' : 'rgba(92, 51, 0, 0.25)';
+            ctx.strokeStyle = isCurrent ? '#ffffff' : 'rgba(92, 51, 0, 0.45)';
+            ctx.lineWidth = isCurrent ? 5 : 3;
+            ctx.beginPath(); ctx.arc(0, 0, sock.r + 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            if (isCurrent && targetShape && targetColor) {
+                if (diffMode === 'easy') {
+                    // Makkelijk: zachte kleur- & vorm-spiekje
+                    ctx.fillStyle = targetColor.light;
+                    ctx.strokeStyle = targetColor.main;
+                    ctx.lineWidth = 4;
+                    drawShapePath(targetShape.id, 0, 0, sock.r * 0.78);
+                    ctx.fill(); ctx.stroke();
+                } else if (diffMode === 'smart') {
+                    // Slim: ALLEEN zilveren vorm-omtrek (geen kleur!) -> ze moet kleur kiezen!
+                    ctx.fillStyle = '#dfe6e9';
+                    ctx.strokeStyle = '#636e72';
+                    ctx.lineWidth = 3.5;
+                    drawShapePath(targetShape.id, 0, 0, sock.r * 0.78);
+                    ctx.fill(); ctx.stroke();
+                } else {
+                    // Extra slim: alleen magisch vraagteken -> puur op luisteren naar kleur + vorm!
+                    ctx.fillStyle = '#7e22ce';
+                    ctx.font = '900 40px "Fredoka One", sans-serif';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('?', 0, 2);
+                }
+            }
+            ctx.restore();
+        }
+    });
+
+    ctx.restore();
+}
+
+function drawBannerAndSpeaker() {
+    if (bannerText) {
+        ctx.save();
+        ctx.font = '900 34px "Fredoka One", "Trebuchet MS", sans-serif';
+        const tw = ctx.measureText(bannerText).width;
+        const pw = Math.min(W - 180, Math.max(400, tw + 74));
+        const px = (W - pw) / 2, py = 26;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+        ctx.strokeStyle = bannerColor;
+        ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.roundRect(px, py, pw, 62, 30); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#2d1b4e';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(bannerText, W / 2, py + 33);
+        ctx.restore();
+    }
+
+    if (phase === 'play') {
+        ctx.save();
+        const s = 1 + Math.sin(time * 4) * 0.06;
+        ctx.translate(speakerBtn.x, speakerBtn.y);
+        ctx.scale(s, s);
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#ffd000';
+        ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.arc(0, 0, speakerBtn.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.font = '38px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('🔊', 0, 2);
+        ctx.restore();
+    }
+}
+
+function drawCelebration() {
+    partyHearts.forEach(h => {
+        if (h.popped) return;
+        const hx = h.x + Math.sin(time * 2.3 + h.sway) * 18;
+        drawJewel(h.shape.id, h.color, hx, h.y, h.r);
+    });
+
+    const p = 1 + Math.sin(time * 4.5) * 0.04;
+    ctx.save();
+    ctx.translate(replayBtn.x + replayBtn.w / 2, replayBtn.y + replayBtn.h / 2);
+    ctx.scale(p, p);
+    ctx.fillStyle = '#ff66a6'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.roundRect(-replayBtn.w / 2, -replayBtn.h / 2, replayBtn.w, replayBtn.h, 34); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.font = '900 40px "Fredoka One", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('▶ NOG EEN KROON!', 0, 3);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.strokeStyle = '#ced6e0'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.roundRect(homeBtn.x, homeBtn.y, homeBtn.w, homeBtn.h, 20); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#2d3436'; ctx.font = '900 24px Nunito, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('← 🏠 Alle spellen', homeBtn.x + homeBtn.w / 2, homeBtn.y + homeBtn.h / 2 + 1);
+    ctx.restore();
+}
+
+// ============================================================================
+// HOOFDLUS
+// ============================================================================
+let lastTs = 0;
+function loop(ts) {
+    const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0.016);
+    lastTs = ts;
+    time += dt;
+
+    if (crownBounce > 0) crownBounce = Math.max(0, crownBounce - dt * 2.2);
+    trayJewels.forEach(j => { if (j.wiggle > 0) j.wiggle = Math.max(0, j.wiggle - dt); });
+
+    if (phase === 'fly' && flyingJewel) {
+        flyingJewel.t += dt / flyingJewel.dur;
+        const p = Math.min(1, flyingJewel.t);
+        const ease = 1 - Math.pow(1 - p, 3);
+        flyingJewel.x = flyingJewel.sx + (flyingJewel.tx - flyingJewel.sx) * ease;
+        flyingJewel.y = flyingJewel.sy + (flyingJewel.ty - flyingJewel.sy) * ease - Math.sin(p * Math.PI) * 120;
+        if (p >= 1) {
+            flyingJewel = null;
+            completeJewelPlacement();
+        }
+    } else if (phase === 'celebrate') {
+        partyHearts.forEach(h => {
+            if (h.popped) return;
+            h.y -= h.vy * 60 * dt;
+            if (h.y < -80) h.y = H + 80;
+        });
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    drawBackground();
+    drawCrown();
+    drawBannerAndSpeaker();
+
+    if (phase !== 'celebrate') {
+        trayJewels.forEach(j => {
+            if (j === dragJewel) return;
+            const hint = phase === 'play' && wrongCount >= 2 && j.color.id === targetColor.id && j.shape.id === targetShape.id;
+            drawJewel(j.shape.id, j.color, j.x, j.y, j.r, { onTray: true, wiggle: j.wiggle, hintPulse: hint });
+        });
+        if (dragJewel) {
+            drawJewel(dragJewel.shape.id, dragJewel.color, dragJewel.x, dragJewel.y, dragJewel.r, { dragging: true });
+        }
+        if (flyingJewel) {
+            drawJewel(flyingJewel.shape.id, flyingJewel.color, flyingJewel.x, flyingJewel.y, 48);
+        }
+    } else {
+        drawCelebration();
+    }
+
+    particles.forEach(p => {
+        ctx.save(); ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        drawShapePath('ster', p.x, p.y, p.size);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
