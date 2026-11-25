@@ -27,6 +27,12 @@ Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
 - **[Kleur & Vorm Kroon-Maker](kleur-en-vorm-kroon.html)** 👑✨  
   Combineer **kleur én vorm** tegelijk (bijv. *de blauwe ster* tussen een *rode ster* en een *blauw hartje*) om de gouden prinsessenkroon met 6 glinsterende juwelen te versieren — met 3 moeilijkheidsniveaus in het oudermenu.
 
+### 🤝 Samen Spelen · Multiplayer (7 jaar + 3 jaar · 2 telefoons)
+- **[De Familie-Bakkerij](familie-bakkerij-samen.html)** 🧁🤝  
+  Samen reuzentaarten bakken op 2 telefoons (via QR-code of 4-letter code): **7 jaar (Telefoon 1 + TV)** bakt elke laag met tafels, plus/min of themawoorden, **3 jaar (Telefoon 2)** versiert elke laag met grote kleur-knoppen, en samen blazen ze de kaarsjes uit!
+- **[Schat-Eiland: De Dubbele Sleutel](schat-eiland-samen.html)** 🐉🗝️  
+  Samen over de schatkaart op 2 telefoons: **7 jaar (Telefoon 1 + TV)** bouwt de weg naar elke schatkist en **3 jaar (Telefoon 2)** opent de kisten met haar magische kleur- & vorm-sleutelbos tot ze samen de drakenschat openen!
+
 ## Spelen (Tip voor Android + Chromecast naar TV!)
 Open [`index.html`](index.html) direct in je browser, of activeer **GitHub Pages** in de repository-instellingen om alle spellen direct online op telefoon en Chromecast/TV te spelen.
 

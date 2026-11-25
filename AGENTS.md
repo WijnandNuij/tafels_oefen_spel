@@ -11,9 +11,10 @@ This document describes the purpose, architecture, and strict requirements for b
 
 ## 2. Repository Structure
 
-- `index.html` — The **begin-screen / game-picker** with two sides:
+- `index.html` — The **begin-screen / game-picker** with two solo sides plus a dedicated co-op multiplayer category:
   - **Left side (`age7`):** Games for the **7-year-old**.
   - **Right side (`age3`):** Games for the **3-year-old (girl)**.
+  - **Multiplayer section (`coop`):** 2-phone cooperative games where **7 jaar (Phone 1 + TV Host)** and **3 jaar (Phone 2 via QR/4-letter code)** work together as a team (using PeerJS WebRTC + inline QR code, plus a 1-phone fallback).
 - `manifest.json` — Lightweight PWA manifest (`display: "fullscreen"` / `"standalone"`) so adding the site to an Android phone's Home Screen launches the picker and every game with **zero browser URL bar** when casting to a TV.
 - `<game-slug>.html` — Individual standalone single-HTML games in lowercase Dutch kebab-case (e.g. `boerderij-reken-avontuur.html`).
 - `AGENTS.md` — These requirements and conventions.
@@ -104,3 +105,5 @@ This document describes the purpose, architecture, and strict requirements for b
 | Right — 3 jaar | Kleuren Mandjes | `kleuren-mandjes.html` | Kleuren herkennen & sorteren (slepen of tikken, Nederlandse stem, ballonnenfeest) |
 | Right — 3 jaar | De Kleuren-Trein | `kleuren-trein.html` | Kleurpatronen herkennen & afmaken (ABAB, AABB, ABC, ritmische Nederlandse stem, regenboog-feesttrein) |
 | Right — 3 jaar | Kleur & Vorm Kroon-Maker | `kleur-en-vorm-kroon.html` | Kleur én vorm combineren met slimme afleiders (prinsessenkroon versieren, Nederlandse stem, 3 niveaus) |
+| Multiplayer — Samen (7 + 3 jaar) | De Familie-Bakkerij | `familie-bakkerij-samen.html` | 2-telefoon co-op: 7 jaar bakt taartlagen (tafels/plus-min/woorden), 3 jaar kiest kleuren & versiering + samen kaarsjes uitblazen |
+| Multiplayer — Samen (7 + 3 jaar) | Schat-Eiland: De Dubbele Sleutel | `schat-eiland-samen.html` | 2-telefoon co-op: 7 jaar bouwt bruggen op de schatkaart, 3 jaar opent schatkisten met magische kleur+vorm sleutels + drakenfeest |

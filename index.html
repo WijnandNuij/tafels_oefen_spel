@@ -162,6 +162,34 @@
             background: linear-gradient(180deg, #fff3f8 0%, #ffffff 34%);
         }
 
+        /* Aparte Multiplayer-categorie (volle breedte onder de 2 kolommen) */
+        .side-coop {
+            grid-column: 1 / -1;
+            border-color: #ffd000;
+            background: linear-gradient(180deg, #fffbe6 0%, #ffffff 36%);
+        }
+        .side-coop .side-avatar {
+            background: linear-gradient(135deg, #ffa502, #ff66a6, #6c5ce7);
+        }
+        .side-coop .side-title-text h2 {
+            color: #9c5a00;
+        }
+        .side-coop .count-pill {
+            background: #fff3cd;
+            color: #8a4f00;
+            border: 2px solid #ffd000;
+        }
+        .side-coop .game-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 780px) {
+            .side-coop .game-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .side-header {
             display: flex;
             align-items: center;
@@ -580,6 +608,21 @@
                 </div>
                 <div class="game-list" id="list-age3"></div>
             </section>
+
+            <!-- Aparte categorie: Multiplayer (Samen spelen met 2 telefoons!) -->
+            <section class="side-panel side-coop" aria-labelledby="heading-coop">
+                <div class="side-header">
+                    <div class="side-title-group">
+                        <div class="side-avatar" aria-hidden="true">🤝</div>
+                        <div class="side-title-text">
+                            <h2 id="heading-coop">Samen Spelen · Multiplayer (2 telefoons)</h2>
+                            <p class="side-subtitle">🚀 7 jaar (Telefoon 1 + TV) &amp; 🦄 3 jaar (Telefoon 2) werken samen als één team!</p>
+                        </div>
+                    </div>
+                    <span class="count-pill" id="count-coop">0 spellen</span>
+                </div>
+                <div class="game-list" id="list-coop"></div>
+            </section>
         </main>
     </div>
 
@@ -660,6 +703,28 @@
                     accent: '#9b59ff',
                     shadow: '#6223c7',
                     soft: '#f3e8ff'
+                }
+            ],
+            coop: [
+                {
+                    title: 'De Familie-Bakkerij',
+                    file: 'familie-bakkerij-samen.html',
+                    icon: '🧁',
+                    description: '7 jaar bakt de taartlagen (tafels, plus/min of woorden) en 3 jaar versiert elke laag vanaf haar eigen telefoon!',
+                    tags: ['🤝 Samen', '2 telefoons', 'QR-code'],
+                    accent: '#ff66a6',
+                    shadow: '#c43670',
+                    soft: '#ffeaf3'
+                },
+                {
+                    title: 'Schat-Eiland: De Dubbele Sleutel',
+                    file: 'schat-eiland-samen.html',
+                    icon: '🐉',
+                    description: '7 jaar bouwt de bruggen op de schatkaart en 3 jaar opent elke schatkist met de magische kleur- & vorm-sleutel!',
+                    tags: ['🤝 Samen', '2 telefoons', 'QR-code'],
+                    accent: '#00b894',
+                    shadow: '#0b6e4f',
+                    soft: '#e8fbf5'
                 }
             ]
         };
@@ -754,6 +819,12 @@
             emoji: '🌈✨',
             title: 'Binnenkort komen hier jouw spelletjes!',
             text: 'Dieren, kleuren, vormen, tellen en nog veel meer om samen te ontdekken.'
+        });
+
+        renderGameList('list-coop', 'count-coop', GAMES.coop, {
+            emoji: '🤝✨',
+            title: 'Binnenkort samen-spellen!',
+            text: 'Speel samen op 2 telefoons.'
         });
 
         // Volledig scherm ondersteuning voor Android Chrome (Chromecast naar TV)
