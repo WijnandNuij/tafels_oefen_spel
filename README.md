@@ -1,14 +1,23 @@
-# Boerderij Reken-Avontuur 🚜🌾
+# Spelletjes Kiezen — Leerzame Kinderspelletjes 🎮🇳🇱
 
-Een kindvriendelijk 2D-platformspel in één HTML-bestand om de tafels van 1 t/m 10 te oefenen — speelbaar op zowel PC als Chromecast / TV.
+Een verzameling Nederlandse, leerzame spelletjes — elk als **één los HTML-bestand** — speciaal gemaakt om op de **telefoon** te spelen terwijl het scherm naar de **TV (Chromecast)** wordt gecast zodat ouders gezellig mee kunnen kijken.
 
-## Kenmerken
-- **8 unieke boerderijlevels** (van *Het Kippenhok* tot *Het Boerderij-Feest*) met eigen thema's, dieren, modderpoelen, spring-hooibalen en bewegende platforms.
-- **Kies je karakter:** Boer Teun of Boerin Saar.
-- **Instelbare tafels (1–10)** en moeilijkheidsgraad (1, 2 of 3 sommen per schuur).
-- **Hartjes & Reddings-som:** 3 hartjes per level; bij 0 hartjes kun je met een reddings-som direct verder spelen met 2 hartjes.
-- **Bonus `?-kisten`** tussendoor voor extra appels en hartjes.
-- **Besturing:** Pijltjestoetsen / WASD / Spatiebalk én grote knoppen op het scherm (`◀`, `▶`, `SPRING`) voor mobiel, tablet en TV/Chromecast.
+## Begin-scherm (`index.html`)
+Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
+- **Links — 7 jaar:** Rekenen, taal & avontuur
+- **Rechts — 3 jaar:** Kleuren, vormen, dieren & ontdekken
+
+## Spellen
+
+### 🚀 7 jaar (links)
+- **[Boerderij Reken-Avontuur](boerderij-reken-avontuur.html)** 🚜🌾  
+  Een kindvriendelijk 2D-platformspel met 8 unieke boerderijlevels om de tafels van 1 t/m 10 te oefenen. Met kiesbare boer (Boer Teun / Boerin Saar), instelbare tafels en moeilijkheidsgraad, bonus `?-kisten`, hartjes met reddings-som en grote knoppen voor telefoon & TV.
+
+### 🦄 3 jaar (rechts)
+- *Binnenkort komen hier de eerste peuterspelletjes!*
 
 ## Spelen
-Open [`index.html`](index.html) direct in je browser, of activeer **GitHub Pages** in de repository-instellingen om het spel direct online te spelen.
+Open [`index.html`](index.html) direct in je browser, of activeer **GitHub Pages** in de repository-instellingen om alle spellen direct online op telefoon en Chromecast/TV te spelen.
+
+## Nieuwe spellen toevoegen
+Zie [`AGENTS.md`](AGENTS.md) voor alle spelvereisten, doelgroeprichtlijnen (7 jaar & 3 jaar) en het stappenplan om nieuwe single-HTML spellen toe te voegen aan het keuzescherm.
