@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Woord-Detective: Kraak de Kluis!</title>
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#14192b">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"
+        rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -17,7 +21,9 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
         }
-        html, body {
+
+        html,
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -50,7 +56,12 @@
             gap: 1.4%;
             color: #fff;
         }
-        :fullscreen #game-stage { border-radius: 0; box-shadow: none; }
+
+        :fullscreen #game-stage {
+            border-radius: 0;
+            box-shadow: none;
+        }
+
         @media (max-height: 520px) and (orientation: landscape) {
             #game-stage {
                 width: 100vw;
@@ -73,6 +84,7 @@
             padding: 6px 12px;
             flex-shrink: 0;
         }
+
         .v-btn {
             background: #2c3e75;
             color: #fff;
@@ -84,7 +96,10 @@
             cursor: pointer;
             white-space: nowrap;
         }
-        .v-btn:active { transform: scale(0.94); }
+
+        .v-btn:active {
+            transform: scale(0.94);
+        }
 
         #locks-row {
             flex: 1;
@@ -94,6 +109,7 @@
             flex-wrap: wrap;
             gap: 5px;
         }
+
         .lock-dot {
             width: clamp(20px, 2.3vw, 30px);
             height: clamp(20px, 2.3vw, 30px);
@@ -106,6 +122,7 @@
             font-size: clamp(0.65rem, 1.15vw, 0.9rem);
             transition: all 0.25s;
         }
+
         .lock-dot.open {
             background: #2ecc71;
             border-color: #ffeaa7;
@@ -124,7 +141,10 @@
             font-weight: 900;
             white-space: nowrap;
         }
-        #karel-emoji { font-size: clamp(1.2rem, 2.2vw, 1.75rem); }
+
+        #karel-emoji {
+            font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+        }
 
         /* Hoofd-werkblad: wisselt tussen Spoor-Scanner & Laser-Koppelkluis */
         #desk-area {
@@ -143,6 +163,7 @@
             gap: 10px;
             min-height: 0;
         }
+
         #clue-card {
             background: linear-gradient(135deg, #fffdf4 0%, #fff3d1 100%);
             color: #2d3436;
@@ -154,6 +175,7 @@
             gap: 14px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
         }
+
         #clue-badge {
             flex-shrink: 0;
             background: #6c5ce7;
@@ -164,12 +186,14 @@
             border-radius: 14px;
             white-space: nowrap;
         }
+
         #clue-text {
             flex: 1;
             font-size: clamp(1rem, 2.25vw, 1.7rem);
             font-weight: 900;
             line-height: 1.24;
         }
+
         #clue-swatch {
             display: none;
             align-items: center;
@@ -181,9 +205,15 @@
             font-weight: 900;
             font-size: clamp(0.75rem, 1.25vw, 0.95rem);
         }
+
         .swatch-circle {
-            width: 20px; height: 20px; border-radius: 50%; border: 2px solid #2d3436; display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #2d3436;
+            display: inline-block;
         }
+
         #speak-clue-btn {
             flex-shrink: 0;
             width: clamp(44px, 5vw, 56px);
@@ -203,6 +233,7 @@
             gap: 12px;
             min-height: 0;
         }
+
         .key-btn {
             background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%);
             border: 4px solid #74b9ff;
@@ -222,21 +253,29 @@
             transition: transform 0.1s, background-color 0.12s;
             touch-action: manipulation;
         }
+
         .key-btn.is-word {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(1.1rem, 2.25vw, 1.75rem);
         }
-        .key-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0984e3; }
+
+        .key-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0984e3;
+        }
+
         .key-icon {
             font-size: clamp(1.35rem, 2.6vw, 2.1rem);
             flex-shrink: 0;
         }
+
         .key-btn.correct {
             background: #2ecc71 !important;
             border-color: #1e8449 !important;
             box-shadow: 0 4px 0 #1e8449 !important;
             color: #fff !important;
         }
+
         .key-btn.wrong {
             background: #ffe0e0 !important;
             border-color: #ff6b6b !important;
@@ -251,6 +290,7 @@
             gap: 10px;
             min-height: 0;
         }
+
         #wire-banner {
             background: rgba(241, 196, 15, 0.2);
             border: 3px solid #f1c40f;
@@ -261,6 +301,7 @@
             font-size: clamp(0.9rem, 1.8vw, 1.35rem);
             color: #ffeaa7;
         }
+
         #wire-board {
             position: relative;
             flex: 1;
@@ -269,6 +310,7 @@
             gap: 6%;
             min-height: 0;
         }
+
         #wire-svg {
             position: absolute;
             inset: 0;
@@ -277,6 +319,7 @@
             pointer-events: none;
             z-index: 2;
         }
+
         .wire-col {
             display: flex;
             flex-direction: column;
@@ -285,6 +328,7 @@
             z-index: 3;
             min-height: 0;
         }
+
         .wire-node {
             flex: 1;
             background: #ffffff;
@@ -304,16 +348,19 @@
             transition: transform 0.1s, border-color 0.12s;
             touch-action: manipulation;
         }
+
         .wire-node.word-node {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(1rem, 1.95vw, 1.5rem);
         }
+
         .wire-node.selected {
             border-color: #f1c40f;
             background: #fff9db;
             box-shadow: 0 0 0 4px rgba(241, 196, 15, 0.55);
             transform: scale(1.02);
         }
+
         .wire-node.matched {
             background: #2ecc71;
             border-color: #1e8449;
@@ -321,10 +368,61 @@
             color: #fff;
             pointer-events: none;
         }
+
         .wire-node.wrong {
             background: #ffe0e0;
             border-color: #ff6b6b;
             animation: shake 0.35s ease;
+            pointer-events: none;
+        }
+
+        .key-btn.wrong {
+            pointer-events: none;
+        }
+
+        .key-btn.cooldown-dim,
+        .wire-node.cooldown-dim {
+            background: #e5ebf1;
+            border-color: #95a5a6;
+            box-shadow: 0 3px 0 #7f8c8d;
+            color: #1e272e;
+            opacity: 1;
+            pointer-events: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #cooldown-bar {
+            display: none;
+            background: rgba(255, 248, 220, 0.97);
+            border: 3px solid #ff9f43;
+            border-radius: 14px;
+            padding: 5px 14px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        #cooldown-text {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.84rem, 1.55vw, 1.15rem);
+            color: #c0392b;
+            margin-bottom: 4px;
+        }
+
+        .cooldown-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.14);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        #cooldown-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff9f43);
+            border-radius: 999px;
         }
 
         /* Detective Hint balk onderin */
@@ -353,10 +451,15 @@
             overscroll-behavior: contain;
             touch-action: pan-y;
         }
-        .overlay * { touch-action: pan-y; }
+
+        .overlay * {
+            touch-action: pan-y;
+        }
+
         #menu-overlay {
             background: linear-gradient(150deg, #1b1464 0%, #3c40c6 52%, #0fbcf9 100%);
         }
+
         #win-overlay {
             display: none;
             background: linear-gradient(145deg, #2ecc71 0%, #f1c40f 100%);
@@ -375,6 +478,7 @@
             text-align: center;
             box-shadow: 0 16px 38px rgba(0, 0, 0, 0.38);
         }
+
         .top-row {
             display: flex;
             justify-content: space-between;
@@ -382,6 +486,7 @@
             gap: 10px;
             margin-bottom: 6px;
         }
+
         .home-link {
             display: inline-flex;
             align-items: center;
@@ -396,7 +501,11 @@
             font-size: 0.92rem;
             box-shadow: 0 3px 0 #b2bec3;
         }
-        .home-link:hover { background: #ffeaa7; border-color: #fdcb6e; }
+
+        .home-link:hover {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+        }
 
         h1 {
             font-family: 'Fredoka One', cursive, sans-serif;
@@ -405,24 +514,28 @@
             font-size: clamp(1.5rem, 3.8vw, 2.4rem);
             text-shadow: 2px 2px 0 #ffeaa7;
         }
+
         .subtitle {
             margin: 0 0 12px 0;
             font-size: clamp(0.9rem, 1.8vw, 1.12rem);
             font-weight: 800;
             color: #57606f;
         }
+
         h2 {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: 1.02rem;
             color: #2d3436;
             margin: 10px 0 8px 0;
         }
+
         .vault-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 12px;
         }
+
         .vault-btn {
             border: 4px solid #ced6e0;
             background: #f8f9fa;
@@ -435,16 +548,35 @@
             text-align: left;
             transition: all 0.14s;
         }
+
         .vault-btn.selected {
             border-color: #6c5ce7;
             background: #f2efff;
             box-shadow: 0 5px 12px rgba(108, 92, 231, 0.28);
             transform: scale(1.02);
         }
-        .vault-icon { font-size: 2rem; flex-shrink: 0; }
-        .vault-title { font-family: 'Fredoka One', cursive, sans-serif; font-size: 1.05rem; color: #2d3436; }
-        .vault-sub { font-size: 0.8rem; font-weight: 800; color: #636e72; }
-        .vault-badge { margin-left: auto; font-size: 1.25rem; }
+
+        .vault-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .vault-title {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.05rem;
+            color: #2d3436;
+        }
+
+        .vault-sub {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #636e72;
+        }
+
+        .vault-badge {
+            margin-left: auto;
+            font-size: 1.25rem;
+        }
 
         .opt-row {
             display: flex;
@@ -453,6 +585,7 @@
             gap: 8px;
             margin-bottom: 12px;
         }
+
         .opt-btn {
             border: 3px solid #ced6e0;
             background: #f1f2f6;
@@ -464,7 +597,12 @@
             cursor: pointer;
             color: #2d3436;
         }
-        .opt-btn.selected { border-color: #f1c40f; background: #fff9db; color: #7d5a00; }
+
+        .opt-btn.selected {
+            border-color: #f1c40f;
+            background: #fff9db;
+            color: #7d5a00;
+        }
 
         .start-btn {
             background: linear-gradient(180deg, #6c5ce7 0%, #4834d4 100%);
@@ -477,7 +615,11 @@
             cursor: pointer;
             box-shadow: 0 6px 0 #301f9e, 0 10px 18px rgba(0, 0, 0, 0.2);
         }
-        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #301f9e; }
+
+        .start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #301f9e;
+        }
 
         /* Mobiel portret: gebruik het hele telefoonscherm zodat alle 4 sleutels & koppel-kabels groot en tikbaar zijn */
         @media (orientation: portrait) {
@@ -491,653 +633,804 @@
                 padding: max(10px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) 12px;
                 gap: 10px;
             }
-            #vault-bar { flex-wrap: wrap; padding: 8px 10px; gap: 6px; }
-            #clue-card { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
-            #clue-text { font-size: 1.08rem; }
+
+            #vault-bar {
+                flex-wrap: wrap;
+                padding: 8px 10px;
+                gap: 6px;
+            }
+
+            #clue-card {
+                flex-wrap: wrap;
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            #clue-text {
+                font-size: 1.08rem;
+            }
+
             #keys-grid {
                 grid-template-columns: 1fr;
                 gap: 9px;
             }
-            .key-btn { padding: 10px 12px; font-size: 0.96rem; min-height: 58px; }
-            .key-btn.is-word { font-size: 1.15rem; }
-            #wire-board { gap: 4%; }
-            .wire-node { font-size: 0.84rem; padding: 7px 9px; }
-            .wire-node.word-node { font-size: 0.95rem; }
-            #hint-footer { font-size: 0.85rem; }
+
+            .key-btn {
+                padding: 10px 12px;
+                font-size: 0.96rem;
+                min-height: 58px;
+            }
+
+            .key-btn.is-word {
+                font-size: 1.15rem;
+            }
+
+            #wire-board {
+                gap: 4%;
+            }
+
+            .wire-node {
+                font-size: 0.84rem;
+                padding: 7px 9px;
+            }
+
+            .wire-node.word-node {
+                font-size: 0.95rem;
+            }
+
+            #hint-footer {
+                font-size: 0.85rem;
+            }
         }
 
         @media (max-width: 640px) {
-            .vault-grid { grid-template-columns: 1fr; }
+            .vault-grid {
+                grid-template-columns: 1fr;
+            }
         }
+
         @media (max-height: 480px) {
-            .card { padding: 10px 16px 14px 16px; border-width: 4px; }
-            .vault-btn { padding: 6px 10px; }
-            .vault-icon { font-size: 1.5rem; }
-            .subtitle { margin-bottom: 6px; }
-            h2 { margin: 6px 0 4px 0; font-size: 0.9rem; }
-            .start-btn { padding: 8px 30px; }
+            .card {
+                padding: 10px 16px 14px 16px;
+                border-width: 4px;
+            }
+
+            .vault-btn {
+                padding: 6px 10px;
+            }
+
+            .vault-icon {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                margin-bottom: 6px;
+            }
+
+            h2 {
+                margin: 6px 0 4px 0;
+                font-size: 0.9rem;
+            }
+
+            .start-btn {
+                padding: 8px 30px;
+            }
         }
+
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            75% {
+                transform: translateX(6px);
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div id="game-stage">
-    <div id="vault-bar">
-        <button class="v-btn" onclick="openMenu()">📋 Kluizen</button>
-        <div id="locks-row"></div>
-        <div id="karel-box">
-            <span id="karel-emoji">🦝</span>
-            <span id="karel-mood">Karel verstopt zich…</span>
-        </div>
-    </div>
-
-    <div id="desk-area">
-        <!-- Mode A: Spoor-Scanner -->
-        <div id="scanner-view">
-            <div id="clue-card">
-                <span id="clue-badge">🔍 SPOOR</span>
-                <div id="clue-text">Laden…</div>
-                <div id="clue-swatch"></div>
-                <button id="speak-clue-btn" title="Lees spoor voor" aria-label="Lees spoor voor" onclick="speakCurrentClue()">🔊</button>
-            </div>
-            <div id="keys-grid"></div>
-        </div>
-
-        <!-- Mode B: Laser-Koppelkluis (3 paren koppelen!) -->
-        <div id="wire-view">
-            <div id="wire-banner">⚡ LASER-KOPPELKLUIS! Tik links op een woord en rechts op de juiste omschrijving! ⚡</div>
-            <div id="wire-board">
-                <svg id="wire-svg"></svg>
-                <div class="wire-col" id="wire-left"></div>
-                <div class="wire-col" id="wire-right"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="hint-footer">🔍 Kies de juiste sleutel om het slot te kraken!</div>
-</div>
-
-<!-- Start Menu -->
-<div id="menu-overlay" class="overlay">
-    <div class="card">
-        <div class="top-row">
-            <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
-            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-                <button class="home-link" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
-                <span style="font-weight:900; color:#57606f; font-size:0.9rem;" id="badges-count">🏅 0 / 4 kluizen gekraakt</span>
+    <div id="game-stage">
+        <div id="vault-bar">
+            <button class="v-btn" onclick="openMenu()">📋 Kluizen</button>
+            <div id="locks-row"></div>
+            <div id="karel-box">
+                <span id="karel-emoji">🦝</span>
+                <span id="karel-mood">Karel verstopt zich…</span>
             </div>
         </div>
 
-        <h1>🕵️ Woord-Detective: Kraak de Kluis! 🔐</h1>
-        <p class="subtitle">Karel de Knoeier 🦝 heeft de buit opgesloten! Kraak alle sloten met de spoor-scanner én de laser-koppelkluis!</p>
+        <div id="desk-area">
+            <!-- Mode A: Spoor-Scanner -->
+            <div id="scanner-view">
+                <div id="clue-card">
+                    <span id="clue-badge">🔍 SPOOR</span>
+                    <div id="clue-text">Laden…</div>
+                    <div id="clue-swatch"></div>
+                    <button id="speak-clue-btn" title="Lees spoor voor" aria-label="Lees spoor voor"
+                        onclick="speakCurrentClue()">🔊</button>
+                </div>
+                <div id="keys-grid"></div>
+            </div>
 
-        <h2>Kies een kluis om te kraken:</h2>
-        <div class="vault-grid">
-            <button class="vault-btn selected" id="v-0" onclick="pickVault(0)">
-                <span class="vault-icon">🏠</span>
-                <div>
-                    <div class="vault-title">Kluis 1: Het Droomhuis</div>
-                    <div class="vault-sub">Blad 1 · 12 sloten</div>
+            <!-- Mode B: Laser-Koppelkluis (3 paren koppelen!) -->
+            <div id="wire-view">
+                <div id="wire-banner">⚡ LASER-KOPPELKLUIS! Tik links op een woord en rechts op de juiste omschrijving! ⚡
                 </div>
-                <span class="vault-badge" id="vb-0">🔒</span>
-            </button>
-            <button class="vault-btn" id="v-1" onclick="pickVault(1)">
-                <span class="vault-icon">🗺️</span>
-                <div>
-                    <div class="vault-title">Kluis 2: Geheime Plattegrond</div>
-                    <div class="vault-sub">Blad 2 · 12 sloten</div>
+                <div id="wire-board">
+                    <svg id="wire-svg"></svg>
+                    <div class="wire-col" id="wire-left"></div>
+                    <div class="wire-col" id="wire-right"></div>
                 </div>
-                <span class="vault-badge" id="vb-1">🔒</span>
-            </button>
-            <button class="vault-btn" id="v-2" onclick="pickVault(2)">
-                <span class="vault-icon">🎂</span>
-                <div>
-                    <div class="vault-title">Kluis 3: Gouden Taart-Recept</div>
-                    <div class="vault-sub">Blad 3 · 12 sloten</div>
-                </div>
-                <span class="vault-badge" id="vb-2">🔒</span>
-            </button>
-            <button class="vault-btn" id="v-3" onclick="pickVault(3)">
-                <span class="vault-icon">💎</span>
-                <div>
-                    <div class="vault-title">Super-Kluis: Alle 36 Sloten!</div>
-                    <div class="vault-sub">Blad 1 + 2 + 3 door elkaar</div>
-                </div>
-                <span class="vault-badge" id="vb-3">🔒</span>
-            </button>
+            </div>
         </div>
 
-        <div class="opt-row">
-            <button class="opt-btn selected" id="auto-read-btn" onclick="toggleAutoRead()">🔊 Sporen voorlezen: AAN</button>
-            <button class="opt-btn selected" id="wire-mode-btn" onclick="toggleWireMode()">⚡ Laser-koppelkluis: AAN</button>
+        <div id="cooldown-bar" aria-live="polite">
+            <div id="cooldown-text">⏳ Even rustig nadenken… 3</div>
+            <div class="cooldown-track">
+                <div id="cooldown-fill"></div>
+            </div>
         </div>
-
-        <button class="start-btn" onclick="startVault()">KLUIS KRAKEN! 🔍</button>
+        <div id="hint-footer">🔍 Kies de juiste sleutel om het slot te kraken!</div>
     </div>
-</div>
 
-<!-- Kluis Gekraakt! -->
-<div id="win-overlay" class="overlay">
-    <div class="card" style="max-width: 650px; border-color: #2ecc71;">
-        <h1 style="color:#27ae60;">🔓 KLUIS GEKRAAKT! 🕵️‍♂️</h1>
-        <div style="font-size:3.2rem; margin:6px 0;" id="win-emoji">🦝🎉🏆</div>
-        <p style="font-size:1.3rem; font-weight:900; color:#2d3436; margin:8px 0;" id="win-title">Karel de Knoeier is gepakt!</p>
-        <p style="font-size:1.05rem; font-weight:800; color:#57606f; margin:0 0 18px 0;" id="win-stats"></p>
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px;">
-            <button class="start-btn" onclick="nextVault()">VOLGENDE KLUIS ▶</button>
-            <button class="opt-btn" style="font-size:1rem; padding:12px 20px;" onclick="openMenu()">📋 Alle kluizen</button>
-            <a class="home-link" style="font-size:1rem; padding:10px 18px;" href="index.html">🏠 Alle spellen</a>
+    <!-- Start Menu -->
+    <div id="menu-overlay" class="overlay">
+        <div class="card">
+            <div class="top-row">
+                <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                    <button class="home-link" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
+                    <span style="font-weight:900; color:#57606f; font-size:0.9rem;" id="badges-count">🏅 0 / 4 kluizen
+                        gekraakt</span>
+                </div>
+            </div>
+
+            <h1>🕵️ Woord-Detective: Kraak de Kluis! 🔐</h1>
+            <p class="subtitle">Karel de Knoeier 🦝 heeft de buit opgesloten! Kraak alle sloten met de spoor-scanner én
+                de laser-koppelkluis!</p>
+
+            <h2>Kies een kluis om te kraken:</h2>
+            <div class="vault-grid">
+                <button class="vault-btn selected" id="v-0" onclick="pickVault(0)">
+                    <span class="vault-icon">🏠</span>
+                    <div>
+                        <div class="vault-title">Kluis 1: Het Droomhuis</div>
+                        <div class="vault-sub">Blad 1 · 12 sloten</div>
+                    </div>
+                    <span class="vault-badge" id="vb-0">🔒</span>
+                </button>
+                <button class="vault-btn" id="v-1" onclick="pickVault(1)">
+                    <span class="vault-icon">🗺️</span>
+                    <div>
+                        <div class="vault-title">Kluis 2: Geheime Plattegrond</div>
+                        <div class="vault-sub">Blad 2 · 12 sloten</div>
+                    </div>
+                    <span class="vault-badge" id="vb-1">🔒</span>
+                </button>
+                <button class="vault-btn" id="v-2" onclick="pickVault(2)">
+                    <span class="vault-icon">🎂</span>
+                    <div>
+                        <div class="vault-title">Kluis 3: Gouden Taart-Recept</div>
+                        <div class="vault-sub">Blad 3 · 12 sloten</div>
+                    </div>
+                    <span class="vault-badge" id="vb-2">🔒</span>
+                </button>
+                <button class="vault-btn" id="v-3" onclick="pickVault(3)">
+                    <span class="vault-icon">💎</span>
+                    <div>
+                        <div class="vault-title">Super-Kluis: Alle 36 Sloten!</div>
+                        <div class="vault-sub">Blad 1 + 2 + 3 door elkaar</div>
+                    </div>
+                    <span class="vault-badge" id="vb-3">🔒</span>
+                </button>
+            </div>
+
+            <div class="opt-row">
+                <button class="opt-btn selected" id="auto-read-btn" onclick="toggleAutoRead()">🔊 Sporen voorlezen:
+                    AAN</button>
+                <button class="opt-btn selected" id="wire-mode-btn" onclick="toggleWireMode()">⚡ Laser-koppelkluis:
+                    AAN</button>
+            </div>
+
+            <button class="start-btn" onclick="startVault()">KLUIS KRAKEN! 🔍</button>
         </div>
     </div>
-</div>
 
-<script>
-// ============================================================================
-// EXACTE THEMAWOORDEN (alle 36 woorden + omschrijvingen van het blad)
-// ============================================================================
-const WORDS = [
-    { id: 1, col: 0, group: 'kamer', icon: '🪑', word: 'het meubilair', desc: 'Alle meubels bij elkaar, bijvoorbeeld alle stoelen, kasten en tafels.' },
-    { id: 2, col: 0, group: 'kamer', icon: '🛋️', word: 'inrichten', desc: 'Alle spullen in een kamer op de goede plek neerzetten.' },
-    { id: 3, col: 0, group: 'kamer', icon: '📐', word: 'passen en meten (uitdrukking)', desc: 'Uitproberen of iets ergens in, op of tussen past.' },
-    { id: 4, col: 0, group: 'gevoel', icon: '🥱', word: 'saai', desc: 'Iets is steeds hetzelfde, je verveelt je erbij.' },
-    { id: 5, col: 0, group: 'gevoel', icon: '🎢', word: 'afwisselend', desc: 'Iets is steeds anders, je verveelt je niet.' },
-    { id: 6, col: 0, group: 'klus', icon: '💡', word: 'het idee', desc: 'Iets wat je bedenkt.' },
-    { id: 7, col: 0, group: 'huis', icon: '🧱', word: 'de wand', desc: 'Een muur.' },
-    { id: 8, col: 0, group: 'gevoel', icon: '✨', word: 'fraai', desc: 'Mooi.' },
-    { id: 9, col: 0, group: 'been', icon: '🩹', word: 'het gips', desc: 'Verband dat heel hard wordt. De dokter doet gips om je been als het gebroken is.' },
-    { id: 10, col: 0, group: 'klus', icon: '🔨', word: 'het karwei', desc: 'Een klus, werk dat je moet doen.' },
-    { id: 11, col: 0, group: 'been', icon: '🦯', word: 'de krukken', desc: 'Stokken waar je op kunt steunen als je moeilijk kunt lopen, bijvoorbeeld als je been gebroken is.' },
-    { id: 12, col: 0, group: 'huis', icon: '🚪', word: 'het luik', desc: 'Een soort deurtje van hout dat aan de buitenkant van een raam zit.' },
+    <!-- Kluis Gekraakt! -->
+    <div id="win-overlay" class="overlay">
+        <div class="card" style="max-width: 650px; border-color: #2ecc71;">
+            <h1 style="color:#27ae60;">🔓 KLUIS GEKRAAKT! 🕵️‍♂️</h1>
+            <div style="font-size:3.2rem; margin:6px 0;" id="win-emoji">🦝🎉🏆</div>
+            <p style="font-size:1.3rem; font-weight:900; color:#2d3436; margin:8px 0;" id="win-title">Karel de Knoeier
+                is gepakt!</p>
+            <p style="font-size:1.05rem; font-weight:800; color:#57606f; margin:0 0 18px 0;" id="win-stats"></p>
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px;">
+                <button class="start-btn" onclick="nextVault()">VOLGENDE KLUIS ▶</button>
+                <button class="opt-btn" style="font-size:1rem; padding:12px 20px;" onclick="openMenu()">📋 Alle
+                    kluizen</button>
+                <a class="home-link" style="font-size:1rem; padding:10px 18px;" href="index.html">🏠 Alle spellen</a>
+            </div>
+        </div>
+    </div>
 
-    { id: 13, col: 1, group: 'afval', icon: '🛋️', word: 'het grofvuil', desc: 'Alles wat je weggooit en niet in de vuilnisbak past.' },
-    { id: 14, col: 1, group: 'afval', icon: '🗑️', word: 'het vuilnis', desc: 'Dingen die je niet meer gebruikt en weggooit, zoals lege melkpakken.' },
-    { id: 15, col: 1, group: 'afval', icon: '🍎', word: 'het gft', desc: 'Een afkorting van groente-, fruit- en tuinafval.' },
-    { id: 16, col: 1, group: 'afval', icon: '⛰️', word: 'het puin', desc: 'Brokken steen die je weggooit.' },
-    { id: 17, col: 1, group: 'meten', icon: '📏', word: 'het meetinstrument', desc: 'Gereedschap waarmee je kunt meten.' },
-    { id: 18, col: 1, group: 'meten', icon: '📐', word: 'de duimstok', desc: 'Een liniaal die je kunt opvouwen.' },
-    { id: 19, col: 1, group: 'meten', icon: '🧵', word: 'het meetlint', desc: 'Een stuk slappe stof of slap plastic waarmee je kunt meten.' },
-    { id: 20, col: 1, group: 'meten', icon: '📟', word: 'de rolmaat', desc: 'Een liniaal die je kunt oprollen.' },
-    { id: 21, col: 1, group: 'huis', icon: '💡', word: 'de lampenkap', desc: 'Een kap die om de lamp zit.' },
-    { id: 22, col: 1, group: 'been', icon: '🦘', word: 'hinken', desc: 'Met kleine schokjes lopen, bijvoorbeeld doordat je voet pijn doet.' },
-    { id: 23, col: 1, group: 'plan', icon: '🗺️', word: 'de plattegrond', desc: 'Een tekening waarop je een stad of gebied van bovenaf ziet.' },
-    { id: 24, col: 1, group: 'plan', icon: '✏️', word: 'ontwerpen', desc: 'Iets bedenken en op papier tekenen.' },
+    <script>
+        // ============================================================================
+        // EXACTE THEMAWOORDEN (alle 36 woorden + omschrijvingen van het blad)
+        // ============================================================================
+        const WORDS = [
+            { id: 1, col: 0, group: 'kamer', icon: '🪑', word: 'het meubilair', desc: 'Alle meubels bij elkaar, bijvoorbeeld alle stoelen, kasten en tafels.' },
+            { id: 2, col: 0, group: 'kamer', icon: '🛋️', word: 'inrichten', desc: 'Alle spullen in een kamer op de goede plek neerzetten.' },
+            { id: 3, col: 0, group: 'kamer', icon: '📐', word: 'passen en meten (uitdrukking)', desc: 'Uitproberen of iets ergens in, op of tussen past.' },
+            { id: 4, col: 0, group: 'gevoel', icon: '🥱', word: 'saai', desc: 'Iets is steeds hetzelfde, je verveelt je erbij.' },
+            { id: 5, col: 0, group: 'gevoel', icon: '🎢', word: 'afwisselend', desc: 'Iets is steeds anders, je verveelt je niet.' },
+            { id: 6, col: 0, group: 'klus', icon: '💡', word: 'het idee', desc: 'Iets wat je bedenkt.' },
+            { id: 7, col: 0, group: 'huis', icon: '🧱', word: 'de wand', desc: 'Een muur.' },
+            { id: 8, col: 0, group: 'gevoel', icon: '✨', word: 'fraai', desc: 'Mooi.' },
+            { id: 9, col: 0, group: 'been', icon: '🩹', word: 'het gips', desc: 'Verband dat heel hard wordt. De dokter doet gips om je been als het gebroken is.' },
+            { id: 10, col: 0, group: 'klus', icon: '🔨', word: 'het karwei', desc: 'Een klus, werk dat je moet doen.' },
+            { id: 11, col: 0, group: 'been', icon: '🦯', word: 'de krukken', desc: 'Stokken waar je op kunt steunen als je moeilijk kunt lopen, bijvoorbeeld als je been gebroken is.' },
+            { id: 12, col: 0, group: 'huis', icon: '🚪', word: 'het luik', desc: 'Een soort deurtje van hout dat aan de buitenkant van een raam zit.' },
 
-    { id: 25, col: 2, group: 'kruiden', icon: '🌶️', word: 'de specerijen', desc: 'Gedroogde, fijngemalen delen van planten die het eten smaak geven.' },
-    { id: 26, col: 2, group: 'kruiden', icon: '🟤', word: 'het kaneel', desc: 'Een lichtbruin specerij.', swatch: '#c68b59', swatchLabel: 'lichtbruin' },
-    { id: 27, col: 2, group: 'kruiden', icon: '🟡', word: 'de kerrie', desc: 'Een donkergeel specerij.', swatch: '#d4a017', swatchLabel: 'donkergeel' },
-    { id: 28, col: 2, group: 'kruiden', icon: '🌰', word: 'de nootmuskaat', desc: 'Een donkerbruin specerij.', swatch: '#5c3a21', swatchLabel: 'donkerbruin' },
-    { id: 29, col: 2, group: 'deeg', icon: '🌾', word: 'het bakmeel', desc: 'Poeder (van graan) waarmee je bijvoorbeeld een taart of een brood kunt bakken.' },
-    { id: 30, col: 2, group: 'deeg', icon: '🥣', word: 'het deeg', desc: 'Bakmeel dat is vermengd met water, boter en suiker. Deeg moet je kneden.' },
-    { id: 31, col: 2, group: 'deeg', icon: '👐', word: 'kneden', desc: 'Steeds in het deeg knijpen om het soepel te maken.' },
-    { id: 32, col: 2, group: 'deeg', icon: '⬆️', word: 'rijzen', desc: 'Omhoogkomen van deeg. Dat komt omdat er meer lucht in komt.' },
-    { id: 33, col: 2, group: 'bakken', icon: '🔥', word: 'bakken', desc: 'In de pan of de oven gaar laten worden.' },
-    { id: 34, col: 2, group: 'recept', icon: '👩‍🍳', word: 'de bereidingswijze', desc: 'De manier (wijze) hoe je het eten kunt klaarmaken (bereiden).' },
-    { id: 35, col: 2, group: 'recept', icon: '🥚', word: 'de ingrediënten', desc: 'De dingen waarvan het eten gemaakt is.' },
-    { id: 36, col: 2, group: 'recept', icon: '📜', word: 'het recept', desc: 'Een tekst waarop de ingrediënten en de bereidingswijze van een gerecht staan.' }
-];
+            { id: 13, col: 1, group: 'afval', icon: '🛋️', word: 'het grofvuil', desc: 'Alles wat je weggooit en niet in de vuilnisbak past.' },
+            { id: 14, col: 1, group: 'afval', icon: '🗑️', word: 'het vuilnis', desc: 'Dingen die je niet meer gebruikt en weggooit, zoals lege melkpakken.' },
+            { id: 15, col: 1, group: 'afval', icon: '🍎', word: 'het gft', desc: 'Een afkorting van groente-, fruit- en tuinafval.' },
+            { id: 16, col: 1, group: 'afval', icon: '⛰️', word: 'het puin', desc: 'Brokken steen die je weggooit.' },
+            { id: 17, col: 1, group: 'meten', icon: '📏', word: 'het meetinstrument', desc: 'Gereedschap waarmee je kunt meten.' },
+            { id: 18, col: 1, group: 'meten', icon: '📐', word: 'de duimstok', desc: 'Een liniaal die je kunt opvouwen.' },
+            { id: 19, col: 1, group: 'meten', icon: '🧵', word: 'het meetlint', desc: 'Een stuk slappe stof of slap plastic waarmee je kunt meten.' },
+            { id: 20, col: 1, group: 'meten', icon: '📟', word: 'de rolmaat', desc: 'Een liniaal die je kunt oprollen.' },
+            { id: 21, col: 1, group: 'huis', icon: '💡', word: 'de lampenkap', desc: 'Een kap die om de lamp zit.' },
+            { id: 22, col: 1, group: 'been', icon: '🦘', word: 'hinken', desc: 'Met kleine schokjes lopen, bijvoorbeeld doordat je voet pijn doet.' },
+            { id: 23, col: 1, group: 'plan', icon: '🗺️', word: 'de plattegrond', desc: 'Een tekening waarop je een stad of gebied van bovenaf ziet.' },
+            { id: 24, col: 1, group: 'plan', icon: '✏️', word: 'ontwerpen', desc: 'Iets bedenken en op papier tekenen.' },
 
-// --- Web Audio ---
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx = null;
-function tone(f, d = 0.14, type = 'sine', v = 0.12, delay = 0) {
-    try {
-        if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
-        if (!audioCtx) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const t = audioCtx.currentTime + delay;
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.type = type; o.frequency.setValueAtTime(f, t);
-        g.gain.setValueAtTime(v, t);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(t); o.stop(t + d + 0.02);
-    } catch {}
-}
-function sfxUnlock() {
-    tone(520, 0.1, 'triangle', 0.13);
-    tone(780, 0.14, 'triangle', 0.13, 0.07);
-    tone(1040, 0.2, 'sine', 0.12, 0.14);
-}
-function sfxWireZap() {
-    tone(660, 0.09, 'sine', 0.12);
-    tone(990, 0.16, 'triangle', 0.13, 0.05);
-}
-function sfxOops() {
-    tone(240, 0.14, 'sine', 0.11);
-    tone(190, 0.2, 'sine', 0.1, 0.1);
-}
-function sfxVaultOpen() {
-    [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.28, 'triangle', 0.14, i * 0.09));
-}
+            { id: 25, col: 2, group: 'kruiden', icon: '🌶️', word: 'de specerijen', desc: 'Gedroogde, fijngemalen delen van planten die het eten smaak geven.' },
+            { id: 26, col: 2, group: 'kruiden', icon: '🟤', word: 'het kaneel', desc: 'Een lichtbruin specerij.', swatch: '#c68b59', swatchLabel: 'lichtbruin' },
+            { id: 27, col: 2, group: 'kruiden', icon: '🟡', word: 'de kerrie', desc: 'Een donkergeel specerij.', swatch: '#d4a017', swatchLabel: 'donkergeel' },
+            { id: 28, col: 2, group: 'kruiden', icon: '🌰', word: 'de nootmuskaat', desc: 'Een donkerbruin specerij.', swatch: '#5c3a21', swatchLabel: 'donkerbruin' },
+            { id: 29, col: 2, group: 'deeg', icon: '🌾', word: 'het bakmeel', desc: 'Poeder (van graan) waarmee je bijvoorbeeld een taart of een brood kunt bakken.' },
+            { id: 30, col: 2, group: 'deeg', icon: '🥣', word: 'het deeg', desc: 'Bakmeel dat is vermengd met water, boter en suiker. Deeg moet je kneden.' },
+            { id: 31, col: 2, group: 'deeg', icon: '👐', word: 'kneden', desc: 'Steeds in het deeg knijpen om het soepel te maken.' },
+            { id: 32, col: 2, group: 'deeg', icon: '⬆️', word: 'rijzen', desc: 'Omhoogkomen van deeg. Dat komt omdat er meer lucht in komt.' },
+            { id: 33, col: 2, group: 'bakken', icon: '🔥', word: 'bakken', desc: 'In de pan of de oven gaar laten worden.' },
+            { id: 34, col: 2, group: 'recept', icon: '👩‍🍳', word: 'de bereidingswijze', desc: 'De manier (wijze) hoe je het eten kunt klaarmaken (bereiden).' },
+            { id: 35, col: 2, group: 'recept', icon: '🥚', word: 'de ingrediënten', desc: 'De dingen waarvan het eten gemaakt is.' },
+            { id: 36, col: 2, group: 'recept', icon: '📜', word: 'het recept', desc: 'Een tekst waarop de ingrediënten en de bereidingswijze van een gerecht staan.' }
+        ];
 
-// --- Nederlandse stem ---
-let nlVoice = null;
-function loadVoice() {
-    if (!('speechSynthesis' in window)) return;
-    const vs = window.speechSynthesis.getVoices();
-    nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
-           || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
-}
-if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
-function speak(txt) {
-    if (!('speechSynthesis' in window)) return;
-    try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(txt);
-        u.lang = 'nl-NL';
-        if (nlVoice) u.voice = nlVoice;
-        u.rate = 0.96; u.pitch = 1.05;
-        window.speechSynthesis.speak(u);
-    } catch {}
-}
-
-// --- Opslag ---
-const SAVE_KEY = 'woord_detective_v1';
-function loadSave() {
-    try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || { cracked: [false,false,false,false] }; }
-    catch { return { cracked: [false,false,false,false] }; }
-}
-let save = loadSave();
-function persistSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} }
-
-// --- Spelstatus ---
-let selectedVault = 0;
-let autoRead = true;
-let wireEnabled = true;
-
-let pendingQueue = [];
-let crackedIds = new Set();
-let totalLocks = 12;
-let mistakes = 0;
-let stepCounter = 0;
-
-// Scanner status
-let currentClue = null;
-let currentDir = 'd2w';
-let currentKeys = [];
-let scanLocked = false;
-let missedCurrent = false;
-
-// Laser-Koppelkluis status
-let wireItems = [];
-let selectedLeftId = null;
-let selectedRightId = null;
-let matchedWirePairs = []; // [{leftEl, rightEl}]
-
-function refreshMenuBadges() {
-    let count = 0;
-    for (let i = 0; i < 4; i++) {
-        const done = !!save.cracked[i];
-        if (done) count++;
-        document.getElementById(`vb-${i}`).textContent = done ? '🏅' : '🔒';
-    }
-    document.getElementById('badges-count').textContent = `🏅 ${count} / 4 kluizen gekraakt`;
-}
-refreshMenuBadges();
-
-function pickVault(v) {
-    selectedVault = v;
-    for (let i = 0; i < 4; i++) document.getElementById(`v-${i}`).classList.toggle('selected', i === v);
-    tone(420 + v * 45, 0.08);
-}
-function toggleAutoRead() {
-    autoRead = !autoRead;
-    const b = document.getElementById('auto-read-btn');
-    b.classList.toggle('selected', autoRead);
-    b.textContent = autoRead ? '🔊 Sporen voorlezen: AAN' : '🔇 Sporen voorlezen: UIT';
-    tone(480, 0.07);
-}
-function toggleWireMode() {
-    wireEnabled = !wireEnabled;
-    const b = document.getElementById('wire-mode-btn');
-    b.classList.toggle('selected', wireEnabled);
-    b.textContent = wireEnabled ? '⚡ Laser-koppelkluis: AAN' : '⚡ Laser-koppelkluis: UIT';
-    tone(500, 0.07);
-}
-
-function openMenu() {
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    refreshMenuBadges();
-    document.getElementById('win-overlay').style.display = 'none';
-    document.getElementById('menu-overlay').style.display = 'flex';
-}
-
-function isStandaloneApp() {
-    return window.matchMedia('(display-mode: fullscreen)').matches
-        || window.matchMedia('(display-mode: standalone)').matches
-        || window.navigator.standalone === true;
-}
-function enterFullscreen() {
-    if (isStandaloneApp()) return;
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen;
-    if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
-        Promise.resolve(req.call(el)).catch(() => {});
-    }
-}
-function toggleFullscreen() {
-    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-    if (fsEl) {
-        const ex = document.exitFullscreen || document.webkitExitFullscreen;
-        if (ex) Promise.resolve(ex.call(document)).catch(() => {});
-    } else {
-        enterFullscreen();
-    }
-}
-function updateFsBtn() {
-    const b = document.getElementById('fs-btn');
-    if (!b) return;
-    const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
-    if (isStandaloneApp() || !canFs) { b.style.display = 'none'; return; }
-    const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    b.textContent = active ? '✕ Sluit volledig scherm' : '⛶ Volledig scherm';
-}
-document.addEventListener('fullscreenchange', updateFsBtn);
-document.addEventListener('webkitfullscreenchange', updateFsBtn);
-updateFsBtn();
-
-function startVault() {
-    enterFullscreen();
-    document.getElementById('menu-overlay').style.display = 'none';
-    document.getElementById('win-overlay').style.display = 'none';
-
-    const pool = selectedVault === 3 ? [...WORDS] : WORDS.filter(w => w.col === selectedVault);
-    pendingQueue = pool.sort(() => Math.random() - 0.5);
-    totalLocks = pool.length;
-    crackedIds = new Set();
-    mistakes = 0;
-    stepCounter = 0;
-    renderLocks();
-    nextStep();
-}
-
-function nextVault() {
-    if (selectedVault < 3) pickVault(selectedVault + 1);
-    startVault();
-}
-
-function renderLocks() {
-    const row = document.getElementById('locks-row');
-    row.innerHTML = '';
-    const displayLocks = Math.min(totalLocks, 18); // Bij 36 tonen we 18 dubbele sloten zodat ze mooi passen
-    const openCount = totalLocks <= 18
-        ? crackedIds.size
-        : Math.floor((crackedIds.size / totalLocks) * displayLocks);
-
-    for (let i = 0; i < displayLocks; i++) {
-        const d = document.createElement('div');
-        d.className = 'lock-dot' + (i < openCount ? ' open' : '');
-        d.textContent = i < openCount ? '🔓' : '🔒';
-        row.appendChild(d);
-    }
-
-    const ratio = crackedIds.size / Math.max(1, totalLocks);
-    const kMood = document.getElementById('karel-mood');
-    const kEmoji = document.getElementById('karel-emoji');
-    if (ratio >= 0.8) { kEmoji.textContent = '😱'; kMood.textContent = 'Bijna gepakt!!'; }
-    else if (ratio >= 0.45) { kEmoji.textContent = '😰'; kMood.textContent = 'Oei, mijn kluis!'; }
-    else { kEmoji.textContent = '🦝'; kMood.textContent = `Slot ${crackedIds.size}/${totalLocks}`; }
-}
-
-function nextStep() {
-    if (pendingQueue.length === 0) {
-        finishVault();
-        return;
-    }
-    stepCounter++;
-    // Elke 4e stap (als er nog >= 3 woorden over zijn): Laser-Koppelkluis!
-    if (wireEnabled && stepCounter % 4 === 0 && pendingQueue.length >= 3) {
-        startWireRound();
-    } else {
-        startScannerStep();
-    }
-}
-
-function pickDistractors(target) {
-    const sameG = WORDS.filter(w => w.id !== target.id && w.group === target.group).sort(() => Math.random() - 0.5);
-    const sameC = WORDS.filter(w => w.id !== target.id && w.col === target.col && w.group !== target.group).sort(() => Math.random() - 0.5);
-    const rest = WORDS.filter(w => w.id !== target.id && w.col !== target.col).sort(() => Math.random() - 0.5);
-    const out = [];
-    for (const s of [sameG, sameC, rest]) {
-        for (const x of s) if (out.length < 3) out.push(x);
-    }
-    return [target, ...out].sort(() => Math.random() - 0.5);
-}
-
-// --- Mode A: Spoor-Scanner ---
-function startScannerStep() {
-    document.getElementById('wire-view').style.display = 'none';
-    document.getElementById('scanner-view').style.display = 'flex';
-    scanLocked = false;
-    missedCurrent = false;
-    currentClue = pendingQueue.shift();
-    currentDir = Math.random() < 0.62 ? 'd2w' : 'w2d';
-
-    const badge = document.getElementById('clue-badge');
-    const txt = document.getElementById('clue-text');
-    const sw = document.getElementById('clue-swatch');
-    sw.style.display = 'none';
-
-    if (currentDir === 'd2w') {
-        badge.textContent = '🔍 WELK WOORD?';
-        badge.style.background = '#6c5ce7';
-        txt.textContent = `“${currentClue.desc}”`;
-        if (currentClue.swatch) {
-            sw.style.display = 'inline-flex';
-            sw.innerHTML = `<span class="swatch-circle" style="background:${currentClue.swatch}"></span> ${currentClue.swatchLabel}`;
+        // --- Web Audio ---
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        function tone(f, d = 0.14, type = 'sine', v = 0.12, delay = 0) {
+            try {
+                if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const t = audioCtx.currentTime + delay;
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = type; o.frequency.setValueAtTime(f, t);
+                g.gain.setValueAtTime(v, t);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t + d + 0.02);
+            } catch { }
         }
-    } else {
-        badge.textContent = '🔎 WAT BETEKENT…';
-        badge.style.background = '#e17055';
-        txt.textContent = `${currentClue.icon}  ${currentClue.word}`;
-    }
-
-    currentKeys = pickDistractors(currentClue);
-    const grid = document.getElementById('keys-grid');
-    grid.innerHTML = '';
-
-    currentKeys.forEach((k, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'key-btn' + (currentDir === 'd2w' ? ' is-word' : '');
-        btn.dataset.idx = idx;
-        if (currentDir === 'd2w') {
-            btn.innerHTML = `<span class="key-icon">${k.icon}</span><span>${k.word}</span>`;
-        } else {
-            btn.innerHTML = `<span class="key-icon">🔑</span><span>${k.desc}</span>`;
+        function sfxUnlock() {
+            tone(520, 0.1, 'triangle', 0.13);
+            tone(780, 0.14, 'triangle', 0.13, 0.07);
+            tone(1040, 0.2, 'sine', 0.12, 0.14);
         }
-        btn.onclick = () => checkScannerKey(k, btn);
-        grid.appendChild(btn);
-    });
-
-    document.getElementById('hint-footer').textContent = '🔍 Kies de juiste sleutel om dit slot te kraken! (Toetsen 1–4 werken ook)';
-    if (autoRead) speakCurrentClue();
-}
-
-function speakCurrentClue() {
-    if (!currentClue) return;
-    if (currentDir === 'd2w') speak(currentClue.desc);
-    else speak(`Wat betekent ${currentClue.word.replace('(uitdrukking)', '')}?`);
-}
-
-function checkScannerKey(choice, btn) {
-    if (scanLocked) return;
-    if (choice.id === currentClue.id) {
-        scanLocked = true;
-        btn.classList.add('correct');
-        sfxUnlock();
-        crackedIds.add(currentClue.id);
-        renderLocks();
-        document.getElementById('hint-footer').textContent = `✅ KLIK! Slot open: ${currentClue.word}!`;
-        setTimeout(nextStep, 820);
-    } else {
-        btn.classList.add('wrong');
-        sfxOops();
-        if (!missedCurrent) {
-            missedCurrent = true;
-            mistakes++;
-            pendingQueue.splice(Math.min(pendingQueue.length, 3), 0, currentClue);
+        function sfxWireZap() {
+            tone(660, 0.09, 'sine', 0.12);
+            tone(990, 0.16, 'triangle', 0.13, 0.05);
         }
-        document.getElementById('hint-footer').textContent = `💡 Detective-tip: "${choice.word}" betekent: ${choice.desc}`;
-        setTimeout(() => btn.classList.remove('wrong'), 450);
-    }
-}
-
-// --- Mode B: Laser-Koppelkluis (3 paren verbinden!) ---
-function startWireRound() {
-    document.getElementById('scanner-view').style.display = 'none';
-    document.getElementById('wire-view').style.display = 'flex';
-    selectedLeftId = null;
-    selectedRightId = null;
-    matchedWirePairs = [];
-    document.getElementById('wire-svg').innerHTML = '';
-
-    // Kies slim 3 woorden uit de wachtrij (bij voorkeur uit dezelfde groep voor extra leereffect!)
-    const first = pendingQueue.shift();
-    const batch = [first];
-    for (let i = 0; i < pendingQueue.length && batch.length < 3; ) {
-        if (pendingQueue[i].group === first.group) {
-            batch.push(pendingQueue.splice(i, 1)[0]);
-        } else {
-            i++;
+        function sfxOops() {
+            tone(240, 0.14, 'sine', 0.11);
+            tone(190, 0.2, 'sine', 0.1, 0.1);
         }
-    }
-    while (batch.length < 3 && pendingQueue.length > 0) {
-        batch.push(pendingQueue.shift());
-    }
-    wireItems = batch;
+        function sfxVaultOpen() {
+            [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.28, 'triangle', 0.14, i * 0.09));
+        }
 
-    const leftCol = document.getElementById('wire-left');
-    const rightCol = document.getElementById('wire-right');
-    leftCol.innerHTML = '';
-    rightCol.innerHTML = '';
+        // --- Nederlandse stem ---
+        let nlVoice = null;
+        function loadVoice() {
+            if (!('speechSynthesis' in window)) return;
+            const vs = window.speechSynthesis.getVoices();
+            nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+                || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
+        }
+        if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
+        function speak(txt) {
+            if (!('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'nl-NL';
+                if (nlVoice) u.voice = nlVoice;
+                u.rate = 0.96; u.pitch = 1.05;
+                window.speechSynthesis.speak(u);
+            } catch { }
+        }
 
-    const leftOrder = [...wireItems].sort(() => Math.random() - 0.5);
-    const rightOrder = [...wireItems].sort(() => Math.random() - 0.5);
+        // --- Opslag ---
+        const SAVE_KEY = 'woord_detective_v1';
+        function loadSave() {
+            try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || { cracked: [false, false, false, false] }; }
+            catch { return { cracked: [false, false, false, false] }; }
+        }
+        let save = loadSave();
+        function persistSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch { } }
 
-    leftOrder.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'wire-node word-node';
-        btn.dataset.id = item.id;
-        btn.innerHTML = `<span>${item.icon}</span><span>${item.word}</span>`;
-        btn.onclick = () => selectWire('left', item.id, btn);
-        leftCol.appendChild(btn);
-    });
+        // --- Spelstatus ---
+        let selectedVault = 0;
+        let autoRead = true;
+        let wireEnabled = true;
 
-    rightOrder.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'wire-node';
-        btn.dataset.id = item.id;
-        btn.innerHTML = `<span>${item.desc}</span>`;
-        btn.onclick = () => selectWire('right', item.id, btn);
-        rightCol.appendChild(btn);
-    });
+        let pendingQueue = [];
+        let crackedIds = new Set();
+        let totalLocks = 12;
+        let mistakes = 0;
+        let stepCounter = 0;
 
-    document.getElementById('hint-footer').textContent = '⚡ Kraak 3 sloten tegelijk door elk woord aan de juiste omschrijving te koppelen!';
-    if (autoRead) speak('Laser koppelkluis! Koppel de drie woorden aan de juiste omschrijving!');
-}
+        // Scanner status
+        let currentClue = null;
+        let currentDir = 'd2w';
+        let currentKeys = [];
+        let scanLocked = false;
+        let missedCurrent = false;
 
-function selectWire(side, id, el) {
-    if (el.classList.contains('matched')) return;
-    tone(side === 'left' ? 480 : 540, 0.06);
+        // Laser-Koppelkluis status
+        let wireItems = [];
+        let selectedLeftId = null;
+        let selectedRightId = null;
+        let matchedWirePairs = []; // [{leftEl, rightEl}]
 
-    if (side === 'left') {
-        document.querySelectorAll('#wire-left .wire-node').forEach(n => n.classList.remove('selected'));
-        selectedLeftId = id;
-        el.classList.add('selected');
-    } else {
-        document.querySelectorAll('#wire-right .wire-node').forEach(n => n.classList.remove('selected'));
-        selectedRightId = id;
-        el.classList.add('selected');
-    }
-
-    if (selectedLeftId !== null && selectedRightId !== null) {
-        const lEl = document.querySelector(`#wire-left .wire-node[data-id="${selectedLeftId}"]`);
-        const rEl = document.querySelector(`#wire-right .wire-node[data-id="${selectedRightId}"]`);
-
-        if (selectedLeftId === selectedRightId) {
-            sfxWireZap();
-            lEl.classList.remove('selected'); rEl.classList.remove('selected');
-            lEl.classList.add('matched'); rEl.classList.add('matched');
-            crackedIds.add(selectedLeftId);
-            matchedWirePairs.push({ lEl, rEl });
-            redrawWires();
-            renderLocks();
-
-            if (matchedWirePairs.length === wireItems.length) {
-                document.getElementById('hint-footer').textContent = '⚡ BOEM! Alle 3 laser-sloten gekraakt!';
-                sfxUnlock();
-                setTimeout(nextStep, 900);
+        function refreshMenuBadges() {
+            let count = 0;
+            for (let i = 0; i < 4; i++) {
+                const done = !!save.cracked[i];
+                if (done) count++;
+                document.getElementById(`vb-${i}`).textContent = done ? '🏅' : '🔒';
             }
-        } else {
-            sfxOops();
-            mistakes++;
-            lEl.classList.add('wrong'); rEl.classList.add('wrong');
-            const wObj = wireItems.find(x => x.id === selectedLeftId);
-            document.getElementById('hint-footer').textContent = `💡 Kijk goed naar "${wObj.word}" — probeer nog eens!`;
-            setTimeout(() => {
-                lEl.classList.remove('wrong', 'selected');
-                rEl.classList.remove('wrong', 'selected');
-            }, 420);
+            document.getElementById('badges-count').textContent = `🏅 ${count} / 4 kluizen gekraakt`;
         }
-        selectedLeftId = null;
-        selectedRightId = null;
-    }
-}
+        refreshMenuBadges();
 
-function redrawWires() {
-    const svg = document.getElementById('wire-svg');
-    const board = document.getElementById('wire-board').getBoundingClientRect();
-    svg.innerHTML = '';
-    matchedWirePairs.forEach(({ lEl, rEl }) => {
-        const lr = lEl.getBoundingClientRect();
-        const rr = rEl.getBoundingClientRect();
-        const x1 = lr.right - board.left;
-        const y1 = lr.top + lr.height / 2 - board.top;
-        const x2 = rr.left - board.left;
-        const y2 = rr.top + rr.height / 2 - board.top;
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-        line.setAttribute('stroke', '#2ecc71');
-        line.setAttribute('stroke-width', '7');
-        line.setAttribute('stroke-linecap', 'round');
-        svg.appendChild(line);
-    });
-}
-window.addEventListener('resize', redrawWires);
+        function pickVault(v) {
+            selectedVault = v;
+            for (let i = 0; i < 4; i++) document.getElementById(`v-${i}`).classList.toggle('selected', i === v);
+            tone(420 + v * 45, 0.08);
+        }
+        function toggleAutoRead() {
+            autoRead = !autoRead;
+            const b = document.getElementById('auto-read-btn');
+            b.classList.toggle('selected', autoRead);
+            b.textContent = autoRead ? '🔊 Sporen voorlezen: AAN' : '🔇 Sporen voorlezen: UIT';
+            tone(480, 0.07);
+        }
+        function toggleWireMode() {
+            wireEnabled = !wireEnabled;
+            const b = document.getElementById('wire-mode-btn');
+            b.classList.toggle('selected', wireEnabled);
+            b.textContent = wireEnabled ? '⚡ Laser-koppelkluis: AAN' : '⚡ Laser-koppelkluis: UIT';
+            tone(500, 0.07);
+        }
 
-function finishVault() {
-    sfxVaultOpen();
-    save.cracked[selectedVault] = true;
-    persistSave();
-    const names = [
-        'Kluis 1: Het Droomhuis',
-        'Kluis 2: De Geheime Plattegrond',
-        'Kluis 3: Het Gouden Taart-Recept',
-        'De Super-Kluis (alle 36 woorden!)'
-    ];
-    const prizes = ['🏠🪑🏆', '🗺️📏🏆', '🎂🧁🏆', '💎👑🏆'];
-    document.getElementById('win-emoji').textContent = prizes[selectedVault];
-    document.getElementById('win-title').textContent = `${names[selectedVault]} is gekraakt!`;
-    document.getElementById('win-stats').textContent = `Karel de Knoeier 🦝 is gepakt! · ${totalLocks} sloten geopend · Foutjes: ${mistakes}`;
-    document.getElementById('win-overlay').style.display = 'flex';
-    if (autoRead) speak(`Geweldig speurwerk! ${names[selectedVault]} is gekraakt!`);
-}
+        const WRONG_COOLDOWN_MS = 3000;
+        let wireLocked = false;
+        let detectiveCoolingDown = false;
+        let detectiveCooldownRaf = null;
 
-window.addEventListener('keydown', (e) => {
-    if (document.getElementById('menu-overlay').style.display !== 'none') return;
-    if (document.getElementById('win-overlay').style.display === 'flex') return;
-    if (document.getElementById('scanner-view').style.display !== 'none' && ['1','2','3','4'].includes(e.key)) {
-        const idx = parseInt(e.key, 10) - 1;
-        const btn = document.querySelector(`.key-btn[data-idx="${idx}"]`);
-        if (btn && currentKeys[idx]) checkScannerKey(currentKeys[idx], btn);
-    }
-});
-</script>
+        function clearDetectiveCooldown() {
+            if (detectiveCooldownRaf) {
+                cancelAnimationFrame(detectiveCooldownRaf);
+                detectiveCooldownRaf = null;
+            }
+            detectiveCoolingDown = false;
+            wireLocked = false;
+            const bar = document.getElementById('cooldown-bar');
+            if (bar) bar.style.display = 'none';
+        }
+
+        function startDetectiveCooldown(onDone) {
+            clearDetectiveCooldown();
+            detectiveCoolingDown = true;
+            const bar = document.getElementById('cooldown-bar');
+            const textEl = document.getElementById('cooldown-text');
+            const fillEl = document.getElementById('cooldown-fill');
+            bar.style.display = 'block';
+            const start = performance.now();
+
+            function tick(now) {
+                const rem = Math.max(0, WRONG_COOLDOWN_MS - (now - start));
+                const secs = Math.max(1, Math.ceil(rem / 1000));
+                textEl.textContent = `⏳ Even rustig nadenken… ${secs}`;
+                fillEl.style.width = `${(rem / WRONG_COOLDOWN_MS) * 100}%`;
+                if (rem > 0) {
+                    detectiveCooldownRaf = requestAnimationFrame(tick);
+                } else {
+                    detectiveCooldownRaf = null;
+                    detectiveCoolingDown = false;
+                    bar.style.display = 'none';
+                    onDone();
+                }
+            }
+            detectiveCooldownRaf = requestAnimationFrame(tick);
+        }
+
+        function openMenu() {
+            clearDetectiveCooldown();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            refreshMenuBadges();
+            document.getElementById('win-overlay').style.display = 'none';
+            document.getElementById('menu-overlay').style.display = 'flex';
+        }
+
+        function isStandaloneApp() {
+            return window.matchMedia('(display-mode: fullscreen)').matches
+                || window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone === true;
+        }
+        function enterFullscreen() {
+            if (isStandaloneApp()) return;
+            const el = document.documentElement;
+            const req = el.requestFullscreen || el.webkitRequestFullscreen;
+            if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+                Promise.resolve(req.call(el)).catch(() => { });
+            }
+        }
+        function toggleFullscreen() {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            if (fsEl) {
+                const ex = document.exitFullscreen || document.webkitExitFullscreen;
+                if (ex) Promise.resolve(ex.call(document)).catch(() => { });
+            } else {
+                enterFullscreen();
+            }
+        }
+        function updateFsBtn() {
+            const b = document.getElementById('fs-btn');
+            if (!b) return;
+            const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+            if (isStandaloneApp() || !canFs) { b.style.display = 'none'; return; }
+            const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            b.textContent = active ? '✕ Sluit volledig scherm' : '⛶ Volledig scherm';
+        }
+        document.addEventListener('fullscreenchange', updateFsBtn);
+        document.addEventListener('webkitfullscreenchange', updateFsBtn);
+        updateFsBtn();
+
+        function startVault() {
+            clearDetectiveCooldown();
+            enterFullscreen();
+            document.getElementById('menu-overlay').style.display = 'none';
+            document.getElementById('win-overlay').style.display = 'none';
+
+            const pool = selectedVault === 3 ? [...WORDS] : WORDS.filter(w => w.col === selectedVault);
+            pendingQueue = pool.sort(() => Math.random() - 0.5);
+            totalLocks = pool.length;
+            crackedIds = new Set();
+            mistakes = 0;
+            stepCounter = 0;
+            renderLocks();
+            nextStep();
+        }
+
+        function nextVault() {
+            if (selectedVault < 3) pickVault(selectedVault + 1);
+            startVault();
+        }
+
+        function renderLocks() {
+            const row = document.getElementById('locks-row');
+            row.innerHTML = '';
+            const displayLocks = Math.min(totalLocks, 18); // Bij 36 tonen we 18 dubbele sloten zodat ze mooi passen
+            const openCount = totalLocks <= 18
+                ? crackedIds.size
+                : Math.floor((crackedIds.size / totalLocks) * displayLocks);
+
+            for (let i = 0; i < displayLocks; i++) {
+                const d = document.createElement('div');
+                d.className = 'lock-dot' + (i < openCount ? ' open' : '');
+                d.textContent = i < openCount ? '🔓' : '🔒';
+                row.appendChild(d);
+            }
+
+            const ratio = crackedIds.size / Math.max(1, totalLocks);
+            const kMood = document.getElementById('karel-mood');
+            const kEmoji = document.getElementById('karel-emoji');
+            if (ratio >= 0.8) { kEmoji.textContent = '😱'; kMood.textContent = 'Bijna gepakt!!'; }
+            else if (ratio >= 0.45) { kEmoji.textContent = '😰'; kMood.textContent = 'Oei, mijn kluis!'; }
+            else { kEmoji.textContent = '🦝'; kMood.textContent = `Slot ${crackedIds.size}/${totalLocks}`; }
+        }
+
+        function nextStep() {
+            if (pendingQueue.length === 0) {
+                finishVault();
+                return;
+            }
+            stepCounter++;
+            // Elke 4e stap (als er nog >= 3 woorden over zijn): Laser-Koppelkluis!
+            if (wireEnabled && stepCounter % 4 === 0 && pendingQueue.length >= 3) {
+                startWireRound();
+            } else {
+                startScannerStep();
+            }
+        }
+
+        function pickDistractors(target) {
+            const sameG = WORDS.filter(w => w.id !== target.id && w.group === target.group).sort(() => Math.random() - 0.5);
+            const sameC = WORDS.filter(w => w.id !== target.id && w.col === target.col && w.group !== target.group).sort(() => Math.random() - 0.5);
+            const rest = WORDS.filter(w => w.id !== target.id && w.col !== target.col).sort(() => Math.random() - 0.5);
+            const out = [];
+            for (const s of [sameG, sameC, rest]) {
+                for (const x of s) if (out.length < 3) out.push(x);
+            }
+            return [target, ...out].sort(() => Math.random() - 0.5);
+        }
+
+        // --- Mode A: Spoor-Scanner ---
+        function startScannerStep() {
+            clearDetectiveCooldown();
+            document.getElementById('wire-view').style.display = 'none';
+            document.getElementById('scanner-view').style.display = 'flex';
+            scanLocked = false;
+            missedCurrent = false;
+            currentClue = pendingQueue.shift();
+            currentDir = Math.random() < 0.62 ? 'd2w' : 'w2d';
+
+            const badge = document.getElementById('clue-badge');
+            const txt = document.getElementById('clue-text');
+            const sw = document.getElementById('clue-swatch');
+            sw.style.display = 'none';
+
+            if (currentDir === 'd2w') {
+                badge.textContent = '🔍 WELK WOORD?';
+                badge.style.background = '#6c5ce7';
+                txt.textContent = `“${currentClue.desc}”`;
+                if (currentClue.swatch) {
+                    sw.style.display = 'inline-flex';
+                    sw.innerHTML = `<span class="swatch-circle" style="background:${currentClue.swatch}"></span> ${currentClue.swatchLabel}`;
+                }
+            } else {
+                badge.textContent = '🔎 WAT BETEKENT…';
+                badge.style.background = '#e17055';
+                txt.textContent = `${currentClue.icon}  ${currentClue.word}`;
+            }
+
+            currentKeys = pickDistractors(currentClue);
+            const grid = document.getElementById('keys-grid');
+            grid.innerHTML = '';
+
+            currentKeys.forEach((k, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'key-btn' + (currentDir === 'd2w' ? ' is-word' : '');
+                btn.dataset.idx = idx;
+                if (currentDir === 'd2w') {
+                    btn.innerHTML = `<span class="key-icon">${k.icon}</span><span>${k.word}</span>`;
+                } else {
+                    btn.innerHTML = `<span class="key-icon">🔑</span><span>${k.desc}</span>`;
+                }
+                btn.onclick = () => checkScannerKey(k, btn);
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('hint-footer').textContent = '🔍 Kies de juiste sleutel om dit slot te kraken! (Toetsen 1–4 werken ook)';
+            if (autoRead) speakCurrentClue();
+        }
+
+        function speakCurrentClue() {
+            if (!currentClue) return;
+            if (currentDir === 'd2w') speak(currentClue.desc);
+            else speak(`Wat betekent ${currentClue.word.replace('(uitdrukking)', '')}?`);
+        }
+
+        function checkScannerKey(choice, btn) {
+            if (scanLocked || detectiveCoolingDown) return;
+            if (choice.id === currentClue.id) {
+                scanLocked = true;
+                btn.classList.add('correct');
+                sfxUnlock();
+                crackedIds.add(currentClue.id);
+                renderLocks();
+                document.getElementById('hint-footer').textContent = `✅ KLIK! Slot open: ${currentClue.word}!`;
+                setTimeout(nextStep, 820);
+            } else {
+                scanLocked = true;
+                btn.classList.add('wrong');
+                sfxOops();
+                if (!missedCurrent) {
+                    missedCurrent = true;
+                    mistakes++;
+                    pendingQueue.splice(Math.min(pendingQueue.length, 3), 0, currentClue);
+                }
+                document.getElementById('hint-footer').textContent = `💡 Detective-tip: "${choice.word}" betekent: ${choice.desc}`;
+                const allBtns = Array.from(document.querySelectorAll('#keys-grid .key-btn'));
+                allBtns.forEach(b => {
+                    b.disabled = true;
+                    if (b !== btn) b.classList.add('cooldown-dim');
+                });
+                startDetectiveCooldown(() => {
+                    scanLocked = false;
+                    allBtns.forEach(b => {
+                        b.disabled = false;
+                        b.classList.remove('wrong', 'cooldown-dim');
+                    });
+                });
+            }
+        }
+
+        // --- Mode B: Laser-Koppelkluis (3 paren verbinden!) ---
+        function startWireRound() {
+            clearDetectiveCooldown();
+            document.getElementById('scanner-view').style.display = 'none';
+            document.getElementById('wire-view').style.display = 'flex';
+            selectedLeftId = null;
+            selectedRightId = null;
+            matchedWirePairs = [];
+            document.getElementById('wire-svg').innerHTML = '';
+
+            // Kies slim 3 woorden uit de wachtrij (bij voorkeur uit dezelfde groep voor extra leereffect!)
+            const first = pendingQueue.shift();
+            const batch = [first];
+            for (let i = 0; i < pendingQueue.length && batch.length < 3;) {
+                if (pendingQueue[i].group === first.group) {
+                    batch.push(pendingQueue.splice(i, 1)[0]);
+                } else {
+                    i++;
+                }
+            }
+            while (batch.length < 3 && pendingQueue.length > 0) {
+                batch.push(pendingQueue.shift());
+            }
+            wireItems = batch;
+
+            const leftCol = document.getElementById('wire-left');
+            const rightCol = document.getElementById('wire-right');
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            const leftOrder = [...wireItems].sort(() => Math.random() - 0.5);
+            const rightOrder = [...wireItems].sort(() => Math.random() - 0.5);
+
+            leftOrder.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'wire-node word-node';
+                btn.dataset.id = item.id;
+                btn.innerHTML = `<span>${item.icon}</span><span>${item.word}</span>`;
+                btn.onclick = () => selectWire('left', item.id, btn);
+                leftCol.appendChild(btn);
+            });
+
+            rightOrder.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'wire-node';
+                btn.dataset.id = item.id;
+                btn.innerHTML = `<span>${item.desc}</span>`;
+                btn.onclick = () => selectWire('right', item.id, btn);
+                rightCol.appendChild(btn);
+            });
+
+            document.getElementById('hint-footer').textContent = '⚡ Kraak 3 sloten tegelijk door elk woord aan de juiste omschrijving te koppelen!';
+            if (autoRead) speak('Laser koppelkluis! Koppel de drie woorden aan de juiste omschrijving!');
+        }
+
+        function selectWire(side, id, el) {
+            if (wireLocked || detectiveCoolingDown || el.classList.contains('matched')) return;
+            tone(side === 'left' ? 480 : 540, 0.06);
+
+            if (side === 'left') {
+                document.querySelectorAll('#wire-left .wire-node').forEach(n => n.classList.remove('selected'));
+                selectedLeftId = id;
+                el.classList.add('selected');
+            } else {
+                document.querySelectorAll('#wire-right .wire-node').forEach(n => n.classList.remove('selected'));
+                selectedRightId = id;
+                el.classList.add('selected');
+            }
+
+            if (selectedLeftId !== null && selectedRightId !== null) {
+                const lEl = document.querySelector(`#wire-left .wire-node[data-id="${selectedLeftId}"]`);
+                const rEl = document.querySelector(`#wire-right .wire-node[data-id="${selectedRightId}"]`);
+
+                if (selectedLeftId === selectedRightId) {
+                    sfxWireZap();
+                    lEl.classList.remove('selected'); rEl.classList.remove('selected');
+                    lEl.classList.add('matched'); rEl.classList.add('matched');
+                    crackedIds.add(selectedLeftId);
+                    matchedWirePairs.push({ lEl, rEl });
+                    redrawWires();
+                    renderLocks();
+
+                    if (matchedWirePairs.length === wireItems.length) {
+                        document.getElementById('hint-footer').textContent = '⚡ BOEM! Alle 3 laser-sloten gekraakt!';
+                        sfxUnlock();
+                        setTimeout(nextStep, 900);
+                    }
+                } else {
+                    wireLocked = true;
+                    sfxOops();
+                    mistakes++;
+                    lEl.classList.add('wrong'); rEl.classList.add('wrong');
+                    const wObj = wireItems.find(x => x.id === selectedLeftId);
+                    document.getElementById('hint-footer').textContent = `💡 Kijk goed naar "${wObj.word}" — probeer nog eens!`;
+                    const allNodes = Array.from(document.querySelectorAll('#wire-board .wire-node:not(.matched)'));
+                    allNodes.forEach(n => {
+                        n.disabled = true;
+                        if (n !== lEl && n !== rEl) n.classList.add('cooldown-dim');
+                    });
+                    startDetectiveCooldown(() => {
+                        wireLocked = false;
+                        allNodes.forEach(n => {
+                            n.disabled = false;
+                            n.classList.remove('wrong', 'selected', 'cooldown-dim');
+                        });
+                    });
+                }
+                selectedLeftId = null;
+                selectedRightId = null;
+            }
+        }
+
+        function redrawWires() {
+            const svg = document.getElementById('wire-svg');
+            const board = document.getElementById('wire-board').getBoundingClientRect();
+            svg.innerHTML = '';
+            matchedWirePairs.forEach(({ lEl, rEl }) => {
+                const lr = lEl.getBoundingClientRect();
+                const rr = rEl.getBoundingClientRect();
+                const x1 = lr.right - board.left;
+                const y1 = lr.top + lr.height / 2 - board.top;
+                const x2 = rr.left - board.left;
+                const y2 = rr.top + rr.height / 2 - board.top;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+                line.setAttribute('stroke', '#2ecc71');
+                line.setAttribute('stroke-width', '7');
+                line.setAttribute('stroke-linecap', 'round');
+                svg.appendChild(line);
+            });
+        }
+        window.addEventListener('resize', redrawWires);
+
+        function finishVault() {
+            sfxVaultOpen();
+            save.cracked[selectedVault] = true;
+            persistSave();
+            const names = [
+                'Kluis 1: Het Droomhuis',
+                'Kluis 2: De Geheime Plattegrond',
+                'Kluis 3: Het Gouden Taart-Recept',
+                'De Super-Kluis (alle 36 woorden!)'
+            ];
+            const prizes = ['🏠🪑🏆', '🗺️📏🏆', '🎂🧁🏆', '💎👑🏆'];
+            document.getElementById('win-emoji').textContent = prizes[selectedVault];
+            document.getElementById('win-title').textContent = `${names[selectedVault]} is gekraakt!`;
+            document.getElementById('win-stats').textContent = `Karel de Knoeier 🦝 is gepakt! · ${totalLocks} sloten geopend · Foutjes: ${mistakes}`;
+            document.getElementById('win-overlay').style.display = 'flex';
+            if (autoRead) speak(`Geweldig speurwerk! ${names[selectedVault]} is gekraakt!`);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('menu-overlay').style.display !== 'none') return;
+            if (document.getElementById('win-overlay').style.display === 'flex') return;
+            if (document.getElementById('scanner-view').style.display !== 'none' && ['1', '2', '3', '4'].includes(e.key)) {
+                const idx = parseInt(e.key, 10) - 1;
+                const btn = document.querySelector(`.key-btn[data-idx="${idx}"]`);
+                if (btn && currentKeys[idx]) checkScannerKey(currentKeys[idx], btn);
+            }
+        });
+    </script>
 </body>
+
 </html>

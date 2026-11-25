@@ -503,6 +503,55 @@
             background: #ff7675 !important;
             border-color: #d63031 !important;
             box-shadow: 0 4px 0 #d63031 !important;
+            animation: quizShake 0.35s ease;
+        }
+
+        .answer-btn:disabled:not(.correct):not(.wrong) {
+            background: #8395a7;
+            border-color: #576574;
+            color: #ffffff;
+            opacity: 1;
+            cursor: not-allowed;
+            box-shadow: 0 3px 0 #576574;
+            transform: none;
+        }
+
+        #quiz-cooldown {
+            display: none;
+            margin: 10px 0 4px 0;
+            padding: 8px 14px;
+            background: #fff3cd;
+            border: 3px solid #ff9f43;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        #quiz-cooldown-text {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.15rem;
+            color: #c0392b;
+            margin-bottom: 5px;
+        }
+
+        .cooldown-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        #quiz-cooldown-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff9f43);
+            border-radius: 999px;
+        }
+
+        @keyframes quizShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
         .skip-link {
@@ -665,6 +714,20 @@
                 font-size: 1.4rem;
                 padding: 10px;
             }
+
+            #quiz-cooldown {
+                margin: 6px 0 2px 0;
+                padding: 5px 10px;
+            }
+
+            #quiz-cooldown-text {
+                font-size: 0.95rem;
+                margin-bottom: 4px;
+            }
+
+            .cooldown-track {
+                height: 8px;
+            }
         }
 
         @keyframes fadeIn {
@@ -753,6 +816,10 @@
                 <p id="quiz-sub" style="font-size: 1.1rem; margin: 0; color: #57606f;">Los de som op om door te gaan
                     naar de schuur!</p>
                 <div class="quiz-math" id="math-problem">6 × 4 = ?</div>
+                <div id="quiz-cooldown" aria-live="polite">
+                    <div id="quiz-cooldown-text">⏳ Even rustig nadenken… 3</div>
+                    <div class="cooldown-track"><div id="quiz-cooldown-fill"></div></div>
+                </div>
                 <div class="answers-grid" id="answers-container"></div>
                 <button class="skip-link" id="quiz-skip-btn" onclick="skipBonusQuiz()">Overslaan en verder
                     spelen</button>
@@ -3114,7 +3181,53 @@
             return { a, b, ans, choices };
         }
 
+        const WRONG_COOLDOWN_MS = 3000;
+        let quizCooldownRaf = null;
+        let quizCoolingDown = false;
+
+        function clearQuizCooldown() {
+            if (quizCooldownRaf) {
+                cancelAnimationFrame(quizCooldownRaf);
+                quizCooldownRaf = null;
+            }
+            quizCoolingDown = false;
+            const box = document.getElementById('quiz-cooldown');
+            if (box) box.style.display = 'none';
+        }
+
+        function startQuizCooldown(buttons) {
+            clearQuizCooldown();
+            quizCoolingDown = true;
+            const box = document.getElementById('quiz-cooldown');
+            const textEl = document.getElementById('quiz-cooldown-text');
+            const fillEl = document.getElementById('quiz-cooldown-fill');
+            box.style.display = 'block';
+            const start = performance.now();
+
+            function tick(now) {
+                const elapsed = now - start;
+                const rem = Math.max(0, WRONG_COOLDOWN_MS - elapsed);
+                const secs = Math.max(1, Math.ceil(rem / 1000));
+                textEl.innerText = `⏳ Even rustig nadenken… ${secs}`;
+                fillEl.style.width = `${(rem / WRONG_COOLDOWN_MS) * 100}%`;
+
+                if (rem > 0) {
+                    quizCooldownRaf = requestAnimationFrame(tick);
+                } else {
+                    quizCooldownRaf = null;
+                    quizCoolingDown = false;
+                    box.style.display = 'none';
+                    buttons.forEach(b => {
+                        b.disabled = false;
+                        b.classList.remove('wrong');
+                    });
+                }
+            }
+            quizCooldownRaf = requestAnimationFrame(tick);
+        }
+
         function showNextQuestion() {
+            clearQuizCooldown();
             currentQuestion = generateQuestion();
             const skipBtn = document.getElementById('quiz-skip-btn');
             const card = document.getElementById('quiz-card');
@@ -3153,12 +3266,14 @@
         }
 
         function skipBonusQuiz() {
+            clearQuizCooldown();
             document.getElementById('quiz-overlay').style.display = 'none';
             activeBonusBlock = null;
             resumeLoop();
         }
 
         function checkAnswer(chosen, btn) {
+            if (quizCoolingDown) return;
             const buttons = document.querySelectorAll('.answer-btn');
             buttons.forEach(b => b.disabled = true);
 
@@ -3223,13 +3338,7 @@
                 btn.classList.add('wrong');
                 soundWrong();
                 navigator.vibrate?.(100);
-
-                setTimeout(() => {
-                    buttons.forEach(b => {
-                        b.disabled = false;
-                        b.classList.remove('wrong');
-                    });
-                }, 850);
+                startQuizCooldown(buttons);
             }
         }
 
@@ -3240,6 +3349,7 @@
         }
 
         function resetToMenu() {
+            clearQuizCooldown();
             pauseLoop();
             document.getElementById('diploma-overlay').style.display = 'none';
             document.getElementById('gameover-overlay').style.display = 'none';

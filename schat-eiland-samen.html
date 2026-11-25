@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Schat-Eiland: De Dubbele Sleutel — Samen Spelen!</title>
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0d4a5e">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
@@ -19,7 +23,9 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
         }
-        html, body {
+
+        html,
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -44,8 +50,14 @@
             overscroll-behavior: contain;
             touch-action: pan-y;
         }
-        .screen.active { display: flex; }
-        .screen * { touch-action: pan-y; }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .screen * {
+            touch-action: pan-y;
+        }
 
         .card {
             background: rgba(255, 255, 255, 0.97);
@@ -68,6 +80,7 @@
             flex-wrap: wrap;
             margin-bottom: 8px;
         }
+
         .pill-link {
             display: inline-flex;
             align-items: center;
@@ -84,7 +97,11 @@
             cursor: pointer;
             box-shadow: 0 3px 0 #ced6e0;
         }
-        .pill-link:hover { background: #ffeaa7; border-color: #fdcb6e; }
+
+        .pill-link:hover {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+        }
 
         h1 {
             font-family: 'Fredoka One', cursive, sans-serif;
@@ -93,6 +110,7 @@
             font-size: clamp(1.55rem, 3.8vw, 2.45rem);
             text-shadow: 2px 2px 0 #ffeaa7;
         }
+
         .sub {
             margin: 0 0 14px 0;
             font-size: clamp(0.92rem, 1.8vw, 1.12rem);
@@ -107,6 +125,7 @@
             gap: 16px;
             margin-top: 8px;
         }
+
         .role-card {
             border-radius: 24px;
             padding: 18px 16px;
@@ -118,10 +137,12 @@
             gap: 8px;
             box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
         }
+
         .role-card.role-age3 {
             border-color: #9b59ff;
             background: linear-gradient(180deg, #f6f0ff 0%, #ffffff 45%);
         }
+
         .role-badge {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: 0.9rem;
@@ -130,15 +151,27 @@
             color: #fff;
             background: #0b6e4f;
         }
-        .role-age3 .role-badge { background: #6c2bd9; }
-        .role-emoji { font-size: 3.1rem; line-height: 1; }
+
+        .role-age3 .role-badge {
+            background: #6c2bd9;
+        }
+
+        .role-emoji {
+            font-size: 3.1rem;
+            line-height: 1;
+        }
+
         .role-title {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(1.2rem, 2.4vw, 1.65rem);
             margin: 0;
             color: #0b6e4f;
         }
-        .role-age3 .role-title { color: #6c2bd9; }
+
+        .role-age3 .role-title {
+            color: #6c2bd9;
+        }
+
         .role-desc {
             margin: 0 0 6px 0;
             font-size: 0.92rem;
@@ -146,6 +179,7 @@
             color: #57606f;
             line-height: 1.3;
         }
+
         .big-btn {
             border: none;
             border-radius: 20px;
@@ -157,9 +191,20 @@
             width: 100%;
             transition: transform 0.1s;
         }
-        .big-btn:active { transform: translateY(3px); }
-        .btn-green { background: linear-gradient(180deg, #2ed573, #20bf6b); box-shadow: 0 6px 0 #168f4d; }
-        .btn-purple { background: linear-gradient(180deg, #a55eea, #8854d0); box-shadow: 0 6px 0 #5b21b6; }
+
+        .big-btn:active {
+            transform: translateY(3px);
+        }
+
+        .btn-green {
+            background: linear-gradient(180deg, #2ed573, #20bf6b);
+            box-shadow: 0 6px 0 #168f4d;
+        }
+
+        .btn-purple {
+            background: linear-gradient(180deg, #a55eea, #8854d0);
+            box-shadow: 0 6px 0 #5b21b6;
+        }
 
         /* Lobby */
         .lobby-split {
@@ -169,6 +214,7 @@
             align-items: center;
             margin: 10px 0;
         }
+
         .qr-box {
             background: #f8f3ff;
             border: 4px dashed #9b59ff;
@@ -179,6 +225,7 @@
             align-items: center;
             gap: 8px;
         }
+
         #qr-container svg {
             width: 150px;
             height: 150px;
@@ -187,6 +234,7 @@
             background: #fff;
             padding: 6px;
         }
+
         .code-display {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(1.8rem, 4vw, 2.7rem);
@@ -197,6 +245,7 @@
             border-radius: 16px;
             padding: 6px 20px;
         }
+
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -209,6 +258,7 @@
             border: 3px solid #ffc107;
             color: #7d5a00;
         }
+
         .status-pill.connected {
             background: #dff9eb;
             border-color: #2ecc71;
@@ -222,6 +272,7 @@
             gap: 8px;
             margin: 8px 0 12px 0;
         }
+
         .opt-btn {
             border: 3px solid #ced6e0;
             background: #f8f9fa;
@@ -233,6 +284,7 @@
             cursor: pointer;
             color: #2d3436;
         }
+
         .opt-btn.selected {
             border-color: #00b894;
             background: #e8fbf5;
@@ -268,7 +320,10 @@
             background: #dff9fb;
             overflow: hidden;
         }
-        #host-game-screen.active { display: flex; }
+
+        #host-game-screen.active {
+            display: flex;
+        }
 
         #host-scene-wrap {
             position: relative;
@@ -276,12 +331,14 @@
             width: 100%;
             overflow: hidden;
         }
+
         #islandCanvas {
             display: block;
             width: 100%;
             height: 100%;
             touch-action: none;
         }
+
         #host-hud {
             position: absolute;
             top: 8px;
@@ -293,6 +350,7 @@
             gap: 8px;
             pointer-events: none;
         }
+
         .hud-chip {
             pointer-events: auto;
             background: rgba(255, 255, 255, 0.93);
@@ -304,8 +362,15 @@
             color: #2d3436;
             box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
         }
-        .hud-chip.role7 { border-color: #00b894; color: #0b6e4f; }
-        .hud-chip.btn { cursor: pointer; }
+
+        .hud-chip.role7 {
+            border-color: #00b894;
+            color: #0b6e4f;
+        }
+
+        .hud-chip.btn {
+            cursor: pointer;
+        }
 
         #host-bottom {
             flex: 1;
@@ -318,6 +383,7 @@
             gap: 8px;
             min-height: 0;
         }
+
         #host-banner {
             background: #ffffff;
             border: 4px solid #f1c40f;
@@ -330,6 +396,7 @@
             font-weight: 900;
             font-size: clamp(0.95rem, 2.1vw, 1.48rem);
         }
+
         #host-turn-tag {
             background: #00b894;
             color: #fff;
@@ -339,6 +406,7 @@
             border-radius: 12px;
             white-space: nowrap;
         }
+
         #host-choices {
             flex: 1;
             display: grid;
@@ -346,6 +414,7 @@
             gap: 10px;
             min-height: 0;
         }
+
         .h-choice {
             background: #ffffff;
             border: 4px solid #74b9ff;
@@ -358,9 +427,93 @@
             box-shadow: 0 5px 0 #0984e3;
             touch-action: manipulation;
         }
-        .h-choice:active { transform: translateY(3px); box-shadow: 0 2px 0 #0984e3; }
-        .h-choice.correct { background: #2ecc71; border-color: #1e8449; color: #fff; box-shadow: 0 4px 0 #1e8449; }
-        .h-choice.wrong { background: #ffe0e0; border-color: #ff6b6b; }
+
+        .h-choice:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0984e3;
+        }
+
+        .h-choice.correct {
+            background: #2ecc71;
+            border-color: #1e8449;
+            color: #fff;
+            box-shadow: 0 4px 0 #1e8449;
+        }
+
+        .h-choice.wrong {
+            background: #ffe0e0;
+            border-color: #ff6b6b;
+            box-shadow: 0 4px 0 #d63031;
+            animation: hShake 0.35s ease;
+            pointer-events: none;
+        }
+
+        .h-choice.cooldown-dim {
+            background: #edf1f5;
+            border-color: #b2bec3;
+            box-shadow: 0 3px 0 #95a5a6;
+            color: #2d3436;
+            opacity: 1;
+            pointer-events: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes hShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            75% {
+                transform: translateX(6px);
+            }
+        }
+
+        #host-cooldown {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6;
+            display: none;
+            min-width: min(370px, 90%);
+            max-width: 92%;
+            background: rgba(255, 248, 220, 0.97);
+            border: 4px solid #ff9f43;
+            border-radius: 18px;
+            padding: 7px 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #host-cooldown-text {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: clamp(0.9rem, 1.8vw, 1.25rem);
+            color: #c0392b;
+            margin-bottom: 5px;
+        }
+
+        .cooldown-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        #host-cooldown-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff9f43);
+            border-radius: 999px;
+        }
 
         #host-wait-box {
             display: none;
@@ -375,11 +528,13 @@
             gap: 6px;
             text-align: center;
         }
+
         #host-wait-title {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(1.2rem, 2.8vw, 1.9rem);
             color: #5b21b6;
         }
+
         #host-wait-sub {
             font-size: clamp(0.95rem, 1.8vw, 1.25rem);
             font-weight: 900;
@@ -415,7 +570,10 @@
             gap: 10px;
             overflow: hidden;
         }
-        #toddler-screen.active { display: flex; }
+
+        #toddler-screen.active {
+            display: flex;
+        }
 
         #toddler-top {
             display: flex;
@@ -424,6 +582,7 @@
             gap: 8px;
             flex-shrink: 0;
         }
+
         #toddler-prompt-box {
             background: rgba(255, 255, 255, 0.96);
             border: 5px solid #ffd000;
@@ -437,11 +596,13 @@
             flex-shrink: 0;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
         }
+
         #toddler-prompt-text {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(1.2rem, 4vw, 2rem);
             color: #5b21b6;
         }
+
         #toddler-speak {
             width: 52px;
             height: 52px;
@@ -460,6 +621,7 @@
             gap: 14px;
             min-height: 0;
         }
+
         .k-btn {
             border: 6px solid #ffffff;
             border-radius: 28px;
@@ -473,20 +635,36 @@
             transition: transform 0.12s;
             touch-action: manipulation;
         }
-        .k-btn:active { transform: scale(0.94); }
-        .k-btn .k-emoji { font-size: clamp(2.8rem, 10vw, 4.8rem); line-height: 1; }
+
+        .k-btn:active {
+            transform: scale(0.94);
+        }
+
+        .k-btn .k-emoji {
+            font-size: clamp(2.8rem, 10vw, 4.8rem);
+            line-height: 1;
+        }
+
         .k-btn .k-label {
             font-family: 'Fredoka One', cursive, sans-serif;
             font-size: clamp(0.95rem, 3vw, 1.45rem);
             color: #fff;
             text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
         }
-        .k-btn.dimmed { opacity: 0.45; pointer-events: none; }
+
+        .k-btn.dimmed {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
         .k-btn.hint-glow {
             animation: hintPulse 0.9s ease-in-out infinite;
-            box-shadow: 0 0 0 8px #fff59d, 0 9px 0 rgba(0,0,0,0.22);
+            box-shadow: 0 0 0 8px #fff59d, 0 9px 0 rgba(0, 0, 0, 0.22);
         }
-        .k-btn.wiggle { animation: shake 0.35s ease; }
+
+        .k-btn.wiggle {
+            animation: shake 0.35s ease;
+        }
 
         #toddler-big-action {
             display: none;
@@ -507,856 +685,972 @@
         }
 
         @media (max-width: 680px) {
-            .role-grid, .lobby-split { grid-template-columns: 1fr; }
+
+            .role-grid,
+            .lobby-split {
+                grid-template-columns: 1fr;
+            }
         }
+
         @media (max-height: 480px) and (orientation: landscape) {
-            #host-scene-wrap { flex: 0 0 46%; }
-            #host-bottom { padding: 6px 10px 8px 10px; gap: 5px; }
-            #host-banner { padding: 4px 10px; font-size: 0.92rem; }
-            .h-choice { padding: 5px 10px; font-size: 1rem; border-width: 3px; }
-            #toddler-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+            #host-scene-wrap {
+                flex: 0 0 46%;
+            }
+
+            #host-bottom {
+                padding: 6px 10px 8px 10px;
+                gap: 5px;
+            }
+
+            #host-banner {
+                padding: 4px 10px;
+                font-size: 0.92rem;
+            }
+
+            .h-choice {
+                padding: 5px 10px;
+                font-size: 1rem;
+                border-width: 3px;
+            }
+
+            #toddler-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
         }
+
         @keyframes hintPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.06); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.06);
+            }
         }
+
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-8px);
+            }
+
+            75% {
+                transform: translateX(8px);
+            }
         }
     </style>
 </head>
+
 <body>
 
-<!-- 1. ROLKIEZER: Duidelijk kiezen wie 7 jaar is (Telefoon 1 + TV) en wie 3 jaar is (Telefoon 2) -->
-<div id="role-screen" class="screen active">
-    <div class="card">
-        <div class="top-row">
-            <a class="pill-link" href="index.html">← 🏠 Alle spellen</a>
-            <button class="pill-link" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
-        </div>
-
-        <h1>🐉 Schat-Eiland: De Dubbele Sleutel 🗝️</h1>
-        <p class="sub">Ga samen op schattenjacht met 2 telefoons! Kies eerst <strong>wie deze telefoon vasthoudt</strong>:</p>
-
-        <div class="role-grid">
-            <div class="role-card">
-                <span class="role-badge">TELEFOON 1 (+ TV)</span>
-                <div class="role-emoji">🚀🗺️</div>
-                <h2 class="role-title">7 jaar · Ontdekker</h2>
-                <p class="role-desc">Jij start de schatkaart op deze telefoon (en cast naar de TV). Jij bouwt de bruggen met sommen of woorden!</p>
-                <button class="big-btn btn-green" onclick="openHostLobby()">📺 START SPEL (7 JAAR)</button>
+    <!-- 1. ROLKIEZER: Duidelijk kiezen wie 7 jaar is (Telefoon 1 + TV) en wie 3 jaar is (Telefoon 2) -->
+    <div id="role-screen" class="screen active">
+        <div class="card">
+            <div class="top-row">
+                <a class="pill-link" href="index.html">← 🏠 Alle spellen</a>
+                <button class="pill-link" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
             </div>
 
-            <div class="role-card role-age3">
-                <span class="role-badge">TELEFOON 2</span>
-                <div class="role-emoji">🦄🗝️</div>
-                <h2 class="role-title">3 jaar · Sleutel-Bewaker</h2>
-                <p class="role-desc">Jij hebt de magische sleutelbos op telefoon 2! Jij opent elke schatkist met de juiste kleur en vorm!</p>
-                <button class="big-btn btn-purple" onclick="openJoinScreen()">📱 DOE MEE (3 JAAR)</button>
-            </div>
-        </div>
-    </div>
-</div>
+            <h1>🐉 Schat-Eiland: De Dubbele Sleutel 🗝️</h1>
+            <p class="sub">Ga samen op schattenjacht met 2 telefoons! Kies eerst <strong>wie deze telefoon
+                    vasthoudt</strong>:</p>
 
-<!-- 2. HOST LOBBY (7 JAAR + TV) -->
-<div id="host-lobby-screen" class="screen">
-    <div class="card" style="border-color:#00b894;">
-        <div class="top-row">
-            <button class="pill-link" onclick="goToRolePicker()">← 🔄 Andere rol</button>
-            <span class="pill-link" style="background:#e8fbf5; border-color:#00b894; color:#0b6e4f;">🚀 7 jaar · Ontdekker</span>
-            <a class="pill-link" href="index.html">🏠 Alle spellen</a>
-        </div>
-
-        <h1 style="color:#0b6e4f;">🗺️ Verbind de sleutel-telefoon van 3 jaar!</h1>
-
-        <div class="lobby-split">
-            <div class="qr-box">
-                <strong style="color:#5b21b6;">🦄 Scan met telefoon 2 (3 jaar):</strong>
-                <div id="qr-container"></div>
-                <div style="font-size:0.86rem; font-weight:800; color:#636e72;">Of open dit spel op telefoon 2 → <strong>3 jaar</strong> → typ code:</div>
-                <div class="code-display" id="room-code-text">----</div>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
-                <div class="status-pill" id="host-conn-status">⏳ Wachten op telefoon van 3 jaar…</div>
-
-                <div style="width:100%;">
-                    <div style="font-family:'Fredoka One',cursive; font-size:1rem; margin-bottom:4px;">Welke opdrachten lost 7 jaar op?</div>
-                    <div class="opt-row">
-                        <button class="opt-btn selected" id="topic-tafels" onclick="pickTopic('tafels')">✖️ Tafels (1–10)</button>
-                        <button class="opt-btn" id="topic-plusmin" onclick="pickTopic('plusmin')">➕ Plus &amp; Min</button>
-                        <button class="opt-btn" id="topic-woorden" onclick="pickTopic('woorden')">📖 Themawoorden</button>
-                    </div>
+            <div class="role-grid">
+                <div class="role-card">
+                    <span class="role-badge">TELEFOON 1 (+ TV)</span>
+                    <div class="role-emoji">🚀🗺️</div>
+                    <h2 class="role-title">7 jaar · Ontdekker</h2>
+                    <p class="role-desc">Jij start de schatkaart op deze telefoon (en cast naar de TV). Jij bouwt de
+                        bruggen met sommen of woorden!</p>
+                    <button class="big-btn btn-green" onclick="openHostLobby()">📺 START SPEL (7 JAAR)</button>
                 </div>
 
-                <button class="big-btn btn-green" id="host-start-btn" onclick="startCoopGame(false)" disabled style="opacity:0.55;">
-                    🗺️ OP SCHATTENJACHT! (wacht op 3 jaar)
-                </button>
-                <button class="pill-link" style="font-size:0.84rem;" onclick="startCoopGame(true)">
-                    📱 Of speel samen op 1 telefoon (zonder 2e telefoon)
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 3. JOIN SCREEN (3 JAAR · TELEFOON 2) -->
-<div id="join-screen" class="screen">
-    <div class="card" style="max-width:560px; border-color:#9b59ff;">
-        <div class="top-row">
-            <button class="pill-link" onclick="goToRolePicker()">← 🔄 Andere rol</button>
-            <span class="pill-link" style="background:#f3e8ff; border-color:#9b59ff; color:#5b21b6;">🦄 3 jaar · Sleutel-Bewaker</span>
-        </div>
-
-        <h1 style="color:#5b21b6;">🦄 Meedoen als 3 jaar!</h1>
-        <p class="sub">Typ de 4-letter code die op de TV (telefoon van 7 jaar) staat:</p>
-
-        <div style="margin:10px 0 14px 0;">
-            <input id="join-code-input" class="code-input" maxlength="4" placeholder="ABCD" autocomplete="off" autocapitalize="characters">
-        </div>
-
-        <div class="status-pill" id="join-status" style="margin-bottom:14px;">Klaar om te verbinden!</div>
-
-        <button class="big-btn btn-purple" onclick="connectAsToddler()">🔗 VERBINDEN MET 7 JAAR!</button>
-    </div>
-</div>
-
-<!-- 4. ACTIEF SPEL: TELEFOON 1 (7 JAAR + TV) -->
-<div id="host-game-screen">
-    <div id="host-scene-wrap">
-        <canvas id="islandCanvas" width="1280" height="400"></canvas>
-        <div id="host-hud">
-            <div style="display:flex; gap:6px; align-items:center;">
-                <button class="hud-chip btn" onclick="returnToHostLobby()">📋 Lobby</button>
-                <span class="hud-chip role7">🚀 7 jaar · Ontdekker</span>
-            </div>
-            <div style="display:flex; gap:6px; align-items:center;">
-                <span class="hud-chip" id="stop-chip">🏝️ Plek 1 / 5</span>
-                <span class="hud-chip" id="gems-chip">💎 0 schatten</span>
+                <div class="role-card role-age3">
+                    <span class="role-badge">TELEFOON 2</span>
+                    <div class="role-emoji">🦄🗝️</div>
+                    <h2 class="role-title">3 jaar · Sleutel-Bewaker</h2>
+                    <p class="role-desc">Jij hebt de magische sleutelbos op telefoon 2! Jij opent elke schatkist met de
+                        juiste kleur en vorm!</p>
+                    <button class="big-btn btn-purple" onclick="openJoinScreen()">📱 DOE MEE (3 JAAR)</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="host-bottom">
-        <div id="host-banner">
-            <span id="host-turn-tag">🚀 7 JAAR BOUWT DE BRUG</span>
-            <div id="host-question-text" style="flex:1; text-align:center;">Laden…</div>
+    <!-- 2. HOST LOBBY (7 JAAR + TV) -->
+    <div id="host-lobby-screen" class="screen">
+        <div class="card" style="border-color:#00b894;">
+            <div class="top-row">
+                <button class="pill-link" onclick="goToRolePicker()">← 🔄 Andere rol</button>
+                <span class="pill-link" style="background:#e8fbf5; border-color:#00b894; color:#0b6e4f;">🚀 7 jaar ·
+                    Ontdekker</span>
+                <a class="pill-link" href="index.html">🏠 Alle spellen</a>
+            </div>
+
+            <h1 style="color:#0b6e4f;">🗺️ Verbind de sleutel-telefoon van 3 jaar!</h1>
+
+            <div class="lobby-split">
+                <div class="qr-box">
+                    <strong style="color:#5b21b6;">🦄 Scan met telefoon 2 (3 jaar):</strong>
+                    <div id="qr-container"></div>
+                    <div style="font-size:0.86rem; font-weight:800; color:#636e72;">Of open dit spel op telefoon 2 →
+                        <strong>3 jaar</strong> → typ code:</div>
+                    <div class="code-display" id="room-code-text">----</div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                    <div class="status-pill" id="host-conn-status">⏳ Wachten op telefoon van 3 jaar…</div>
+
+                    <div style="width:100%;">
+                        <div style="font-family:'Fredoka One',cursive; font-size:1rem; margin-bottom:4px;">Welke
+                            opdrachten lost 7 jaar op?</div>
+                        <div class="opt-row">
+                            <button class="opt-btn selected" id="topic-tafels" onclick="pickTopic('tafels')">✖️ Tafels
+                                (1–10)</button>
+                            <button class="opt-btn" id="topic-plusmin" onclick="pickTopic('plusmin')">➕ Plus &amp;
+                                Min</button>
+                            <button class="opt-btn" id="topic-woorden" onclick="pickTopic('woorden')">📖
+                                Themawoorden</button>
+                        </div>
+                    </div>
+
+                    <button class="big-btn btn-green" id="host-start-btn" onclick="startCoopGame(false)" disabled
+                        style="opacity:0.55;">
+                        🗺️ OP SCHATTENJACHT! (wacht op 3 jaar)
+                    </button>
+                    <button class="pill-link" style="font-size:0.84rem;" onclick="startCoopGame(true)">
+                        📱 Of speel samen op 1 telefoon (zonder 2e telefoon)
+                    </button>
+                </div>
+            </div>
         </div>
-        <div id="host-choices"></div>
-        <div id="host-wait-box">
-            <div id="host-wait-title">🗝️ Nu opent 3 jaar de schatkist!</div>
-            <div id="host-wait-sub">Zeg tegen je zusje: tik op …</div>
-            <div id="single-phone-keys-row" style="display:none; gap:10px; margin-top:6px; flex-wrap:wrap; justify-content:center;"></div>
+    </div>
+
+    <!-- 3. JOIN SCREEN (3 JAAR · TELEFOON 2) -->
+    <div id="join-screen" class="screen">
+        <div class="card" style="max-width:560px; border-color:#9b59ff;">
+            <div class="top-row">
+                <button class="pill-link" onclick="goToRolePicker()">← 🔄 Andere rol</button>
+                <span class="pill-link" style="background:#f3e8ff; border-color:#9b59ff; color:#5b21b6;">🦄 3 jaar ·
+                    Sleutel-Bewaker</span>
+            </div>
+
+            <h1 style="color:#5b21b6;">🦄 Meedoen als 3 jaar!</h1>
+            <p class="sub">Typ de 4-letter code die op de TV (telefoon van 7 jaar) staat:</p>
+
+            <div style="margin:10px 0 14px 0;">
+                <input id="join-code-input" class="code-input" maxlength="4" placeholder="ABCD" autocomplete="off"
+                    autocapitalize="characters">
+            </div>
+
+            <div class="status-pill" id="join-status" style="margin-bottom:14px;">Klaar om te verbinden!</div>
+
+            <button class="big-btn btn-purple" onclick="connectAsToddler()">🔗 VERBINDEN MET 7 JAAR!</button>
         </div>
-        <button id="host-dragon-btn" onclick="hostHighFiveDragon()">🐉 OPEN SAMEN DE DRAKENSCHAT! ✨</button>
     </div>
-</div>
 
-<!-- 5. ACTIEF SPEL: TELEFOON 2 (3 JAAR · MAGISCHE SLEUTELBOS!) -->
-<div id="toddler-screen">
-    <div id="toddler-top">
-        <span class="pill-link" style="background:#f3e8ff; border-color:#9b59ff; color:#5b21b6;">🦄 3 jaar · Sleutel-Bewaker</span>
-        <div style="display:flex; gap:6px;">
-            <button class="pill-link" onclick="toggleFullscreen()">⛶</button>
-            <a class="pill-link" href="index.html">🏠</a>
+    <!-- 4. ACTIEF SPEL: TELEFOON 1 (7 JAAR + TV) -->
+    <div id="host-game-screen">
+        <div id="host-scene-wrap">
+            <canvas id="islandCanvas" width="1280" height="400"></canvas>
+            <div id="host-hud">
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <button class="hud-chip btn" onclick="returnToHostLobby()">📋 Lobby</button>
+                    <span class="hud-chip role7">🚀 7 jaar · Ontdekker</span>
+                </div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <span class="hud-chip" id="stop-chip">🏝️ Plek 1 / 5</span>
+                    <span class="hud-chip" id="gems-chip">💎 0 schatten</span>
+                </div>
+            </div>
+            <div id="host-cooldown" aria-live="polite">
+                <div id="host-cooldown-text">⏳ Even rustig nadenken… 3</div>
+                <div class="cooldown-track">
+                    <div id="host-cooldown-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="host-bottom">
+            <div id="host-banner">
+                <span id="host-turn-tag">🚀 7 JAAR BOUWT DE BRUG</span>
+                <div id="host-question-text" style="flex:1; text-align:center;">Laden…</div>
+            </div>
+            <div id="host-choices"></div>
+            <div id="host-wait-box">
+                <div id="host-wait-title">🗝️ Nu opent 3 jaar de schatkist!</div>
+                <div id="host-wait-sub">Zeg tegen je zusje: tik op …</div>
+                <div id="single-phone-keys-row"
+                    style="display:none; gap:10px; margin-top:6px; flex-wrap:wrap; justify-content:center;"></div>
+            </div>
+            <button id="host-dragon-btn" onclick="hostHighFiveDragon()">🐉 OPEN SAMEN DE DRAKENSCHAT! ✨</button>
         </div>
     </div>
 
-    <div id="toddler-prompt-box">
-        <div id="toddler-prompt-text">⏳ 7 jaar zoekt de weg op de schatkaart…</div>
-        <button id="toddler-speak" aria-label="Herhaal" onclick="speakToddlerTask()">🔊</button>
+    <!-- 5. ACTIEF SPEL: TELEFOON 2 (3 JAAR · MAGISCHE SLEUTELBOS!) -->
+    <div id="toddler-screen">
+        <div id="toddler-top">
+            <span class="pill-link" style="background:#f3e8ff; border-color:#9b59ff; color:#5b21b6;">🦄 3 jaar ·
+                Sleutel-Bewaker</span>
+            <div style="display:flex; gap:6px;">
+                <button class="pill-link" onclick="toggleFullscreen()">⛶</button>
+                <a class="pill-link" href="index.html">🏠</a>
+            </div>
+        </div>
+
+        <div id="toddler-prompt-box">
+            <div id="toddler-prompt-text">⏳ 7 jaar zoekt de weg op de schatkaart…</div>
+            <button id="toddler-speak" aria-label="Herhaal" onclick="speakToddlerTask()">🔊</button>
+        </div>
+
+        <div id="toddler-grid"></div>
+
+        <button id="toddler-big-action" onclick="toddlerTapDragon()">
+            <span style="font-size:4.2rem; line-height:1;">🐉💎</span>
+            <span>DRAKENSCHAT OPENEN!</span>
+        </button>
     </div>
 
-    <div id="toddler-grid"></div>
+    <script>
+        // ============================================================================
+        // SCHAT-EILAND: DE DUBBELE SLEUTEL — 2-Telefoon Co-Op (7 jaar + 3 jaar)
+        // ============================================================================
+        const PEER_PREFIX = 'schateiland-v1-';
+        const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
-    <button id="toddler-big-action" onclick="toddlerTapDragon()">
-        <span style="font-size:4.2rem; line-height:1;">🐉💎</span>
-        <span>DRAKENSCHAT OPENEN!</span>
-    </button>
-</div>
+        const STOPS = [
+            { name: 'Het Gouden Strand', x: 180, y: 270, icon: '🏖️' },
+            { name: 'De Touwbrug', x: 410, y: 205, icon: '🌉' },
+            { name: 'De Waterval', x: 640, y: 265, icon: '🌊' },
+            { name: 'De Kristalgrot', x: 870, y: 195, icon: '💎' },
+            { name: 'Het Drakennest', x: 1100, y: 245, icon: '🐉' }
+        ];
 
-<script>
-// ============================================================================
-// SCHAT-EILAND: DE DUBBELE SLEUTEL — 2-Telefoon Co-Op (7 jaar + 3 jaar)
-// ============================================================================
-const PEER_PREFIX = 'schateiland-v1-';
-const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+        const KEY_COLORS = [
+            { id: 'rood', adj: 'rode', name: 'ROOD', bg: '#ff4757' },
+            { id: 'geel', adj: 'gele', name: 'GEEL', bg: '#eab308' },
+            { id: 'blauw', adj: 'blauwe', name: 'BLAUW', bg: '#1e90ff' },
+            { id: 'groen', adj: 'groene', name: 'GROEN', bg: '#26cc67' },
+            { id: 'roze', adj: 'roze', name: 'ROZE', bg: '#ff66a6' },
+            { id: 'paars', adj: 'paarse', name: 'PAARS', bg: '#9b59ff' }
+        ];
 
-const STOPS = [
-    { name: 'Het Gouden Strand', x: 180, y: 270, icon: '🏖️' },
-    { name: 'De Touwbrug',       x: 410, y: 205, icon: '🌉' },
-    { name: 'De Waterval',       x: 640, y: 265, icon: '🌊' },
-    { name: 'De Kristalgrot',    x: 870, y: 195, icon: '💎' },
-    { name: 'Het Drakennest',    x: 1100, y: 245, icon: '🐉' }
-];
+        const KEY_SHAPES = [
+            { id: 'ster', label: 'STER', spoken: 'ster-sleutel', emoji: '⭐' },
+            { id: 'hartje', label: 'HARTJE', spoken: 'hart-sleutel', emoji: '❤️' },
+            { id: 'bloem', label: 'BLOEM', spoken: 'bloem-sleutel', emoji: '🌸' },
+            { id: 'maan', label: 'MAAN', spoken: 'maan-sleutel', emoji: '🌙' }
+        ];
 
-const KEY_COLORS = [
-    { id: 'rood',  adj: 'rode',   name: 'ROOD',  bg: '#ff4757' },
-    { id: 'geel',  adj: 'gele',   name: 'GEEL',  bg: '#eab308' },
-    { id: 'blauw', adj: 'blauwe', name: 'BLAUW', bg: '#1e90ff' },
-    { id: 'groen', adj: 'groene', name: 'GROEN', bg: '#26cc67' },
-    { id: 'roze',  adj: 'roze',   name: 'ROZE',  bg: '#ff66a6' },
-    { id: 'paars', adj: 'paarse', name: 'PAARS', bg: '#9b59ff' }
-];
+        const ISLAND_WORDS = [
+            { w: 'de plattegrond', d: 'Een tekening waarop je een stad of gebied van bovenaf ziet.' },
+            { w: 'ontwerpen', d: 'Iets bedenken en op papier tekenen.' },
+            { w: 'het idee', d: 'Iets wat je bedenkt.' },
+            { w: 'het karwei', d: 'Een klus, werk dat je moet doen.' },
+            { w: 'fraai', d: 'Mooi.' },
+            { w: 'de wand', d: 'Een muur.' },
+            { w: 'het luik', d: 'Een soort deurtje van hout dat aan de buitenkant van een raam zit.' },
+            { w: 'de duimstok', d: 'Een liniaal die je kunt opvouwen.' },
+            { w: 'de rolmaat', d: 'Een liniaal die je kunt oprollen.' },
+            { w: 'het meetlint', d: 'Een stuk slappe stof of slap plastic waarmee je kunt meten.' },
+            { w: 'het meetinstrument', d: 'Gereedschap waarmee je kunt meten.' },
+            { w: 'afwisselend', d: 'Iets is steeds anders, je verveelt je niet.' }
+        ];
 
-const KEY_SHAPES = [
-    { id: 'ster',   label: 'STER',   spoken: 'ster-sleutel',   emoji: '⭐' },
-    { id: 'hartje', label: 'HARTJE', spoken: 'hart-sleutel',   emoji: '❤️' },
-    { id: 'bloem',  label: 'BLOEM',  spoken: 'bloem-sleutel',  emoji: '🌸' },
-    { id: 'maan',   label: 'MAAN',   spoken: 'maan-sleutel',   emoji: '🌙' }
-];
-
-const ISLAND_WORDS = [
-    { w: 'de plattegrond', d: 'Een tekening waarop je een stad of gebied van bovenaf ziet.' },
-    { w: 'ontwerpen', d: 'Iets bedenken en op papier tekenen.' },
-    { w: 'het idee', d: 'Iets wat je bedenkt.' },
-    { w: 'het karwei', d: 'Een klus, werk dat je moet doen.' },
-    { w: 'fraai', d: 'Mooi.' },
-    { w: 'de wand', d: 'Een muur.' },
-    { w: 'het luik', d: 'Een soort deurtje van hout dat aan de buitenkant van een raam zit.' },
-    { w: 'de duimstok', d: 'Een liniaal die je kunt opvouwen.' },
-    { w: 'de rolmaat', d: 'Een liniaal die je kunt oprollen.' },
-    { w: 'het meetlint', d: 'Een stuk slappe stof of slap plastic waarmee je kunt meten.' },
-    { w: 'het meetinstrument', d: 'Gereedschap waarmee je kunt meten.' },
-    { w: 'afwisselend', d: 'Iets is steeds anders, je verveelt je niet.' }
-];
-
-// --- Fullscreen ---
-function isStandaloneApp() {
-    return window.matchMedia('(display-mode: fullscreen)').matches
-        || window.matchMedia('(display-mode: standalone)').matches
-        || window.navigator.standalone === true;
-}
-function enterFullscreen() {
-    if (isStandaloneApp()) return;
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen;
-    if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
-        Promise.resolve(req.call(el)).catch(() => {});
-    }
-}
-function toggleFullscreen() {
-    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-    if (fsEl) {
-        const ex = document.exitFullscreen || document.webkitExitFullscreen;
-        if (ex) Promise.resolve(ex.call(document)).catch(() => {});
-    } else enterFullscreen();
-}
-
-// --- Web Audio & Stem ---
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx = null;
-function playTone(f, d = 0.16, type = 'sine', v = 0.13, delay = 0) {
-    try {
-        if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
-        if (!audioCtx) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const t = audioCtx.currentTime + delay;
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.type = type; o.frequency.setValueAtTime(f, t);
-        g.gain.setValueAtTime(v, t);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(t); o.stop(t + d + 0.02);
-    } catch {}
-}
-function sfxChestOpen() { [440, 554.37, 659.25, 880].forEach((f, i) => playTone(f, 0.24, 'triangle', 0.14, i * 0.065)); }
-function sfxSoftOops() { playTone(280, 0.14, 'sine', 0.1); playTone(225, 0.2, 'sine', 0.1, 0.09); }
-function sfxDragonParty() { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => playTone(f, 0.3, 'triangle', 0.14, i * 0.09)); }
-
-let nlVoice = null;
-function loadVoice() {
-    if (!('speechSynthesis' in window)) return;
-    const vs = window.speechSynthesis.getVoices();
-    nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
-           || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
-}
-if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
-function speakDutch(txt) {
-    if (!('speechSynthesis' in window)) return;
-    try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(txt);
-        u.lang = 'nl-NL';
-        if (nlVoice) u.voice = nlVoice;
-        u.rate = 0.94; u.pitch = 1.1;
-        window.speechSynthesis.speak(u);
-    } catch {}
-}
-
-function showOnly(id) {
-    ['role-screen', 'host-lobby-screen', 'join-screen', 'host-game-screen', 'toddler-screen']
-        .forEach(sid => document.getElementById(sid).classList.toggle('active', sid === id));
-}
-function goToRolePicker() {
-    cleanupPeer();
-    showOnly('role-screen');
-}
-
-// --- PeerJS Verbinding ---
-let peer = null;
-let conn = null;
-let roomCode = '';
-let isSinglePhone = false;
-let hostTopic = 'tafels';
-
-function cleanupPeer() {
-    try { if (conn) conn.close(); } catch {}
-    try { if (peer) peer.destroy(); } catch {}
-    conn = null; peer = null;
-}
-function makeRoomCode() {
-    let s = '';
-    for (let i = 0; i < 4; i++) s += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
-    return s;
-}
-function sendMsg(obj) {
-    if (conn && conn.open) {
-        try { conn.send(obj); } catch {}
-    }
-}
-function pickTopic(t) {
-    hostTopic = t;
-    ['tafels', 'plusmin', 'woorden'].forEach(k => document.getElementById(`topic-${k}`).classList.toggle('selected', k === t));
-    playTone(460, 0.08);
-}
-
-// --- HOST LOBBY ---
-function openHostLobby() {
-    cleanupPeer();
-    showOnly('host-lobby-screen');
-    roomCode = makeRoomCode();
-    document.getElementById('room-code-text').textContent = roomCode;
-    const statusEl = document.getElementById('host-conn-status');
-    statusEl.className = 'status-pill';
-    statusEl.textContent = '⏳ Verbinden met kamerserver…';
-    const startBtn = document.getElementById('host-start-btn');
-    startBtn.disabled = true; startBtn.style.opacity = '0.55';
-    startBtn.textContent = '🗺️ OP SCHATTENJACHT! (wacht op 3 jaar)';
-
-    const joinUrl = `${window.location.href.split('?')[0]}?join=${roomCode}&role=age3`;
-    const qrBox = document.getElementById('qr-container');
-    qrBox.innerHTML = '';
-    try {
-        if (window.qrcode) {
-            const qr = window.qrcode(0, 'M');
-            qr.addData(joinUrl);
-            qr.make();
-            qrBox.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2 });
+        // --- Fullscreen ---
+        function isStandaloneApp() {
+            return window.matchMedia('(display-mode: fullscreen)').matches
+                || window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone === true;
         }
-    } catch {}
-
-    if (typeof Peer === 'undefined') {
-        statusEl.textContent = '⚠️ Offline — gebruik "Samen op 1 telefoon" hieronder';
-        return;
-    }
-
-    peer = new Peer(PEER_PREFIX + roomCode, { debug: 0 });
-    peer.on('open', () => {
-        statusEl.textContent = `⏳ Wachten op telefoon van 3 jaar (code ${roomCode})…`;
-    });
-    peer.on('connection', (c) => {
-        conn = c;
-        c.on('open', () => {
-            sfxChestOpen();
-            statusEl.className = 'status-pill connected';
-            statusEl.textContent = '✅ 3 jaar (Sleutel-Bewaker) is verbonden!';
-            startBtn.disabled = false;
-            startBtn.style.opacity = '1';
-            startBtn.textContent = '🗺️ START SCHATTENJACHT! 🐉';
-            sendMsg({ type: 'welcome', text: 'Verbonden met 7 jaar! Even wachten op de schatkaart…' });
-        });
-        c.on('data', handleHostReceive);
-        c.on('close', () => {
-            statusEl.className = 'status-pill';
-            statusEl.textContent = '⚠️ Verbinding verbroken — scan opnieuw met telefoon 2';
-        });
-    });
-    peer.on('error', () => {
-        statusEl.textContent = '⚠️ Netwerk-wachtrij — probeer opnieuw of speel op 1 telefoon';
-    });
-}
-
-function returnToHostLobby() {
-    if (isSinglePhone) openHostLobby();
-    else showOnly('host-lobby-screen');
-}
-
-// --- CLIENT JOIN (3 JAAR) ---
-function openJoinScreen(prefillCode = '') {
-    cleanupPeer();
-    showOnly('join-screen');
-    document.getElementById('join-code-input').value = prefillCode.toUpperCase();
-    document.getElementById('join-status').className = 'status-pill';
-    document.getElementById('join-status').textContent = 'Klaar om te verbinden!';
-    if (prefillCode.length === 4) setTimeout(() => connectAsToddler(true), 250);
-}
-
-function connectAsToddler(fromAuto = false) {
-    const code = document.getElementById('join-code-input').value.trim().toUpperCase();
-    const st = document.getElementById('join-status');
-    if (code.length !== 4) { st.textContent = '⚠️ Vul alle 4 tekens van de TV in!'; return; }
-    if (typeof Peer === 'undefined') { st.textContent = '⚠️ Geen internetverbinding voor 2-telefoon koppeling.'; return; }
-    if (!fromAuto) enterFullscreen();
-    cleanupPeer();
-    st.className = 'status-pill';
-    st.textContent = `⏳ Verbinden met eiland ${code}…`;
-
-    peer = new Peer(undefined, { debug: 0 });
-    peer.on('open', () => {
-        conn = peer.connect(PEER_PREFIX + code, { reliable: true });
-        conn.on('open', () => {
-            sfxChestOpen();
-            st.className = 'status-pill connected';
-            st.textContent = '✅ Verbonden met 7 jaar!';
-            showOnly('toddler-screen');
-            renderToddlerWaiting('⏳ 7 jaar opent de schatkaart…');
-        });
-        conn.on('data', handleToddlerReceive);
-        conn.on('close', () => {
-            showOnly('join-screen');
-            st.className = 'status-pill';
-            st.textContent = '⚠️ Verbinding gestopt — klik nog eens op Verbinden';
-        });
-    });
-    peer.on('error', () => {
-        st.textContent = '⚠️ Kamer niet gevonden — controleer de 4-letter code!';
-    });
-}
-
-// ============================================================================
-// HOST SPEL-LOGICA (7 JAAR + TV)
-// ============================================================================
-let currentStop = 0; // 0..4
-let chestsOpened = 0;
-let turnPhase = 'age7'; // 'age7' | 'age3' | 'finale' | 'party'
-let currentQ = null;
-let targetKey = null;
-let toddlerWrong = 0;
-let hostTappedFinale = false;
-let toddlerTappedFinale = false;
-
-function startCoopGame(singlePhone) {
-    isSinglePhone = singlePhone;
-    enterFullscreen();
-    showOnly('host-game-screen');
-    currentStop = 0;
-    chestsOpened = 0;
-    hostTappedFinale = false;
-    toddlerTappedFinale = false;
-    updateIslandHUD();
-    startAge7Step();
-}
-
-function updateIslandHUD() {
-    document.getElementById('stop-chip').textContent = `🏝️ Plek ${Math.min(currentStop + 1, STOPS.length)} / ${STOPS.length}`;
-    document.getElementById('gems-chip').textContent = `💎 ${chestsOpened} schatten`;
-}
-
-function generateAge7Question() {
-    if (hostTopic === 'woorden') {
-        const target = ISLAND_WORDS[Math.floor(Math.random() * ISLAND_WORDS.length)];
-        const others = ISLAND_WORDS.filter(x => x.w !== target.w).sort(() => Math.random() - 0.5).slice(0, 3);
-        return { prompt: target.d, answer: target.w, choices: [target.w, ...others.map(x => x.w)].sort(() => Math.random() - 0.5) };
-    }
-    if (hostTopic === 'plusmin') {
-        const isPlus = Math.random() < 0.6;
-        const a = Math.floor(Math.random() * 30) + 10;
-        const b = Math.floor(Math.random() * 18) + 4;
-        const ans = isPlus ? a + b : Math.max(a, b) - Math.min(a, b);
-        const prompt = isPlus ? `${a} + ${b} = ?` : `${Math.max(a, b)} − ${Math.min(a, b)} = ?`;
-        const wrong = new Set();
-        while (wrong.size < 3) {
-            const c = ans + [-10, -2, -1, 1, 2, 3, 10][Math.floor(Math.random() * 7)];
-            if (c >= 0 && c !== ans) wrong.add(c);
-        }
-        return { prompt, answer: String(ans), choices: [String(ans), ...[...wrong].map(String)].sort(() => Math.random() - 0.5) };
-    }
-    const a = [1,2,3,4,5,6,7,8,9,10][Math.floor(Math.random() * 10)];
-    const b = Math.floor(Math.random() * 10) + 1;
-    const ans = a * b;
-    const wrong = new Set();
-    while (wrong.size < 3) {
-        const c = ans + [-a, a, -2, -1, 1, 2, 3][Math.floor(Math.random() * 7)];
-        if (c > 0 && c !== ans) wrong.add(c);
-    }
-    return { prompt: `${a} × ${b} = ?`, answer: String(ans), choices: [String(ans), ...[...wrong].map(String)].sort(() => Math.random() - 0.5) };
-}
-
-function startAge7Step() {
-    turnPhase = 'age7';
-    currentQ = generateAge7Question();
-    const stop = STOPS[currentStop];
-
-    document.getElementById('host-turn-tag').textContent = `🚀 7 JAAR · ${stop.name.toUpperCase()}`;
-    document.getElementById('host-turn-tag').style.background = '#00b894';
-    document.getElementById('host-question-text').textContent = currentQ.prompt;
-    document.getElementById('host-choices').style.display = 'grid';
-    document.getElementById('host-wait-box').style.display = 'none';
-    document.getElementById('host-dragon-btn').style.display = 'none';
-
-    const grid = document.getElementById('host-choices');
-    grid.innerHTML = '';
-    currentQ.choices.forEach(c => {
-        const btn = document.createElement('button');
-        btn.className = 'h-choice';
-        btn.textContent = c;
-        btn.onclick = () => {
-            if (turnPhase !== 'age7') return;
-            if (c === currentQ.answer) {
-                btn.classList.add('correct');
-                sfxChestOpen();
-                spawnIslandSparkles(stop.x, stop.y, '#ffd000', 26);
-                setTimeout(startAge3KeyStep, 600);
-            } else {
-                btn.classList.add('wrong');
-                sfxSoftOops();
-                setTimeout(() => btn.classList.remove('wrong'), 400);
+        function enterFullscreen() {
+            if (isStandaloneApp()) return;
+            const el = document.documentElement;
+            const req = el.requestFullscreen || el.webkitRequestFullscreen;
+            if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+                Promise.resolve(req.call(el)).catch(() => { });
             }
-        };
-        grid.appendChild(btn);
-    });
+        }
+        function toggleFullscreen() {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            if (fsEl) {
+                const ex = document.exitFullscreen || document.webkitExitFullscreen;
+                if (ex) Promise.resolve(ex.call(document)).catch(() => { });
+            } else enterFullscreen();
+        }
 
-    sendMsg({ type: 'wait', text: `⏳ 7 jaar bouwt de weg naar ${stop.name}…` });
-}
+        // --- Web Audio & Stem ---
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        function playTone(f, d = 0.16, type = 'sine', v = 0.13, delay = 0) {
+            try {
+                if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const t = audioCtx.currentTime + delay;
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = type; o.frequency.setValueAtTime(f, t);
+                g.gain.setValueAtTime(v, t);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t + d + 0.02);
+            } catch { }
+        }
+        function sfxChestOpen() { [440, 554.37, 659.25, 880].forEach((f, i) => playTone(f, 0.24, 'triangle', 0.14, i * 0.065)); }
+        function sfxSoftOops() { playTone(280, 0.14, 'sine', 0.1); playTone(225, 0.2, 'sine', 0.1, 0.09); }
+        function sfxDragonParty() { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => playTone(f, 0.3, 'triangle', 0.14, i * 0.09)); }
 
-function startAge3KeyStep() {
-    turnPhase = 'age3';
-    toddlerWrong = 0;
+        let nlVoice = null;
+        function loadVoice() {
+            if (!('speechSynthesis' in window)) return;
+            const vs = window.speechSynthesis.getVoices();
+            nlVoice = vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+                || vs.find(v => v.lang && v.lang.toLowerCase().startsWith('nl')) || null;
+        }
+        if ('speechSynthesis' in window) { loadVoice(); window.speechSynthesis.onvoiceschanged = loadVoice; }
+        function speakDutch(txt) {
+            if (!('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'nl-NL';
+                if (nlVoice) u.voice = nlVoice;
+                u.rate = 0.94; u.pitch = 1.1;
+                window.speechSynthesis.speak(u);
+            } catch { }
+        }
 
-    // Slimme dubbele sleutel (kleur + vorm!)
-    const col = KEY_COLORS[Math.floor(Math.random() * KEY_COLORS.length)];
-    const shp = KEY_SHAPES[Math.floor(Math.random() * KEY_SHAPES.length)];
-    const otherCols = KEY_COLORS.filter(c => c.id !== col.id).sort(() => Math.random() - 0.5);
-    const otherShps = KEY_SHAPES.filter(s => s.id !== shp.id).sort(() => Math.random() - 0.5);
+        function showOnly(id) {
+            ['role-screen', 'host-lobby-screen', 'join-screen', 'host-game-screen', 'toddler-screen']
+                .forEach(sid => document.getElementById(sid).classList.toggle('active', sid === id));
+        }
+        function goToRolePicker() {
+            cleanupPeer();
+            showOnly('role-screen');
+        }
 
-    const makeKeyObj = (c, s) => ({
-        keyId: `${c.id}_${s.id}`,
-        color: c,
-        shape: s,
-        spoken: `de ${c.adj} ${s.spoken}`,
-        label: `${c.name} ${s.label}`
-    });
+        // --- PeerJS Verbinding ---
+        let peer = null;
+        let conn = null;
+        let roomCode = '';
+        let isSinglePhone = false;
+        let hostTopic = 'tafels';
 
-    targetKey = makeKeyObj(col, shp);
-    const keyChoices = [
-        targetKey,
-        makeKeyObj(otherCols[0], shp),         // Zelfde vorm, andere kleur
-        makeKeyObj(col, otherShps[0]),         // Zelfde kleur, andere vorm
-        makeKeyObj(otherCols[1], otherShps[1]) // Beide anders
-    ].sort(() => Math.random() - 0.5);
+        function cleanupPeer() {
+            try { if (conn) conn.close(); } catch { }
+            try { if (peer) peer.destroy(); } catch { }
+            conn = null; peer = null;
+        }
+        function makeRoomCode() {
+            let s = '';
+            for (let i = 0; i < 4; i++) s += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+            return s;
+        }
+        function sendMsg(obj) {
+            if (conn && conn.open) {
+                try { conn.send(obj); } catch { }
+            }
+        }
+        function pickTopic(t) {
+            hostTopic = t;
+            ['tafels', 'plusmin', 'woorden'].forEach(k => document.getElementById(`topic-${k}`).classList.toggle('selected', k === t));
+            playTone(460, 0.08);
+        }
 
-    document.getElementById('host-turn-tag').textContent = '🦄 3 JAAR OPENT DE KIST!';
-    document.getElementById('host-turn-tag').style.background = '#9b59ff';
-    document.getElementById('host-question-text').textContent = `Schatkist gevonden! Nu mag 3 jaar de juiste sleutel kiezen!`;
-    document.getElementById('host-choices').style.display = 'none';
-    document.getElementById('host-wait-box').style.display = 'flex';
-    document.getElementById('host-wait-title').textContent = `🗝️ Vraag 3 jaar om: ${targetKey.shape.emoji} ${targetKey.label}!`;
-    document.getElementById('host-wait-sub').textContent = `Zeg samen: "Tik op ${targetKey.spoken}!"`;
+        // --- HOST LOBBY ---
+        function openHostLobby() {
+            cleanupPeer();
+            showOnly('host-lobby-screen');
+            roomCode = makeRoomCode();
+            document.getElementById('room-code-text').textContent = roomCode;
+            const statusEl = document.getElementById('host-conn-status');
+            statusEl.className = 'status-pill';
+            statusEl.textContent = '⏳ Verbinden met kamerserver…';
+            const startBtn = document.getElementById('host-start-btn');
+            startBtn.disabled = true; startBtn.style.opacity = '0.55';
+            startBtn.textContent = '🗺️ OP SCHATTENJACHT! (wacht op 3 jaar)';
 
-    const localRow = document.getElementById('single-phone-keys-row');
-    localRow.innerHTML = '';
-    if (isSinglePhone) {
-        localRow.style.display = 'flex';
-        keyChoices.forEach(k => {
-            const b = document.createElement('button');
-            b.className = 'pill-link';
-            b.style.background = k.color.bg; b.style.color = '#fff'; b.style.borderColor = '#fff';
-            b.style.fontSize = '1.05rem'; b.style.padding = '10px 14px';
-            b.textContent = `🗝️ ${k.shape.emoji} ${k.color.name}`;
-            b.onclick = () => processToddlerKey(k.keyId);
-            localRow.appendChild(b);
-        });
-    } else {
-        localRow.style.display = 'none';
-    }
+            const joinUrl = `${window.location.href.split('?')[0]}?join=${roomCode}&role=age3`;
+            const qrBox = document.getElementById('qr-container');
+            qrBox.innerHTML = '';
+            try {
+                if (window.qrcode) {
+                    const qr = window.qrcode(0, 'M');
+                    qr.addData(joinUrl);
+                    qr.make();
+                    qrBox.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2 });
+                }
+            } catch { }
 
-    sendMsg({
-        type: 'toddlerKeyTurn',
-        targetKeyId: targetKey.keyId,
-        spoken: targetKey.spoken,
-        emoji: targetKey.shape.emoji,
-        choices: keyChoices
-    });
-}
+            if (typeof Peer === 'undefined') {
+                statusEl.textContent = '⚠️ Offline — gebruik "Samen op 1 telefoon" hieronder';
+                return;
+            }
 
-function processToddlerKey(pickedKeyId) {
-    if (turnPhase !== 'age3') return;
-    if (pickedKeyId === targetKey.keyId) {
-        sfxChestOpen();
-        chestsOpened++;
-        const stop = STOPS[currentStop];
-        spawnIslandSparkles(stop.x, stop.y - 20, '#ffd000', 44);
-        updateIslandHUD();
-        sendMsg({ type: 'toddlerSuccess', text: `💎 KLIK-BOEM! Schatkist open!` });
+            peer = new Peer(PEER_PREFIX + roomCode, { debug: 0 });
+            peer.on('open', () => {
+                statusEl.textContent = `⏳ Wachten op telefoon van 3 jaar (code ${roomCode})…`;
+            });
+            peer.on('connection', (c) => {
+                conn = c;
+                c.on('open', () => {
+                    sfxChestOpen();
+                    statusEl.className = 'status-pill connected';
+                    statusEl.textContent = '✅ 3 jaar (Sleutel-Bewaker) is verbonden!';
+                    startBtn.disabled = false;
+                    startBtn.style.opacity = '1';
+                    startBtn.textContent = '🗺️ START SCHATTENJACHT! 🐉';
+                    sendMsg({ type: 'welcome', text: 'Verbonden met 7 jaar! Even wachten op de schatkaart…' });
+                });
+                c.on('data', handleHostReceive);
+                c.on('close', () => {
+                    statusEl.className = 'status-pill';
+                    statusEl.textContent = '⚠️ Verbinding verbroken — scan opnieuw met telefoon 2';
+                });
+            });
+            peer.on('error', () => {
+                statusEl.textContent = '⚠️ Netwerk-wachtrij — probeer opnieuw of speel op 1 telefoon';
+            });
+        }
 
-        if (currentStop >= STOPS.length - 1) {
-            setTimeout(startDragonFinale, 850);
-        } else {
-            currentStop++;
+        function returnToHostLobby() {
+            clearHostCooldown();
+            if (isSinglePhone) openHostLobby();
+            else showOnly('host-lobby-screen');
+        }
+
+        // --- CLIENT JOIN (3 JAAR) ---
+        function openJoinScreen(prefillCode = '') {
+            cleanupPeer();
+            showOnly('join-screen');
+            document.getElementById('join-code-input').value = prefillCode.toUpperCase();
+            document.getElementById('join-status').className = 'status-pill';
+            document.getElementById('join-status').textContent = 'Klaar om te verbinden!';
+            if (prefillCode.length === 4) setTimeout(() => connectAsToddler(true), 250);
+        }
+
+        function connectAsToddler(fromAuto = false) {
+            const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+            const st = document.getElementById('join-status');
+            if (code.length !== 4) { st.textContent = '⚠️ Vul alle 4 tekens van de TV in!'; return; }
+            if (typeof Peer === 'undefined') { st.textContent = '⚠️ Geen internetverbinding voor 2-telefoon koppeling.'; return; }
+            if (!fromAuto) enterFullscreen();
+            cleanupPeer();
+            st.className = 'status-pill';
+            st.textContent = `⏳ Verbinden met eiland ${code}…`;
+
+            peer = new Peer(undefined, { debug: 0 });
+            peer.on('open', () => {
+                conn = peer.connect(PEER_PREFIX + code, { reliable: true });
+                conn.on('open', () => {
+                    sfxChestOpen();
+                    st.className = 'status-pill connected';
+                    st.textContent = '✅ Verbonden met 7 jaar!';
+                    showOnly('toddler-screen');
+                    renderToddlerWaiting('⏳ 7 jaar opent de schatkaart…');
+                });
+                conn.on('data', handleToddlerReceive);
+                conn.on('close', () => {
+                    showOnly('join-screen');
+                    st.className = 'status-pill';
+                    st.textContent = '⚠️ Verbinding gestopt — klik nog eens op Verbinden';
+                });
+            });
+            peer.on('error', () => {
+                st.textContent = '⚠️ Kamer niet gevonden — controleer de 4-letter code!';
+            });
+        }
+
+        // ============================================================================
+        // HOST SPEL-LOGICA (7 JAAR + TV)
+        // ============================================================================
+        let currentStop = 0; // 0..4
+        let chestsOpened = 0;
+        let turnPhase = 'age7'; // 'age7' | 'age3' | 'finale' | 'party'
+        let currentQ = null;
+        let targetKey = null;
+        let toddlerWrong = 0;
+        let hostTappedFinale = false;
+        let toddlerTappedFinale = false;
+        const WRONG_COOLDOWN_MS = 3000;
+        let hostAnswerLocked = false;
+        let hostCooldownRaf = null;
+
+        function clearHostCooldown() {
+            if (hostCooldownRaf) {
+                cancelAnimationFrame(hostCooldownRaf);
+                hostCooldownRaf = null;
+            }
+            hostAnswerLocked = false;
+            const box = document.getElementById('host-cooldown');
+            if (box) box.style.display = 'none';
+        }
+
+        function startHostCooldown(wrongBtn) {
+            clearHostCooldown();
+            hostAnswerLocked = true;
+            const allBtns = Array.from(document.querySelectorAll('#host-choices .h-choice'));
+            allBtns.forEach(b => {
+                b.disabled = true;
+                if (b !== wrongBtn) b.classList.add('cooldown-dim');
+            });
+            const box = document.getElementById('host-cooldown');
+            const textEl = document.getElementById('host-cooldown-text');
+            const fillEl = document.getElementById('host-cooldown-fill');
+            box.style.display = 'block';
+            const start = performance.now();
+
+            function tick(now) {
+                const rem = Math.max(0, WRONG_COOLDOWN_MS - (now - start));
+                const secs = Math.max(1, Math.ceil(rem / 1000));
+                textEl.textContent = `⏳ Even rustig nadenken… ${secs}`;
+                fillEl.style.width = `${(rem / WRONG_COOLDOWN_MS) * 100}%`;
+                if (rem > 0) {
+                    hostCooldownRaf = requestAnimationFrame(tick);
+                } else {
+                    hostCooldownRaf = null;
+                    hostAnswerLocked = false;
+                    box.style.display = 'none';
+                    allBtns.forEach(b => {
+                        b.disabled = false;
+                        b.classList.remove('wrong', 'cooldown-dim');
+                    });
+                }
+            }
+            hostCooldownRaf = requestAnimationFrame(tick);
+        }
+
+        function startCoopGame(singlePhone) {
+            isSinglePhone = singlePhone;
+            enterFullscreen();
+            showOnly('host-game-screen');
+            currentStop = 0;
+            chestsOpened = 0;
+            hostTappedFinale = false;
+            toddlerTappedFinale = false;
             updateIslandHUD();
-            setTimeout(startAge7Step, 900);
+            startAge7Step();
         }
-    } else {
-        toddlerWrong++;
-        sfxSoftOops();
-        sendMsg({
-            type: 'toddlerRetry',
-            wrongKeyId: pickedKeyId,
-            hintKeyId: toddlerWrong >= 2 ? targetKey.keyId : null,
-            text: `Probeer nog eens! Zoek ${targetKey.spoken}!`
-        });
-    }
-}
 
-function startDragonFinale() {
-    turnPhase = 'finale';
-    hostTappedFinale = false;
-    toddlerTappedFinale = isSinglePhone;
-    document.getElementById('host-turn-tag').textContent = '🐉 DRAKEN-FEEST!';
-    document.getElementById('host-turn-tag').style.background = '#ff9f43';
-    document.getElementById('host-question-text').textContent = 'Druk ALLEBEI tegelijk om de reuzen-drakenschat te openen!';
-    document.getElementById('host-choices').style.display = 'none';
-    document.getElementById('host-wait-box').style.display = 'none';
-    const dbtn = document.getElementById('host-dragon-btn');
-    dbtn.style.display = 'block';
-    dbtn.textContent = '🐉 OPEN SAMEN DE DRAKENSCHAT! 💎';
-    sendMsg({ type: 'dragonFinaleTurn' });
-}
-
-function hostHighFiveDragon() {
-    if (turnPhase !== 'finale') return;
-    hostTappedFinale = true;
-    playTone(640, 0.14, 'triangle', 0.14);
-    document.getElementById('host-dragon-btn').textContent = toddlerTappedFinale
-        ? '🎉 HOERA! SCHAT GEOPEND!'
-        : '✅ 7 jaar drukte! Nu nog 3 jaar! 🦄';
-    checkDragonParty();
-}
-
-function checkDragonParty() {
-    if (hostTappedFinale && toddlerTappedFinale && turnPhase === 'finale') {
-        turnPhase = 'party';
-        sfxDragonParty();
-        spawnIslandSparkles(640, 190, '#ffd000', 75);
-        document.getElementById('host-question-text').textContent = '🎉 HOERA! Baby-Draakje 🐉 danst van blijdschap! Super team!';
-        const dbtn = document.getElementById('host-dragon-btn');
-        dbtn.textContent = '🗺️ NIEUWE SCHATTENJACHT! ▶';
-        dbtn.onclick = () => {
-            dbtn.onclick = hostHighFiveDragon;
-            startCoopGame(isSinglePhone);
-        };
-        sendMsg({ type: 'party', text: '🎉 HOERA! Baby-Draakje 🐉 is superblij! Goed samengewerkt!' });
-    }
-}
-
-function handleHostReceive(msg) {
-    if (!msg || !msg.type) return;
-    if (msg.type === 'toddlerKeyPick') processToddlerKey(msg.keyId);
-    if (msg.type === 'toddlerDragonTap') {
-        toddlerTappedFinale = true;
-        playTone(760, 0.14, 'triangle', 0.14);
-        if (!hostTappedFinale) {
-            document.getElementById('host-dragon-btn').textContent = '🦄 3 jaar drukte al! Nu jij nog, 7 jaar! 🐉';
+        function updateIslandHUD() {
+            document.getElementById('stop-chip').textContent = `🏝️ Plek ${Math.min(currentStop + 1, STOPS.length)} / ${STOPS.length}`;
+            document.getElementById('gems-chip').textContent = `💎 ${chestsOpened} schatten`;
         }
-        checkDragonParty();
-    }
-}
 
-// ============================================================================
-// CLIENT SPEL-LOGICA (3 JAAR · TELEFOON 2)
-// ============================================================================
-let toddlerSpoken = '';
-
-function renderToddlerWaiting(text) {
-    document.getElementById('toddler-prompt-text').textContent = text;
-    document.getElementById('toddler-grid').style.display = 'grid';
-    document.getElementById('toddler-big-action').style.display = 'none';
-    document.querySelectorAll('#toddler-grid .k-btn').forEach(b => b.classList.add('dimmed'));
-}
-
-function speakToddlerTask() {
-    if (toddlerSpoken) speakDutch(`Tik op ${toddlerSpoken}!`);
-}
-
-function handleToddlerReceive(msg) {
-    if (!msg || !msg.type) return;
-    if (msg.type === 'welcome' || msg.type === 'wait') {
-        toddlerSpoken = '';
-        renderToddlerWaiting(msg.text);
-    } else if (msg.type === 'toddlerKeyTurn') {
-        toddlerSpoken = msg.spoken;
-        document.getElementById('toddler-big-action').style.display = 'none';
-        const grid = document.getElementById('toddler-grid');
-        grid.style.display = 'grid';
-        grid.innerHTML = '';
-        document.getElementById('toddler-prompt-text').textContent = `🗝️ Tik op ${msg.spoken}! ${msg.emoji}`;
-        msg.choices.forEach(k => {
-            const btn = document.createElement('button');
-            btn.className = 'k-btn';
-            btn.dataset.id = k.keyId;
-            btn.style.background = k.color.bg;
-            btn.innerHTML = `<span class="k-emoji">🗝️${k.shape.emoji}</span><span class="k-label">${k.color.name}</span>`;
-            btn.onclick = () => {
-                playTone(540, 0.08);
-                sendMsg({ type: 'toddlerKeyPick', keyId: k.keyId });
-            };
-            grid.appendChild(btn);
-        });
-        speakDutch(`Jouw beurt! Tik op ${msg.spoken}!`);
-    } else if (msg.type === 'toddlerSuccess') {
-        sfxChestOpen();
-        toddlerSpoken = '';
-        renderToddlerWaiting(msg.text);
-        speakDutch('Hoera! De schatkist is open!');
-    } else if (msg.type === 'toddlerRetry') {
-        sfxSoftOops();
-        document.getElementById('toddler-prompt-text').textContent = msg.text;
-        const wb = document.querySelector(`#toddler-grid .k-btn[data-id="${msg.wrongKeyId}"]`);
-        if (wb) { wb.classList.add('wiggle'); setTimeout(() => wb.classList.remove('wiggle'), 400); }
-        if (msg.hintKeyId) {
-            const hb = document.querySelector(`#toddler-grid .k-btn[data-id="${msg.hintKeyId}"]`);
-            if (hb) hb.classList.add('hint-glow');
+        function generateAge7Question() {
+            if (hostTopic === 'woorden') {
+                const target = ISLAND_WORDS[Math.floor(Math.random() * ISLAND_WORDS.length)];
+                const others = ISLAND_WORDS.filter(x => x.w !== target.w).sort(() => Math.random() - 0.5).slice(0, 3);
+                return { prompt: target.d, answer: target.w, choices: [target.w, ...others.map(x => x.w)].sort(() => Math.random() - 0.5) };
+            }
+            if (hostTopic === 'plusmin') {
+                const isPlus = Math.random() < 0.6;
+                const a = Math.floor(Math.random() * 30) + 10;
+                const b = Math.floor(Math.random() * 18) + 4;
+                const ans = isPlus ? a + b : Math.max(a, b) - Math.min(a, b);
+                const prompt = isPlus ? `${a} + ${b} = ?` : `${Math.max(a, b)} − ${Math.min(a, b)} = ?`;
+                const wrong = new Set();
+                while (wrong.size < 3) {
+                    const c = ans + [-10, -2, -1, 1, 2, 3, 10][Math.floor(Math.random() * 7)];
+                    if (c >= 0 && c !== ans) wrong.add(c);
+                }
+                return { prompt, answer: String(ans), choices: [String(ans), ...[...wrong].map(String)].sort(() => Math.random() - 0.5) };
+            }
+            const a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10][Math.floor(Math.random() * 10)];
+            const b = Math.floor(Math.random() * 10) + 1;
+            const ans = a * b;
+            const wrong = new Set();
+            while (wrong.size < 3) {
+                const c = ans + [-a, a, -2, -1, 1, 2, 3][Math.floor(Math.random() * 7)];
+                if (c > 0 && c !== ans) wrong.add(c);
+            }
+            return { prompt: `${a} × ${b} = ?`, answer: String(ans), choices: [String(ans), ...[...wrong].map(String)].sort(() => Math.random() - 0.5) };
         }
-        speakDutch(msg.text);
-    } else if (msg.type === 'dragonFinaleTurn') {
-        toddlerSpoken = 'de grote draken-knop';
-        document.getElementById('toddler-grid').style.display = 'none';
-        const big = document.getElementById('toddler-big-action');
-        big.style.display = 'flex';
-        big.disabled = false;
-        big.style.opacity = '1';
-        document.getElementById('toddler-prompt-text').textContent = '🐉 Tik op de grote knop voor de drakenschat!';
-        speakDutch('Hoera! Tik samen op de grote knop voor het baby draakje!');
-    } else if (msg.type === 'party') {
-        sfxDragonParty();
-        document.getElementById('toddler-prompt-text').textContent = msg.text;
-        speakDutch('Hoera! Goed samengewerkt!');
-    }
-}
 
-function toddlerTapDragon() {
-    sfxChestOpen();
-    const big = document.getElementById('toddler-big-action');
-    big.disabled = true;
-    big.style.opacity = '0.75';
-    document.getElementById('toddler-prompt-text').textContent = '✨ Jaaa! Nu kijkt draakje blij!';
-    sendMsg({ type: 'toddlerDragonTap' });
-}
+        function startAge7Step() {
+            clearHostCooldown();
+            turnPhase = 'age7';
+            currentQ = generateAge7Question();
+            const stop = STOPS[currentStop];
 
-// ============================================================================
-// LIVE SCHAT-EILAND KAART OP TELEFOON 1 / TV
-// ============================================================================
-const iCanvas = document.getElementById('islandCanvas');
-const iCtx = iCanvas.getContext('2d');
-let iTime = 0;
-let islandParticles = [];
+            document.getElementById('host-turn-tag').textContent = `🚀 7 JAAR · ${stop.name.toUpperCase()}`;
+            document.getElementById('host-turn-tag').style.background = '#00b894';
+            document.getElementById('host-question-text').textContent = currentQ.prompt;
+            document.getElementById('host-choices').style.display = 'grid';
+            document.getElementById('host-wait-box').style.display = 'none';
+            document.getElementById('host-dragon-btn').style.display = 'none';
 
-function spawnIslandSparkles(x, y, col, n) {
-    for (let i = 0; i < n; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const sp = 2.5 + Math.random() * 7;
-        islandParticles.push({
-            x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2.5,
-            r: 5 + Math.random() * 8,
-            color: i % 3 === 0 ? '#ffffff' : (i % 4 === 0 ? '#ff66a6' : col),
-            life: 1, decay: 0.018 + Math.random() * 0.014
-        });
-    }
-}
+            const grid = document.getElementById('host-choices');
+            grid.innerHTML = '';
+            currentQ.choices.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'h-choice';
+                btn.textContent = c;
+                btn.onclick = () => {
+                    if (turnPhase !== 'age7' || hostAnswerLocked) return;
+                    if (c === currentQ.answer) {
+                        hostAnswerLocked = true;
+                        btn.classList.add('correct');
+                        sfxChestOpen();
+                        spawnIslandSparkles(stop.x, stop.y, '#ffd000', 26);
+                        setTimeout(startAge3KeyStep, 600);
+                    } else {
+                        btn.classList.add('wrong');
+                        sfxSoftOops();
+                        startHostCooldown(btn);
+                    }
+                };
+                grid.appendChild(btn);
+            });
 
-function drawIsland() {
-    const W = iCanvas.width, H = iCanvas.height;
-    // Blauwe zee
-    const sea = iCtx.createLinearGradient(0, 0, 0, H);
-    sea.addColorStop(0, '#48dbfb'); sea.addColorStop(1, '#0984e3');
-    iCtx.fillStyle = sea; iCtx.fillRect(0, 0, W, H);
-
-    // Zachte golfjes
-    iCtx.strokeStyle = 'rgba(255,255,255,0.32)'; iCtx.lineWidth = 4;
-    for (let y = 55; y < H; y += 75) {
-        for (let x = 40; x < W; x += 220) {
-            const ox = Math.sin(iTime * 2 + y) * 14;
-            iCtx.beginPath(); iCtx.arc(x + ox, y, 22, 0.15 * Math.PI, 0.85 * Math.PI); iCtx.stroke();
+            sendMsg({ type: 'wait', text: `⏳ 7 jaar bouwt de weg naar ${stop.name}…` });
         }
-    }
 
-    // Zonnig groen/zand eiland
-    iCtx.fillStyle = '#ffeaa7'; iCtx.strokeStyle = '#e17055'; iCtx.lineWidth = 7;
-    iCtx.beginPath(); iCtx.ellipse(640, 238, 560, 138, 0, 0, Math.PI * 2); iCtx.fill(); iCtx.stroke();
-    iCtx.fillStyle = '#55efc4';
-    iCtx.beginPath(); iCtx.ellipse(640, 232, 515, 112, 0, 0, Math.PI * 2); iCtx.fill();
+        function startAge3KeyStep() {
+            clearHostCooldown();
+            turnPhase = 'age3';
+            toddlerWrong = 0;
 
-    // Gestippeld schatpad tussen de 5 plekken
-    iCtx.strokeStyle = '#d35400'; iCtx.lineWidth = 9; iCtx.setLineDash([16, 12]);
-    iCtx.beginPath();
-    STOPS.forEach((s, i) => { if (i === 0) iCtx.moveTo(s.x, s.y); else iCtx.lineTo(s.x, s.y); });
-    iCtx.stroke();
-    iCtx.setLineDash([]);
+            // Slimme dubbele sleutel (kleur + vorm!)
+            const col = KEY_COLORS[Math.floor(Math.random() * KEY_COLORS.length)];
+            const shp = KEY_SHAPES[Math.floor(Math.random() * KEY_SHAPES.length)];
+            const otherCols = KEY_COLORS.filter(c => c.id !== col.id).sort(() => Math.random() - 0.5);
+            const otherShps = KEY_SHAPES.filter(s => s.id !== shp.id).sort(() => Math.random() - 0.5);
 
-    // 5 Schat-plekken + schatkisten
-    STOPS.forEach((s, i) => {
-        const opened = i < chestsOpened;
-        const active = i === currentStop && turnPhase !== 'party';
-        const pulse = active ? 1 + Math.sin(iTime * 6) * 0.1 : 1;
+            const makeKeyObj = (c, s) => ({
+                keyId: `${c.id}_${s.id}`,
+                color: c,
+                shape: s,
+                spoken: `de ${c.adj} ${s.spoken}`,
+                label: `${c.name} ${s.label}`
+            });
 
-        iCtx.save();
-        iCtx.translate(s.x, s.y);
-        iCtx.scale(pulse, pulse);
+            targetKey = makeKeyObj(col, shp);
+            const keyChoices = [
+                targetKey,
+                makeKeyObj(otherCols[0], shp),         // Zelfde vorm, andere kleur
+                makeKeyObj(col, otherShps[0]),         // Zelfde kleur, andere vorm
+                makeKeyObj(otherCols[1], otherShps[1]) // Beide anders
+            ].sort(() => Math.random() - 0.5);
 
-        iCtx.fillStyle = opened ? '#2ecc71' : (active ? '#ffd000' : '#ffffff');
-        iCtx.strokeStyle = '#2d3436'; iCtx.lineWidth = 5;
-        iCtx.beginPath(); iCtx.arc(0, 0, 42, 0, Math.PI * 2); iCtx.fill(); iCtx.stroke();
+            document.getElementById('host-turn-tag').textContent = '🦄 3 JAAR OPENT DE KIST!';
+            document.getElementById('host-turn-tag').style.background = '#9b59ff';
+            document.getElementById('host-question-text').textContent = `Schatkist gevonden! Nu mag 3 jaar de juiste sleutel kiezen!`;
+            document.getElementById('host-choices').style.display = 'none';
+            document.getElementById('host-wait-box').style.display = 'flex';
+            document.getElementById('host-wait-title').textContent = `🗝️ Vraag 3 jaar om: ${targetKey.shape.emoji} ${targetKey.label}!`;
+            document.getElementById('host-wait-sub').textContent = `Zeg samen: "Tik op ${targetKey.spoken}!"`;
 
-        iCtx.font = '40px sans-serif'; iCtx.textAlign = 'center'; iCtx.textBaseline = 'middle';
-        iCtx.fillText(opened ? '💎' : (i === STOPS.length - 1 ? '🐉' : '🧰'), 0, 2);
+            const localRow = document.getElementById('single-phone-keys-row');
+            localRow.innerHTML = '';
+            if (isSinglePhone) {
+                localRow.style.display = 'flex';
+                keyChoices.forEach(k => {
+                    const b = document.createElement('button');
+                    b.className = 'pill-link';
+                    b.style.background = k.color.bg; b.style.color = '#fff'; b.style.borderColor = '#fff';
+                    b.style.fontSize = '1.05rem'; b.style.padding = '10px 14px';
+                    b.textContent = `🗝️ ${k.shape.emoji} ${k.color.name}`;
+                    b.onclick = () => processToddlerKey(k.keyId);
+                    localRow.appendChild(b);
+                });
+            } else {
+                localRow.style.display = 'none';
+            }
 
-        iCtx.fillStyle = 'rgba(255,255,255,0.92)';
-        iCtx.beginPath(); iCtx.roundRect(-78, 48, 156, 28, 12); iCtx.fill();
-        iCtx.fillStyle = '#2d3436'; iCtx.font = '900 14px "Fredoka One", sans-serif';
-        iCtx.fillText(s.name, 0, 63);
-        iCtx.restore();
-    });
+            sendMsg({
+                type: 'toddlerKeyTurn',
+                targetKeyId: targetKey.keyId,
+                spoken: targetKey.spoken,
+                emoji: targetKey.shape.emoji,
+                choices: keyChoices
+            });
+        }
 
-    // Team-bootje / ontdekkers op huidige plek!
-    const cur = STOPS[Math.min(currentStop, STOPS.length - 1)];
-    const bob = Math.sin(iTime * 5) * 6;
-    iCtx.save();
-    iCtx.font = '46px sans-serif'; iCtx.textAlign = 'center';
-    iCtx.fillText('🚀🦄', cur.x, cur.y - 62 + bob);
-    iCtx.restore();
+        function processToddlerKey(pickedKeyId) {
+            if (turnPhase !== 'age3') return;
+            if (pickedKeyId === targetKey.keyId) {
+                sfxChestOpen();
+                chestsOpened++;
+                const stop = STOPS[currentStop];
+                spawnIslandSparkles(stop.x, stop.y - 20, '#ffd000', 44);
+                updateIslandHUD();
+                sendMsg({ type: 'toddlerSuccess', text: `💎 KLIK-BOEM! Schatkist open!` });
 
-    // Partikels
-    for (let i = islandParticles.length - 1; i >= 0; i--) {
-        const p = islandParticles[i];
-        p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= p.decay;
-        if (p.life <= 0) { islandParticles.splice(i, 1); continue; }
-        iCtx.save(); iCtx.globalAlpha = p.life; iCtx.fillStyle = p.color;
-        iCtx.beginPath(); iCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2); iCtx.fill();
-        iCtx.restore();
-    }
-}
+                if (currentStop >= STOPS.length - 1) {
+                    setTimeout(startDragonFinale, 850);
+                } else {
+                    currentStop++;
+                    updateIslandHUD();
+                    setTimeout(startAge7Step, 900);
+                }
+            } else {
+                toddlerWrong++;
+                sfxSoftOops();
+                sendMsg({
+                    type: 'toddlerRetry',
+                    wrongKeyId: pickedKeyId,
+                    hintKeyId: toddlerWrong >= 2 ? targetKey.keyId : null,
+                    text: `Probeer nog eens! Zoek ${targetKey.spoken}!`
+                });
+            }
+        }
 
-let lastT = 0;
-function animLoop(ts) {
-    const dt = Math.min(0.05, (ts - lastT) / 1000 || 0.016);
-    lastT = ts;
-    iTime += dt;
-    if (document.getElementById('host-game-screen').classList.contains('active')) {
-        drawIsland();
-    }
-    requestAnimationFrame(animLoop);
-}
-requestAnimationFrame(animLoop);
+        function startDragonFinale() {
+            turnPhase = 'finale';
+            hostTappedFinale = false;
+            toddlerTappedFinale = isSinglePhone;
+            document.getElementById('host-turn-tag').textContent = '🐉 DRAKEN-FEEST!';
+            document.getElementById('host-turn-tag').style.background = '#ff9f43';
+            document.getElementById('host-question-text').textContent = 'Druk ALLEBEI tegelijk om de reuzen-drakenschat te openen!';
+            document.getElementById('host-choices').style.display = 'none';
+            document.getElementById('host-wait-box').style.display = 'none';
+            const dbtn = document.getElementById('host-dragon-btn');
+            dbtn.style.display = 'block';
+            dbtn.textContent = '🐉 OPEN SAMEN DE DRAKENSCHAT! 💎';
+            sendMsg({ type: 'dragonFinaleTurn' });
+        }
 
-// Auto-join via QR code (?join=ABCD&role=age3)
-(function checkAutoJoin() {
-    const params = new URLSearchParams(window.location.search);
-    const joinCode = params.get('join');
-    if (joinCode) openJoinScreen(joinCode.slice(0, 4));
-})();
-</script>
+        function hostHighFiveDragon() {
+            if (turnPhase !== 'finale') return;
+            hostTappedFinale = true;
+            playTone(640, 0.14, 'triangle', 0.14);
+            document.getElementById('host-dragon-btn').textContent = toddlerTappedFinale
+                ? '🎉 HOERA! SCHAT GEOPEND!'
+                : '✅ 7 jaar drukte! Nu nog 3 jaar! 🦄';
+            checkDragonParty();
+        }
+
+        function checkDragonParty() {
+            if (hostTappedFinale && toddlerTappedFinale && turnPhase === 'finale') {
+                turnPhase = 'party';
+                sfxDragonParty();
+                spawnIslandSparkles(640, 190, '#ffd000', 75);
+                document.getElementById('host-question-text').textContent = '🎉 HOERA! Baby-Draakje 🐉 danst van blijdschap! Super team!';
+                const dbtn = document.getElementById('host-dragon-btn');
+                dbtn.textContent = '🗺️ NIEUWE SCHATTENJACHT! ▶';
+                dbtn.onclick = () => {
+                    dbtn.onclick = hostHighFiveDragon;
+                    startCoopGame(isSinglePhone);
+                };
+                sendMsg({ type: 'party', text: '🎉 HOERA! Baby-Draakje 🐉 is superblij! Goed samengewerkt!' });
+            }
+        }
+
+        function handleHostReceive(msg) {
+            if (!msg || !msg.type) return;
+            if (msg.type === 'toddlerKeyPick') processToddlerKey(msg.keyId);
+            if (msg.type === 'toddlerDragonTap') {
+                toddlerTappedFinale = true;
+                playTone(760, 0.14, 'triangle', 0.14);
+                if (!hostTappedFinale) {
+                    document.getElementById('host-dragon-btn').textContent = '🦄 3 jaar drukte al! Nu jij nog, 7 jaar! 🐉';
+                }
+                checkDragonParty();
+            }
+        }
+
+        // ============================================================================
+        // CLIENT SPEL-LOGICA (3 JAAR · TELEFOON 2)
+        // ============================================================================
+        let toddlerSpoken = '';
+
+        function renderToddlerWaiting(text) {
+            document.getElementById('toddler-prompt-text').textContent = text;
+            document.getElementById('toddler-grid').style.display = 'grid';
+            document.getElementById('toddler-big-action').style.display = 'none';
+            document.querySelectorAll('#toddler-grid .k-btn').forEach(b => b.classList.add('dimmed'));
+        }
+
+        function speakToddlerTask() {
+            if (toddlerSpoken) speakDutch(`Tik op ${toddlerSpoken}!`);
+        }
+
+        function handleToddlerReceive(msg) {
+            if (!msg || !msg.type) return;
+            if (msg.type === 'welcome' || msg.type === 'wait') {
+                toddlerSpoken = '';
+                renderToddlerWaiting(msg.text);
+            } else if (msg.type === 'toddlerKeyTurn') {
+                toddlerSpoken = msg.spoken;
+                document.getElementById('toddler-big-action').style.display = 'none';
+                const grid = document.getElementById('toddler-grid');
+                grid.style.display = 'grid';
+                grid.innerHTML = '';
+                document.getElementById('toddler-prompt-text').textContent = `🗝️ Tik op ${msg.spoken}! ${msg.emoji}`;
+                msg.choices.forEach(k => {
+                    const btn = document.createElement('button');
+                    btn.className = 'k-btn';
+                    btn.dataset.id = k.keyId;
+                    btn.style.background = k.color.bg;
+                    btn.innerHTML = `<span class="k-emoji">🗝️${k.shape.emoji}</span><span class="k-label">${k.color.name}</span>`;
+                    btn.onclick = () => {
+                        playTone(540, 0.08);
+                        sendMsg({ type: 'toddlerKeyPick', keyId: k.keyId });
+                    };
+                    grid.appendChild(btn);
+                });
+                speakDutch(`Jouw beurt! Tik op ${msg.spoken}!`);
+            } else if (msg.type === 'toddlerSuccess') {
+                sfxChestOpen();
+                toddlerSpoken = '';
+                renderToddlerWaiting(msg.text);
+                speakDutch('Hoera! De schatkist is open!');
+            } else if (msg.type === 'toddlerRetry') {
+                sfxSoftOops();
+                document.getElementById('toddler-prompt-text').textContent = msg.text;
+                const wb = document.querySelector(`#toddler-grid .k-btn[data-id="${msg.wrongKeyId}"]`);
+                if (wb) { wb.classList.add('wiggle'); setTimeout(() => wb.classList.remove('wiggle'), 400); }
+                if (msg.hintKeyId) {
+                    const hb = document.querySelector(`#toddler-grid .k-btn[data-id="${msg.hintKeyId}"]`);
+                    if (hb) hb.classList.add('hint-glow');
+                }
+                speakDutch(msg.text);
+            } else if (msg.type === 'dragonFinaleTurn') {
+                toddlerSpoken = 'de grote draken-knop';
+                document.getElementById('toddler-grid').style.display = 'none';
+                const big = document.getElementById('toddler-big-action');
+                big.style.display = 'flex';
+                big.disabled = false;
+                big.style.opacity = '1';
+                document.getElementById('toddler-prompt-text').textContent = '🐉 Tik op de grote knop voor de drakenschat!';
+                speakDutch('Hoera! Tik samen op de grote knop voor het baby draakje!');
+            } else if (msg.type === 'party') {
+                sfxDragonParty();
+                document.getElementById('toddler-prompt-text').textContent = msg.text;
+                speakDutch('Hoera! Goed samengewerkt!');
+            }
+        }
+
+        function toddlerTapDragon() {
+            sfxChestOpen();
+            const big = document.getElementById('toddler-big-action');
+            big.disabled = true;
+            big.style.opacity = '0.75';
+            document.getElementById('toddler-prompt-text').textContent = '✨ Jaaa! Nu kijkt draakje blij!';
+            sendMsg({ type: 'toddlerDragonTap' });
+        }
+
+        // ============================================================================
+        // LIVE SCHAT-EILAND KAART OP TELEFOON 1 / TV
+        // ============================================================================
+        const iCanvas = document.getElementById('islandCanvas');
+        const iCtx = iCanvas.getContext('2d');
+        let iTime = 0;
+        let islandParticles = [];
+
+        function spawnIslandSparkles(x, y, col, n) {
+            for (let i = 0; i < n; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const sp = 2.5 + Math.random() * 7;
+                islandParticles.push({
+                    x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2.5,
+                    r: 5 + Math.random() * 8,
+                    color: i % 3 === 0 ? '#ffffff' : (i % 4 === 0 ? '#ff66a6' : col),
+                    life: 1, decay: 0.018 + Math.random() * 0.014
+                });
+            }
+        }
+
+        function drawIsland() {
+            const W = iCanvas.width, H = iCanvas.height;
+            // Blauwe zee
+            const sea = iCtx.createLinearGradient(0, 0, 0, H);
+            sea.addColorStop(0, '#48dbfb'); sea.addColorStop(1, '#0984e3');
+            iCtx.fillStyle = sea; iCtx.fillRect(0, 0, W, H);
+
+            // Zachte golfjes
+            iCtx.strokeStyle = 'rgba(255,255,255,0.32)'; iCtx.lineWidth = 4;
+            for (let y = 55; y < H; y += 75) {
+                for (let x = 40; x < W; x += 220) {
+                    const ox = Math.sin(iTime * 2 + y) * 14;
+                    iCtx.beginPath(); iCtx.arc(x + ox, y, 22, 0.15 * Math.PI, 0.85 * Math.PI); iCtx.stroke();
+                }
+            }
+
+            // Zonnig groen/zand eiland
+            iCtx.fillStyle = '#ffeaa7'; iCtx.strokeStyle = '#e17055'; iCtx.lineWidth = 7;
+            iCtx.beginPath(); iCtx.ellipse(640, 238, 560, 138, 0, 0, Math.PI * 2); iCtx.fill(); iCtx.stroke();
+            iCtx.fillStyle = '#55efc4';
+            iCtx.beginPath(); iCtx.ellipse(640, 232, 515, 112, 0, 0, Math.PI * 2); iCtx.fill();
+
+            // Gestippeld schatpad tussen de 5 plekken
+            iCtx.strokeStyle = '#d35400'; iCtx.lineWidth = 9; iCtx.setLineDash([16, 12]);
+            iCtx.beginPath();
+            STOPS.forEach((s, i) => { if (i === 0) iCtx.moveTo(s.x, s.y); else iCtx.lineTo(s.x, s.y); });
+            iCtx.stroke();
+            iCtx.setLineDash([]);
+
+            // 5 Schat-plekken + schatkisten
+            STOPS.forEach((s, i) => {
+                const opened = i < chestsOpened;
+                const active = i === currentStop && turnPhase !== 'party';
+                const pulse = active ? 1 + Math.sin(iTime * 6) * 0.1 : 1;
+
+                iCtx.save();
+                iCtx.translate(s.x, s.y);
+                iCtx.scale(pulse, pulse);
+
+                iCtx.fillStyle = opened ? '#2ecc71' : (active ? '#ffd000' : '#ffffff');
+                iCtx.strokeStyle = '#2d3436'; iCtx.lineWidth = 5;
+                iCtx.beginPath(); iCtx.arc(0, 0, 42, 0, Math.PI * 2); iCtx.fill(); iCtx.stroke();
+
+                iCtx.font = '40px sans-serif'; iCtx.textAlign = 'center'; iCtx.textBaseline = 'middle';
+                iCtx.fillText(opened ? '💎' : (i === STOPS.length - 1 ? '🐉' : '🧰'), 0, 2);
+
+                iCtx.fillStyle = 'rgba(255,255,255,0.92)';
+                iCtx.beginPath(); iCtx.roundRect(-78, 48, 156, 28, 12); iCtx.fill();
+                iCtx.fillStyle = '#2d3436'; iCtx.font = '900 14px "Fredoka One", sans-serif';
+                iCtx.fillText(s.name, 0, 63);
+                iCtx.restore();
+            });
+
+            // Team-bootje / ontdekkers op huidige plek!
+            const cur = STOPS[Math.min(currentStop, STOPS.length - 1)];
+            const bob = Math.sin(iTime * 5) * 6;
+            iCtx.save();
+            iCtx.font = '46px sans-serif'; iCtx.textAlign = 'center';
+            iCtx.fillText('🚀🦄', cur.x, cur.y - 62 + bob);
+            iCtx.restore();
+
+            // Partikels
+            for (let i = islandParticles.length - 1; i >= 0; i--) {
+                const p = islandParticles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= p.decay;
+                if (p.life <= 0) { islandParticles.splice(i, 1); continue; }
+                iCtx.save(); iCtx.globalAlpha = p.life; iCtx.fillStyle = p.color;
+                iCtx.beginPath(); iCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2); iCtx.fill();
+                iCtx.restore();
+            }
+        }
+
+        let lastT = 0;
+        function animLoop(ts) {
+            const dt = Math.min(0.05, (ts - lastT) / 1000 || 0.016);
+            lastT = ts;
+            iTime += dt;
+            if (document.getElementById('host-game-screen').classList.contains('active')) {
+                drawIsland();
+            }
+            requestAnimationFrame(animLoop);
+        }
+        requestAnimationFrame(animLoop);
+
+        // Auto-join via QR code (?join=ABCD&role=age3)
+        (function checkAutoJoin() {
+            const params = new URLSearchParams(window.location.search);
+            const joinCode = params.get('join');
+            if (joinCode) openJoinScreen(joinCode.slice(0, 4));
+        })();
+    </script>
 </body>
+
 </html>
