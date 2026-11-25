@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spelletjes Kiezen!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"
+        rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -13,14 +18,14 @@
             -webkit-touch-callout: none;
         }
 
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
             min-height: 100%;
             font-family: 'Nunito', 'Trebuchet MS', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(160deg, #54a0ff 0%, #5f27cd 48%, #ff6b81 100%);
-            background-attachment: fixed;
+            background-color: #5f27cd;
             color: #2d3436;
             overflow-x: hidden;
             overflow-y: auto;
@@ -28,22 +33,42 @@
             touch-action: pan-y;
         }
 
-        /* Zachte decoratieve wolken / sterren op de achtergrond */
+        /* Vaste achtergrond + zachte decoratieve wolken (blijft altijd schermvullend bij scrollen) */
         .bg-decor {
             position: fixed;
             inset: 0;
+            background: linear-gradient(160deg, #54a0ff 0%, #5f27cd 48%, #ff6b81 100%);
             pointer-events: none;
             overflow: hidden;
             z-index: 0;
         }
+
         .bg-bubble {
             position: absolute;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.14);
         }
-        .bg-bubble.b1 { width: 260px; height: 260px; top: -70px; left: -60px; }
-        .bg-bubble.b2 { width: 220px; height: 220px; top: 15%; right: -50px; }
-        .bg-bubble.b3 { width: 320px; height: 320px; bottom: -110px; left: 32%; }
+
+        .bg-bubble.b1 {
+            width: 260px;
+            height: 260px;
+            top: -70px;
+            left: -60px;
+        }
+
+        .bg-bubble.b2 {
+            width: 220px;
+            height: 220px;
+            top: 15%;
+            right: -50px;
+        }
+
+        .bg-bubble.b3 {
+            width: 320px;
+            height: 320px;
+            bottom: -110px;
+            left: 32%;
+        }
 
         .page-wrap {
             position: relative;
@@ -63,6 +88,7 @@
             color: #fff;
             padding: 4px 10px 0 10px;
         }
+
         .picker-header h1 {
             font-family: 'Fredoka One', 'Trebuchet MS', cursive, sans-serif;
             font-size: clamp(1.75rem, 4vw, 3rem);
@@ -70,6 +96,7 @@
             letter-spacing: 0.5px;
             text-shadow: 0 4px 0 rgba(0, 0, 0, 0.22);
         }
+
         .picker-header p {
             margin: 6px 0 0 0;
             font-size: clamp(0.98rem, 2vw, 1.25rem);
@@ -136,9 +163,11 @@
             flex-shrink: 0;
             box-shadow: 0 5px 0 rgba(0, 0, 0, 0.14);
         }
+
         .side-left .side-avatar {
             background: linear-gradient(135deg, #00b894, #0984e3);
         }
+
         .side-right .side-avatar {
             background: linear-gradient(135deg, #ff79b0, #a29bfe);
         }
@@ -149,8 +178,14 @@
             font-size: clamp(1.35rem, 2.6vw, 2rem);
             line-height: 1.1;
         }
-        .side-left .side-title-text h2 { color: #0b8457; }
-        .side-right .side-title-text h2 { color: #c43670; }
+
+        .side-left .side-title-text h2 {
+            color: #0b8457;
+        }
+
+        .side-right .side-title-text h2 {
+            color: #c43670;
+        }
 
         .side-title-text .side-subtitle {
             margin: 4px 0 0 0;
@@ -167,11 +202,13 @@
             white-space: nowrap;
             flex-shrink: 0;
         }
+
         .side-left .count-pill {
             background: #dff9eb;
             color: #0b8457;
             border: 2px solid #55efc4;
         }
+
         .side-right .count-pill {
             background: #ffe3f0;
             color: #c43670;
@@ -301,22 +338,29 @@
             background: linear-gradient(180deg, #fff8fb 0%, #fff0f6 100%);
             min-height: 170px;
         }
+
         .side-left .empty-state {
             border-color: #81ecec;
             background: linear-gradient(180deg, #f5fffe 0%, #eafaf7 100%);
         }
+
         .empty-emoji {
             font-size: 3.1rem;
             margin-bottom: 8px;
             line-height: 1;
         }
+
         .empty-title {
             font-family: 'Fredoka One', 'Trebuchet MS', cursive, sans-serif;
             font-size: clamp(1.15rem, 2vw, 1.45rem);
             color: #c43670;
             margin: 0 0 6px 0;
         }
-        .side-left .empty-title { color: #0b8457; }
+
+        .side-left .empty-title {
+            color: #0b8457;
+        }
+
         .empty-text {
             margin: 0;
             font-size: clamp(0.9rem, 1.5vw, 1.04rem);
@@ -332,21 +376,25 @@
                 grid-template-columns: 1fr;
                 gap: 16px;
             }
+
             .side-panel {
                 padding: 16px;
                 border-radius: 22px;
                 border-width: 5px;
             }
+
             .game-card {
                 flex-wrap: wrap;
                 gap: 12px;
                 padding: 12px;
             }
+
             .game-icon {
                 width: 62px;
                 height: 62px;
                 font-size: 2.2rem;
             }
+
             .play-pill {
                 width: 100%;
                 text-align: center;
@@ -360,171 +408,243 @@
                 padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
                 gap: 10px;
             }
-            .picker-header h1 { font-size: 1.55rem; }
-            .picker-header p { font-size: 0.88rem; margin-top: 2px; }
-            .sides-grid { gap: 12px; }
+
+            .picker-header h1 {
+                font-size: 1.55rem;
+            }
+
+            .picker-header p {
+                font-size: 0.88rem;
+                margin-top: 2px;
+            }
+
+            .sides-grid {
+                gap: 12px;
+            }
+
             .side-panel {
                 padding: 12px 14px;
                 border-radius: 20px;
                 border-width: 4px;
                 gap: 10px;
             }
-            .side-header { padding-bottom: 8px; }
-            .side-avatar { width: 44px; height: 44px; font-size: 1.6rem; border-radius: 14px; }
-            .side-title-text h2 { font-size: 1.2rem; }
-            .side-title-text .side-subtitle { font-size: 0.78rem; }
-            .count-pill { font-size: 0.78rem; padding: 4px 10px; }
-            .game-card { padding: 10px 12px; gap: 10px; border-radius: 16px; border-width: 3px; }
-            .game-icon, .side-right .game-icon { width: 54px; height: 54px; font-size: 2rem; border-radius: 14px; }
-            .game-title { font-size: 1.05rem; }
-            .game-desc { font-size: 0.8rem; margin: 3px 0 5px 0; }
-            .game-tag { font-size: 0.7rem; padding: 2px 7px; }
-            .play-pill { font-size: 0.88rem; padding: 7px 11px; border-radius: 12px; }
-            .empty-state { min-height: 110px; padding: 14px 12px; }
-            .empty-emoji { font-size: 2.2rem; margin-bottom: 4px; }
-            .empty-title { font-size: 1.05rem; }
-            .empty-text { font-size: 0.82rem; }
+
+            .side-header {
+                padding-bottom: 8px;
+            }
+
+            .side-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                border-radius: 14px;
+            }
+
+            .side-title-text h2 {
+                font-size: 1.2rem;
+            }
+
+            .side-title-text .side-subtitle {
+                font-size: 0.78rem;
+            }
+
+            .count-pill {
+                font-size: 0.78rem;
+                padding: 4px 10px;
+            }
+
+            .game-card {
+                padding: 10px 12px;
+                gap: 10px;
+                border-radius: 16px;
+                border-width: 3px;
+            }
+
+            .game-icon,
+            .side-right .game-icon {
+                width: 54px;
+                height: 54px;
+                font-size: 2rem;
+                border-radius: 14px;
+            }
+
+            .game-title {
+                font-size: 1.05rem;
+            }
+
+            .game-desc {
+                font-size: 0.8rem;
+                margin: 3px 0 5px 0;
+            }
+
+            .game-tag {
+                font-size: 0.7rem;
+                padding: 2px 7px;
+            }
+
+            .play-pill {
+                font-size: 0.88rem;
+                padding: 7px 11px;
+                border-radius: 12px;
+            }
+
+            .empty-state {
+                min-height: 110px;
+                padding: 14px 12px;
+            }
+
+            .empty-emoji {
+                font-size: 2.2rem;
+                margin-bottom: 4px;
+            }
+
+            .empty-title {
+                font-size: 1.05rem;
+            }
+
+            .empty-text {
+                font-size: 0.82rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="bg-decor" aria-hidden="true">
-    <div class="bg-bubble b1"></div>
-    <div class="bg-bubble b2"></div>
-    <div class="bg-bubble b3"></div>
-</div>
+    <div class="bg-decor" aria-hidden="true">
+        <div class="bg-bubble b1"></div>
+        <div class="bg-bubble b2"></div>
+        <div class="bg-bubble b3"></div>
+    </div>
 
-<div class="page-wrap">
-    <header class="picker-header">
-        <h1>🎮 Spelletjes Kiezen!</h1>
-        <p>Tik op een spelletje om samen op telefoon &amp; TV te spelen</p>
-    </header>
+    <div class="page-wrap">
+        <header class="picker-header">
+            <h1>🎮 Spelletjes Kiezen!</h1>
+            <p>Tik op een spelletje om samen op telefoon &amp; TV te spelen</p>
+        </header>
 
-    <main class="sides-grid">
-        <!-- Linkerkant: 7 jaar -->
-        <section class="side-panel side-left" aria-labelledby="heading-age7">
-            <div class="side-header">
-                <div class="side-title-group">
-                    <div class="side-avatar" aria-hidden="true">🚀</div>
-                    <div class="side-title-text">
-                        <h2 id="heading-age7">7 jaar</h2>
-                        <p class="side-subtitle">Rekenen, taal &amp; avontuur</p>
+        <main class="sides-grid">
+            <!-- Linkerkant: 7 jaar -->
+            <section class="side-panel side-left" aria-labelledby="heading-age7">
+                <div class="side-header">
+                    <div class="side-title-group">
+                        <div class="side-avatar" aria-hidden="true">🚀</div>
+                        <div class="side-title-text">
+                            <h2 id="heading-age7">7 jaar</h2>
+                            <p class="side-subtitle">Rekenen, taal &amp; avontuur</p>
+                        </div>
                     </div>
+                    <span class="count-pill" id="count-age7">0 spellen</span>
                 </div>
-                <span class="count-pill" id="count-age7">0 spellen</span>
-            </div>
-            <div class="game-list" id="list-age7"></div>
-        </section>
+                <div class="game-list" id="list-age7"></div>
+            </section>
 
-        <!-- Rechterkant: 3 jaar (meisje) -->
-        <section class="side-panel side-right" aria-labelledby="heading-age3">
-            <div class="side-header">
-                <div class="side-title-group">
-                    <div class="side-avatar" aria-hidden="true">🦄</div>
-                    <div class="side-title-text">
-                        <h2 id="heading-age3">3 jaar</h2>
-                        <p class="side-subtitle">Kleuren, vormen, dieren &amp; ontdekken</p>
+            <!-- Rechterkant: 3 jaar (meisje) -->
+            <section class="side-panel side-right" aria-labelledby="heading-age3">
+                <div class="side-header">
+                    <div class="side-title-group">
+                        <div class="side-avatar" aria-hidden="true">🦄</div>
+                        <div class="side-title-text">
+                            <h2 id="heading-age3">3 jaar</h2>
+                            <p class="side-subtitle">Kleuren, vormen, dieren &amp; ontdekken</p>
+                        </div>
                     </div>
+                    <span class="count-pill" id="count-age3">Binnenkort</span>
                 </div>
-                <span class="count-pill" id="count-age3">Binnenkort</span>
-            </div>
-            <div class="game-list" id="list-age3"></div>
-        </section>
-    </main>
-</div>
+                <div class="game-list" id="list-age3"></div>
+            </section>
+        </main>
+    </div>
 
-<script>
-// --- Spellenoverzicht ---
-// Voeg nieuwe single-HTML spelletjes hier toe onder `age7` (links) of `age3` (rechts).
-// Zie AGENTS.md voor alle spel- en ontwerpvereisten.
-const GAMES = {
-    age7: [
-        {
-            title: 'Boerderij Reken-Avontuur',
-            file: 'boerderij-reken-avontuur.html',
-            icon: '🚜',
-            description: 'Spring door 8 boerderijlevels, verzamel appels en oefen de tafels van 1 t/m 10!',
-            tags: ['Tafels 1–10', '8 levels', 'Platformspel'],
-            accent: '#2ecc71',
-            shadow: '#27ae60',
-            soft: '#e8f8f0'
+    <script>
+        // --- Spellenoverzicht ---
+        // Voeg nieuwe single-HTML spelletjes hier toe onder `age7` (links) of `age3` (rechts).
+        // Zie AGENTS.md voor alle spel- en ontwerpvereisten.
+        const GAMES = {
+            age7: [
+                {
+                    title: 'Boerderij Reken-Avontuur',
+                    file: 'boerderij-reken-avontuur.html',
+                    icon: '🚜',
+                    description: 'Spring door 8 boerderijlevels, verzamel appels en oefen de tafels van 1 t/m 10!',
+                    tags: ['Tafels 1–10', '8 levels', 'Platformspel'],
+                    accent: '#2ecc71',
+                    shadow: '#27ae60',
+                    soft: '#e8f8f0'
+                }
+            ],
+            age3: [
+                {
+                    title: 'Kleuren Mandjes',
+                    file: 'kleuren-mandjes.html',
+                    icon: '🌈',
+                    description: 'Sleep of tik de vrolijke plaatjes naar het juiste kleuren-mandje en laat de regenboog stralen!',
+                    tags: ['Kleuren', 'Geen lezen nodig', 'Met stem'],
+                    accent: '#ff66a6',
+                    shadow: '#c43670',
+                    soft: '#ffeaf3'
+                }
+            ]
+        };
+
+        // Zacht klik-geluidje via Web Audio API
+        function playSelectChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const now = ctx.currentTime;
+                [523.25, 659.25].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.055);
+                    gain.gain.setValueAtTime(0.09, now + i * 0.055);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.055 + 0.14);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + i * 0.055);
+                    osc.stop(now + i * 0.055 + 0.15);
+                });
+            } catch (e) { }
         }
-    ],
-    age3: [
-        // Voeg hier nieuwe spelletjes voor 3 jaar toe!
-        // Voorbeeld:
-        // {
-        //     title: 'Dieren & Geluiden',
-        //     file: 'dieren-en-geluiden.html',
-        //     icon: '🦋',
-        //     description: 'Tik op de lieve dieren en ontdek welk geluid ze maken!',
-        //     tags: ['Dieren', 'Geluiden', 'Geen lezen nodig'],
-        //     accent: '#ff79b0',
-        //     shadow: '#d63384',
-        //     soft: '#fff0f6'
-        // }
-    ]
-};
 
-// Zacht klik-geluidje via Web Audio API
-function playSelectChime() {
-    try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const now = ctx.currentTime;
-        [523.25, 659.25].forEach((freq, i) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, now + i * 0.055);
-            gain.gain.setValueAtTime(0.09, now + i * 0.055);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.055 + 0.14);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(now + i * 0.055);
-            osc.stop(now + i * 0.055 + 0.15);
-        });
-    } catch (e) {}
-}
+        function formatCount(count) {
+            if (count === 0) return 'Binnenkort';
+            return count === 1 ? '1 spel' : `${count} spellen`;
+        }
 
-function formatCount(count) {
-    if (count === 0) return 'Binnenkort';
-    return count === 1 ? '1 spel' : `${count} spellen`;
-}
+        function renderGameList(listId, countId, games, emptyConfig) {
+            const container = document.getElementById(listId);
+            const countEl = document.getElementById(countId);
+            countEl.textContent = formatCount(games.length);
+            container.innerHTML = '';
 
-function renderGameList(listId, countId, games, emptyConfig) {
-    const container = document.getElementById(listId);
-    const countEl = document.getElementById(countId);
-    countEl.textContent = formatCount(games.length);
-    container.innerHTML = '';
-
-    if (games.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'empty-state';
-        empty.innerHTML = `
+            if (games.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.innerHTML = `
             <div class="empty-emoji" aria-hidden="true">${emptyConfig.emoji}</div>
             <h3 class="empty-title">${emptyConfig.title}</h3>
             <p class="empty-text">${emptyConfig.text}</p>
         `;
-        container.appendChild(empty);
-        return;
-    }
+                container.appendChild(empty);
+                return;
+            }
 
-    games.forEach((game) => {
-        const card = document.createElement('a');
-        card.className = 'game-card';
-        card.href = game.file;
-        if (game.accent) card.style.setProperty('--card-accent', game.accent);
-        if (game.shadow) card.style.setProperty('--card-shadow', game.shadow);
-        if (game.soft) card.style.setProperty('--card-soft', game.soft);
+            games.forEach((game) => {
+                const card = document.createElement('a');
+                card.className = 'game-card';
+                card.href = game.file;
+                if (game.accent) card.style.setProperty('--card-accent', game.accent);
+                if (game.shadow) card.style.setProperty('--card-shadow', game.shadow);
+                if (game.soft) card.style.setProperty('--card-soft', game.soft);
 
-        const tagsHtml = (game.tags || [])
-            .map((tag) => `<span class="game-tag">${tag}</span>`)
-            .join('');
+                const tagsHtml = (game.tags || [])
+                    .map((tag) => `<span class="game-tag">${tag}</span>`)
+                    .join('');
 
-        card.innerHTML = `
+                card.innerHTML = `
             <div class="game-icon" aria-hidden="true">${game.icon || '🎮'}</div>
             <div class="game-info">
                 <h3 class="game-title">${game.title}</h3>
@@ -534,31 +654,32 @@ function renderGameList(listId, countId, games, emptyConfig) {
             <span class="play-pill">Speel ▶</span>
         `;
 
-        card.addEventListener('click', (e) => {
-            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-            e.preventDefault();
-            playSelectChime();
-            setTimeout(() => {
-                window.location.href = game.file;
-            }, 90);
+                card.addEventListener('click', (e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                    e.preventDefault();
+                    playSelectChime();
+                    setTimeout(() => {
+                        window.location.href = game.file;
+                    }, 90);
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        renderGameList('list-age7', 'count-age7', GAMES.age7, {
+            emoji: '🌟',
+            title: 'Binnenkort meer spellen!',
+            text: 'Hier komen leuke leer- en avonturenspelletjes.'
         });
 
-        container.appendChild(card);
-    });
-}
-
-renderGameList('list-age7', 'count-age7', GAMES.age7, {
-    emoji: '🌟',
-    title: 'Binnenkort meer spellen!',
-    text: 'Hier komen leuke leer- en avonturenspelletjes.'
-});
-
-renderGameList('list-age3', 'count-age3', GAMES.age3, {
-    emoji: '🌈✨',
-    title: 'Binnenkort komen hier jouw spelletjes!',
-    text: 'Dieren, kleuren, vormen, tellen en nog veel meer om samen te ontdekken.'
-});
-</script>
+        renderGameList('list-age3', 'count-age3', GAMES.age3, {
+            emoji: '🌈✨',
+            title: 'Binnenkort komen hier jouw spelletjes!',
+            text: 'Dieren, kleuren, vormen, tellen en nog veel meer om samen te ontdekken.'
+        });
+    </script>
 
 </body>
+
 </html>

@@ -14,7 +14,8 @@ Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
   Een kindvriendelijk 2D-platformspel met 8 unieke boerderijlevels om de tafels van 1 t/m 10 te oefenen. Met kiesbare boer (Boer Teun / Boerin Saar), instelbare tafels en moeilijkheidsgraad, bonus `?-kisten`, hartjes met reddings-som en grote knoppen voor telefoon & TV.
 
 ### 🦄 3 jaar (rechts)
-- *Binnenkort komen hier de eerste peuterspelletjes!*
+- **[Kleuren Mandjes](kleuren-mandjes.html)** 🧺🌈  
+  Een vrolijk kleurensorteerspel speciaal voor peuters (geen lezen nodig!). Sleep of tik schattige gekleurde plaatjes (aardbei, sterretje, walvis, kikker, bloem en meer) naar het juiste levende kleuren-mandje. Met Nederlandse stem, groeiende regenboog, eenhoorn-feestje met ballonnen om kapot te tikken en ouder-instellingen (3, 4 of 6 kleuren).
 
 ## Spelen
 Open [`index.html`](index.html) direct in je browser, of activeer **GitHub Pages** in de repository-instellingen om alle spellen direct online op telefoon en Chromecast/TV te spelen.

@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kleuren Mandjes — Kleuren Leren!</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌈</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2d1b4e, #1e3c72);
+            font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 16:9 TV & Chromecast vriendelijk speelveld */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background: #87e0ff;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        /* Discrete ouderknop rechtsboven tijdens het spelen */
+        #parent-gear-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(4px);
+            font-size: 1.45rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+            transition: transform 0.12s;
+            touch-action: manipulation;
+        }
+        #parent-gear-btn:active { transform: scale(0.9); }
+
+        /* Scrollbare overlays voor startscherm & ouder-instellingen */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom)) 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+        .overlay * { touch-action: pan-y; }
+
+        #start-overlay {
+            background: linear-gradient(160deg, #ff9ff3 0%, #feca57 50%, #48dbfb 100%);
+        }
+
+        #settings-overlay {
+            display: none;
+            background: rgba(34, 24, 58, 0.72);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            border: 7px solid #ff79b0;
+            border-radius: 32px;
+            padding: 20px 28px 24px 28px;
+            width: 100%;
+            max-width: 720px;
+            margin: auto;
+            flex-shrink: 0;
+            text-align: center;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f2f6;
+            color: #2d3436;
+            text-decoration: none;
+            border: 3px solid #ced6e0;
+            border-radius: 16px;
+            padding: 7px 14px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            box-shadow: 0 3px 0 #ced6e0;
+            transition: transform 0.1s, background-color 0.15s;
+        }
+        .home-link:hover { background: #ffeaa7; border-color: #fdcb6e; box-shadow: 0 3px 0 #e17055; }
+        .home-link:active { transform: translateY(2px); }
+
+        .small-gear {
+            background: #fff0f6;
+            color: #c43670;
+            border: 3px solid #ff9ec7;
+            border-radius: 16px;
+            padding: 7px 13px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #ff9ec7;
+        }
+        .small-gear:active { transform: translateY(2px); }
+
+        .hero-baskets {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 6px 0 8px 0;
+            font-size: clamp(2.4rem, 6vw, 3.6rem);
+            line-height: 1;
+        }
+        .hero-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 68px;
+            height: 68px;
+            border-radius: 22px;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+            animation: gentleBob 2.2s ease-in-out infinite;
+        }
+        .hero-dot:nth-child(2) { animation-delay: 0.25s; }
+        .hero-dot:nth-child(3) { animation-delay: 0.5s; }
+        .hero-dot:nth-child(4) { animation-delay: 0.75s; }
+
+        h1 {
+            font-family: 'Fredoka One', 'Trebuchet MS', cursive, sans-serif;
+            color: #d63384;
+            margin: 6px 0 4px 0;
+            font-size: clamp(1.9rem, 4.6vw, 3rem);
+            text-shadow: 2px 3px 0 #ffe3f0;
+        }
+
+        .subtitle {
+            margin: 0 0 18px 0;
+            font-size: clamp(1rem, 2.2vw, 1.25rem);
+            font-weight: 800;
+            color: #57606f;
+        }
+
+        .big-play-btn {
+            background: linear-gradient(180deg, #2ed573 0%, #20bf6b 100%);
+            color: #fff;
+            border: 5px solid #fff;
+            border-radius: 30px;
+            padding: 18px 54px;
+            font-family: 'Fredoka One', 'Trebuchet MS', cursive, sans-serif;
+            font-size: clamp(1.7rem, 4vw, 2.5rem);
+            cursor: pointer;
+            box-shadow: 0 9px 0 #168f4d, 0 14px 26px rgba(32, 191, 107, 0.42);
+            transition: transform 0.1s, box-shadow 0.1s;
+            letter-spacing: 1px;
+            animation: pulseBtn 1.8s ease-in-out infinite;
+        }
+        .big-play-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #168f4d;
+        }
+
+        /* Ouder-instellingen knoppen */
+        .settings-title {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            color: #c43670;
+            font-size: 1.7rem;
+            margin: 4px 0 12px 0;
+        }
+        .setting-group {
+            margin: 12px 0;
+            text-align: center;
+        }
+        .setting-label {
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.08rem;
+            color: #2d3436;
+            margin: 0 0 8px 0;
+        }
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .opt-btn {
+            border: 3px solid #ced6e0;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 10px 16px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.98rem;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .opt-btn.selected {
+            border-color: #ff6b9d;
+            background: #ffe3f0;
+            color: #b82563;
+            transform: scale(1.04);
+            box-shadow: 0 4px 10px rgba(255, 107, 157, 0.28);
+        }
+
+        .color-preview-dots {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .mini-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            display: inline-block;
+        }
+
+        .close-settings-btn {
+            margin-top: 16px;
+            background: #2ed573;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 34px;
+            font-family: 'Fredoka One', cursive, sans-serif;
+            font-size: 1.35rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #168f4d;
+        }
+        .close-settings-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #168f4d; }
+
+        /* Compact op kleine telefoon in landschap */
+        @media (max-height: 480px) {
+            .card { padding: 12px 18px 16px 18px; border-width: 5px; border-radius: 24px; }
+            .hero-dot { width: 52px; height: 52px; font-size: 1.9rem; border-radius: 16px; }
+            h1 { font-size: 1.7rem; }
+            .subtitle { font-size: 0.92rem; margin-bottom: 10px; }
+            .big-play-btn { padding: 11px 38px; font-size: 1.55rem; }
+            .settings-title { font-size: 1.35rem; margin-bottom: 6px; }
+            .setting-group { margin: 7px 0; }
+            .opt-btn { padding: 7px 12px; font-size: 0.88rem; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes gentleBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+        @keyframes pulseBtn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.045); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Discrete ouder-instellingen knop rechtsboven -->
+    <button id="parent-gear-btn" aria-label="Ouder-instellingen" onclick="openSettings()">⚙️</button>
+
+    <!-- Startscherm: direct uitnodigend met 1 reuzengrote SPEEL-knop -->
+    <div id="start-overlay" class="overlay">
+        <div class="card">
+            <div class="top-bar">
+                <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                <button class="small-gear" onclick="openSettings()">⚙️ Ouders</button>
+            </div>
+
+            <div class="hero-baskets" aria-hidden="true">
+                <span class="hero-dot" style="background:#ff4757;">🍓</span>
+                <span class="hero-dot" style="background:#ffd32a;">⭐</span>
+                <span class="hero-dot" style="background:#1e90ff;">🐳</span>
+                <span class="hero-dot" style="background:#2ed573;">🐸</span>
+            </div>
+
+            <h1>🧺 Kleuren Mandjes 🌈</h1>
+            <p class="subtitle">Sleep of tik het plaatje naar het mandje met dezelfde kleur!</p>
+
+            <button class="big-play-btn" onclick="startGame()">▶ SPEEL!</button>
+        </div>
+    </div>
+
+    <!-- Ouder-instellingen overlay -->
+    <div id="settings-overlay" class="overlay">
+        <div class="card" style="border-color: #a29bfe;">
+            <div class="top-bar">
+                <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
+                <button class="small-gear" onclick="closeSettings()">✕ Sluiten</button>
+            </div>
+
+            <h2 class="settings-title">⚙️ Instellingen voor ouders</h2>
+
+            <div class="setting-group">
+                <p class="setting-label">Welke kleuren oefenen?</p>
+                <div class="option-row">
+                    <button class="opt-btn" id="mode-3" onclick="setColorCount(3)">
+                        3 kleuren
+                        <span class="color-preview-dots">
+                            <span class="mini-dot" style="background:#ff4757"></span>
+                            <span class="mini-dot" style="background:#ffd32a"></span>
+                            <span class="mini-dot" style="background:#1e90ff"></span>
+                        </span>
+                    </button>
+                    <button class="opt-btn selected" id="mode-4" onclick="setColorCount(4)">
+                        4 kleuren
+                        <span class="color-preview-dots">
+                            <span class="mini-dot" style="background:#ff4757"></span>
+                            <span class="mini-dot" style="background:#ffd32a"></span>
+                            <span class="mini-dot" style="background:#1e90ff"></span>
+                            <span class="mini-dot" style="background:#2ed573"></span>
+                        </span>
+                    </button>
+                    <button class="opt-btn" id="mode-6" onclick="setColorCount(6)">
+                        6 kleuren
+                        <span class="color-preview-dots">
+                            <span class="mini-dot" style="background:#ff4757"></span>
+                            <span class="mini-dot" style="background:#ffd32a"></span>
+                            <span class="mini-dot" style="background:#1e90ff"></span>
+                            <span class="mini-dot" style="background:#2ed573"></span>
+                            <span class="mini-dot" style="background:#ff6b9d"></span>
+                            <span class="mini-dot" style="background:#9b59b6"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <p class="setting-label">Nederlandse stem:</p>
+                <div class="option-row">
+                    <button class="opt-btn selected" id="voice-on" onclick="setVoiceEnabled(true)">🔊 Stem aan</button>
+                    <button class="opt-btn" id="voice-off" onclick="setVoiceEnabled(false)">🔇 Alleen geluidjes</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <p class="setting-label">Feestje na hoeveel plaatjes?</p>
+                <div class="option-row">
+                    <button class="opt-btn" id="round-5" onclick="setRoundLength(5)">🎈 5 plaatjes</button>
+                    <button class="opt-btn selected" id="round-6" onclick="setRoundLength(6)">🌈 6 plaatjes</button>
+                    <button class="opt-btn" id="round-8" onclick="setRoundLength(8)">⭐ 8 plaatjes</button>
+                </div>
+            </div>
+
+            <button class="close-settings-btn" onclick="applySettingsAndResume()">VERDER SPELEN ▶</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+</div>
+
+<script>
+// ============================================================================
+// KLEUREN MANDJES — Leerzaam kleurensorteerspel voor een 3-jarig meisje
+// ============================================================================
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 1280;
+const H = 720;
+
+// --- Instellingen ---
+let colorCountSetting = 4; // 3, 4 of 6
+let voiceEnabled = true;
+let roundTarget = 6;
+let gameStarted = false;
+let settingsOpen = false;
+
+// --- Kleurdefinities (helder, contrastrijk en onmiskenbaar op TV!) ---
+const ALL_COLORS = [
+    {
+        id: 'rood',
+        name: 'ROOD',
+        spoken: 'rood',
+        main: '#ff3b4e',
+        light: '#ff7a86',
+        dark: '#c2182b',
+        rim: '#d92638',
+        soft: '#ffe6e9',
+        textOnColor: '#ffffff',
+        items: [
+            { type: 'strawberry', spoken: 'de rode aardbei' },
+            { type: 'heart', spoken: 'het rode hartje' },
+            { type: 'ladybug', spoken: 'het rode lieveheersbeestje' },
+            { type: 'apple', spoken: 'de rode appel' }
+        ]
+    },
+    {
+        id: 'geel',
+        name: 'GEEL',
+        spoken: 'geel',
+        main: '#ffd000',
+        light: '#fff08a',
+        dark: '#d49b00',
+        rim: '#e6ae00',
+        soft: '#fffbe0',
+        textOnColor: '#4a3500',
+        items: [
+            { type: 'star', spoken: 'de gele ster' },
+            { type: 'sun', spoken: 'het gele zonnetje' },
+            { type: 'chick', spoken: 'het gele kuikentje' },
+            { type: 'banana', spoken: 'de gele banaan' }
+        ]
+    },
+    {
+        id: 'blauw',
+        name: 'BLAUW',
+        spoken: 'blauw',
+        main: '#1e90ff',
+        light: '#74b9ff',
+        dark: '#0c5bb5',
+        rim: '#1270d6',
+        soft: '#e4f2ff',
+        textOnColor: '#ffffff',
+        items: [
+            { type: 'whale', spoken: 'de blauwe walvis' },
+            { type: 'butterfly', spoken: 'de blauwe vlinder' },
+            { type: 'drop', spoken: 'de blauwe druppel' },
+            { type: 'balloon', spoken: 'de blauwe ballon' }
+        ]
+    },
+    {
+        id: 'groen',
+        name: 'GROEN',
+        spoken: 'groen',
+        main: '#26cc67',
+        light: '#7bed9f',
+        dark: '#148f44',
+        rim: '#1cad54',
+        soft: '#e5faed',
+        textOnColor: '#ffffff',
+        items: [
+            { type: 'frog', spoken: 'de groene kikker' },
+            { type: 'turtle', spoken: 'de groene schildpad' },
+            { type: 'clover', spoken: 'het groene klavertje' },
+            { type: 'pear', spoken: 'de groene peer' }
+        ]
+    },
+    {
+        id: 'roze',
+        name: 'ROZE',
+        spoken: 'roze',
+        main: '#ff66a6',
+        light: '#ffa8cc',
+        dark: '#c43670',
+        rim: '#e04888',
+        soft: '#ffeaf3',
+        textOnColor: '#ffffff',
+        items: [
+            { type: 'flower', spoken: 'de roze bloem' },
+            { type: 'bow', spoken: 'de roze strik' },
+            { type: 'cupcake', spoken: 'het roze taartje' },
+            { type: 'piggy', spoken: 'het roze biggetje' }
+        ]
+    },
+    {
+        id: 'paars',
+        name: 'PAARS',
+        spoken: 'paars',
+        main: '#9b59ff',
+        light: '#c7a4ff',
+        dark: '#6729c9',
+        rim: '#7e3be6',
+        soft: '#f2eaff',
+        textOnColor: '#ffffff',
+        items: [
+            { type: 'grapes', spoken: 'de paarse druiven' },
+            { type: 'octopus', spoken: 'de paarse octopus' },
+            { type: 'umbrella', spoken: 'de paarse paraplu' },
+            { type: 'gem', spoken: 'de paarse diamant' }
+        ]
+    }
+];
+
+const CHEER_PHRASES = [
+    (c) => `Goed zo! Dat is ${c}!`,
+    (c) => `Super knap! ${c}!`,
+    (c) => `Jaaa! Mooi ${c}!`,
+    (c) => `Fantastisch! Dat hoort bij ${c}!`,
+    (c) => `Hoera! ${c}!`
+];
+
+// --- Web Audio API Synthesizer (vrolijk & zacht voor peuters) ---
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio() {
+    if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+}
+
+function playNote(freq, duration = 0.22, type = 'sine', vol = 0.14, delay = 0) {
+    try {
+        ensureAudio();
+        if (!audioCtx) return;
+        const t = audioCtx.currentTime + delay;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.001, t);
+        gain.gain.linearRampToValueAtTime(vol, t + 0.018);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + duration + 0.02);
+    } catch (e) {}
+}
+
+function soundPickup() {
+    playNote(440, 0.12, 'sine', 0.12, 0);
+    playNote(587.33, 0.15, 'sine', 0.12, 0.05);
+}
+
+function soundCorrect() {
+    // Vrolijke xylofoon-arpeggio
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        playNote(f, 0.28, 'triangle', 0.15, i * 0.075);
+        playNote(f * 2, 0.18, 'sine', 0.05, i * 0.075);
+    });
+}
+
+function soundGentleWrong() {
+    // Zachte, lieve houten "boing" (nooit schrikken!)
+    playNote(310, 0.16, 'sine', 0.11, 0);
+    playNote(260, 0.22, 'sine', 0.1, 0.1);
+}
+
+function soundPop() {
+    playNote(680, 0.08, 'sine', 0.14, 0);
+    playNote(980, 0.1, 'triangle', 0.12, 0.03);
+}
+
+function soundPartyFanfare() {
+    const melody = [
+        [523.25, 0], [659.25, 0.11], [783.99, 0.22],
+        [1046.5, 0.34], [880, 0.48], [1046.5, 0.62]
+    ];
+    melody.forEach(([f, d]) => {
+        playNote(f, 0.34, 'triangle', 0.15, d);
+        playNote(f * 1.5, 0.22, 'sine', 0.05, d);
+    });
+}
+
+// --- Nederlandse stem (Web Speech API met veilige fallback) ---
+let nlVoice = null;
+function loadDutchVoice() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    nlVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('nl-nl'))
+           || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('nl'))
+           || null;
+}
+if ('speechSynthesis' in window) {
+    loadDutchVoice();
+    window.speechSynthesis.onvoiceschanged = loadDutchVoice;
+}
+
+function speakDutch(text) {
+    if (!voiceEnabled || !('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'nl-NL';
+        if (nlVoice) utter.voice = nlVoice;
+        utter.rate = 0.92;
+        utter.pitch = 1.15;
+        utter.volume = 0.95;
+        window.speechSynthesis.speak(utter);
+    } catch (e) {}
+}
+
+// --- Speltoestand ---
+// phase: 'play' | 'flyToBasket' | 'celebrate'
+let phase = 'play';
+let time = 0;
+let sortedCount = 0;
+let wrongAttemptsOnCurrent = 0;
+let lastColorId = null;
+let roundSessionId = 0;
+
+// Actieve mandjes op het scherm (altijd 3 of 4 grote mandjes!)
+let baskets = [];
+// Huidig voorwerp op het wolkje / tijdens slepen
+let activeItem = null;
+// Vliegende animatie naar het mandje
+let flyingItem = null;
+// Vliegende ster naar de regenboog
+let rainbowStars = [];
+// Feestballonnen tijdens de viering
+let balloons = [];
+// Confetti & sparkles
+let particles = [];
+// Zachte wolken en vlinders op de achtergrond
+let bgClouds = [
+    { x: 160, y: 115, s: 1.0, spd: 12 },
+    { x: 640, y: 85, s: 0.85, spd: 9 },
+    { x: 1090, y: 125, s: 1.05, spd: 11 }
+];
+let meadowFlowers = [];
+for (let i = 0; i < 18; i++) {
+    meadowFlowers.push({
+        x: 45 + i * 72 + (i % 3) * 14,
+        y: 525 + (i % 4) * 38,
+        color: ['#ff6b9d', '#ffd32a', '#ffffff', '#a29bfe', '#ff9f43'][i % 5],
+        size: 8 + (i % 3) * 3,
+        phase: i * 0.7
+    });
+}
+
+// Interactie (slepen of tikken)
+let pointerDown = false;
+let pointerId = null;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+let dragStartX = 0;
+let dragStartY = 0;
+let isDraggingItem = false;
+let hoveredBasket = null;
+
+// Spreekballon / feedbacktekst bovenin (voor meelezende ouders op TV!)
+let feedbackBanner = { text: '', color: '#ff66a6', timer: 0 };
+
+// Regenboog-eenhoorn vriendje (animatie!)
+let unicorn = { x: -160, y: 205, active: false, happyTimer: 0 };
+
+// "Nog een keer" knop rechthoek op canvas tijdens feestje
+const replayBtnRect = { x: W / 2 - 200, y: 545, w: 400, h: 100 };
+const homeCelebrationRect = { x: 34, y: 26, w: 230, h: 64 };
+const speakerBtn = { x: W / 2 + 195, y: 270, r: 44 };
+
+// --- Hulp-functies voor het opzetten van rondes ---
+function getActivePalette() {
+    return ALL_COLORS.slice(0, colorCountSetting);
+}
+
+function setupBasketsForTarget(targetColor) {
+    const palette = getActivePalette();
+    let chosen;
+    if (palette.length <= 4) {
+        chosen = [...palette];
+    } else {
+        // Bij 6 kleuren tonen we 4 grote mandjes per beurt zodat peuters grote vakken hebben!
+        const others = palette.filter(c => c.id !== targetColor.id)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+        chosen = [targetColor, ...others].sort(() => Math.random() - 0.5);
+    }
+
+    const count = chosen.length;
+    const basketW = count === 3 ? 280 : 250;
+    const basketH = 190;
+    const gap = count === 3 ? 85 : 44;
+    const totalW = count * basketW + (count - 1) * gap;
+    const startX = (W - totalW) / 2;
+    const baseY = 505;
+
+    // Bewaar reeds verzamelde items per kleur binnen deze ronde
+    const prevItemsMap = {};
+    baskets.forEach(b => { prevItemsMap[b.color.id] = b.collected; });
+
+    baskets = chosen.map((color, idx) => ({
+        color,
+        x: startX + idx * (basketW + gap),
+        y: baseY,
+        w: basketW,
+        h: basketH,
+        cx: startX + idx * (basketW + gap) + basketW / 2,
+        cy: baseY + basketH / 2,
+        scale: 1,
+        jumpOffset: 0,
+        happyTimer: 0,
+        wiggleTimer: 0,
+        collected: prevItemsMap[color.id] || []
+    }));
+}
+
+function spawnNextItem() {
+    const palette = getActivePalette();
+    // Kies bij voorkeur een andere kleur dan de vorige keer
+    let candidates = palette.filter(c => c.id !== lastColorId);
+    if (candidates.length === 0) candidates = palette;
+    const color = candidates[Math.floor(Math.random() * candidates.length)];
+    lastColorId = color.id;
+
+    // Houd mandjes rustig op dezelfde plek bij 3 of 4 kleuren; bij 6 kleuren vernieuw alleen als nodig
+    if (baskets.length === 0 || colorCountSetting === 6 && !baskets.some(b => b.color.id === color.id)) {
+        setupBasketsForTarget(color);
+    } else if (baskets.length !== Math.min(colorCountSetting, 4)) {
+        setupBasketsForTarget(color);
+    }
+
+    const itemDef = color.items[Math.floor(Math.random() * color.items.length)];
+    wrongAttemptsOnCurrent = 0;
+
+    activeItem = {
+        color,
+        type: itemDef.type,
+        spoken: itemDef.spoken,
+        homeX: W / 2,
+        homeY: 270,
+        x: W / 2,
+        y: -90, // Valt vrolijk omlaag naar het wolkje!
+        vx: 0,
+        vy: 0,
+        radius: 86,
+        scale: 0.5,
+        returning: false,
+        entering: true,
+        bobPhase: 0
+    };
+
+    showFeedback(`Waar hoort ${color.spoken}?`, color.main, 3.2);
+    const sid = roundSessionId;
+    setTimeout(() => {
+        if (sid === roundSessionId && phase === 'play' && activeItem && activeItem.color.id === color.id) {
+            speakDutch(`Waar hoort ${color.spoken}?`);
+        }
+    }, 220);
+}
+
+function startNewRound() {
+    roundSessionId++;
+    phase = 'play';
+    sortedCount = 0;
+    baskets = [];
+    flyingItem = null;
+    rainbowStars = [];
+    balloons = [];
+    unicorn.active = false;
+    lastColorId = null;
+    spawnNextItem();
+}
+
+function showFeedback(text, color, duration = 2.2) {
+    feedbackBanner.text = text;
+    feedbackBanner.color = color;
+    feedbackBanner.timer = duration;
+}
+
+// --- Partikels & Feest-effecten ---
+function spawnSparkles(x, y, color, count = 24) {
+    const shapes = ['star', 'heart', 'circle'];
+    for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+        const speed = 3 + Math.random() * 7.5;
+        particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 2.5,
+            size: 9 + Math.random() * 11,
+            color: i % 3 === 0 ? '#ffffff' : (i % 4 === 0 ? '#ffd32a' : color),
+            shape: shapes[i % shapes.length],
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 0.25,
+            life: 1.0,
+            decay: 0.015 + Math.random() * 0.012,
+            gravity: 0.16
+        });
+    }
+}
+
+function spawnConfettiBurst(count = 70) {
+    const colors = ['#ff3b4e', '#ffd000', '#1e90ff', '#26cc67', '#ff66a6', '#9b59ff'];
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: Math.random() * W,
+            y: -20 - Math.random() * 260,
+            vx: (Math.random() - 0.5) * 3.5,
+            vy: 2.2 + Math.random() * 4.5,
+            size: 10 + Math.random() * 10,
+            color: colors[i % colors.length],
+            shape: i % 3 === 0 ? 'star' : (i % 3 === 1 ? 'heart' : 'rect'),
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 0.2,
+            life: 1.0,
+            decay: 0.004 + Math.random() * 0.004,
+            gravity: 0.035
+        });
+    }
+}
+
+function spawnCelebrationBalloons() {
+    const palette = ALL_COLORS;
+    balloons = [];
+    for (let i = 0; i < 9; i++) {
+        const c = palette[i % palette.length];
+        balloons.push({
+            x: 120 + i * 130 + (Math.random() - 0.5) * 40,
+            y: H + 80 + Math.random() * 260,
+            r: 52 + (i % 3) * 6,
+            color: c,
+            vy: 1.35 + Math.random() * 0.85,
+            sway: Math.random() * Math.PI * 2,
+            popped: false
+        });
+    }
+}
+
+function triggerCelebration() {
+    phase = 'celebrate';
+    activeItem = null;
+    flyingItem = null;
+    unicorn = { x: -160, y: 235, active: true, happyTimer: 6 };
+    soundPartyFanfare();
+    spawnConfettiBurst(90);
+    spawnCelebrationBalloons();
+    showFeedback('🎉 HOERA! WAT KNAP GEDAAN! 🌈', '#ff66a6', 99);
+    speakDutch('Hoera! Wat heb jij alle kleuren knap gevonden! Tik maar op de ballonnen!');
+}
+
+// --- Antwoord afhandelen (voor zowel slepen als tikken!) ---
+function tryBasket(basket, fromDrag) {
+    if (!activeItem || phase !== 'play') return;
+
+    if (basket.color.id === activeItem.color.id) {
+        // GOED!
+        const itemCopy = {
+            type: activeItem.type,
+            color: activeItem.color,
+            startX: activeItem.x,
+            startY: activeItem.y,
+            targetBasket: basket,
+            t: 0,
+            duration: fromDrag ? 0.22 : 0.45
+        };
+        activeItem = null;
+        flyingItem = itemCopy;
+        phase = 'flyToBasket';
+        soundCorrect();
+        const phrase = CHEER_PHRASES[Math.floor(Math.random() * CHEER_PHRASES.length)](basket.color.spoken);
+        showFeedback(`⭐ Goed zo! ${basket.color.name}! ⭐`, basket.color.main, 2.4);
+        speakDutch(phrase);
+    } else {
+        // Zachte, lieve aanmoediging (geen straf, leert de naam van het aangeraakte mandje!)
+        wrongAttemptsOnCurrent++;
+        basket.wiggleTimer = 0.55;
+        soundGentleWrong();
+        if (activeItem) activeItem.returning = true;
+        showFeedback(`Dat is ${basket.color.spoken}! Zoek ${activeItem.color.spoken}!`, activeItem.color.main, 2.6);
+        speakDutch(`Dat is ${basket.color.spoken}. Waar is ${activeItem.color.spoken}?`);
+    }
+}
+
+function completeItemLanding(basket, itemType, color) {
+    basket.happyTimer = 0.85;
+    basket.collected.push(itemType);
+    sortedCount++;
+
+    spawnSparkles(basket.cx, basket.y + 20, color.main, 30);
+
+    // Ster vliegt omhoog naar de voortgangsbalk
+    rainbowStars.push({
+        startX: basket.cx,
+        startY: basket.y,
+        x: basket.cx,
+        y: basket.y,
+        targetX: W / 2 + (sortedCount - (roundTarget + 1) / 2) * 52,
+        targetY: 44,
+        color: color.main,
+        t: 0
+    });
+
+    const sid = roundSessionId;
+    if (sortedCount >= roundTarget) {
+        setTimeout(() => {
+            if (gameStarted && sid === roundSessionId) triggerCelebration();
+        }, 700);
+    } else {
+        setTimeout(() => {
+            if (gameStarted && sid === roundSessionId && phase !== 'celebrate') {
+                phase = 'play';
+                spawnNextItem();
+            }
+        }, 780);
+    }
+}
+
+// --- Pointer / Touch / Muis besturing ---
+function getCanvasPos(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: ((clientX - rect.left) / rect.width) * W,
+        y: ((clientY - rect.top) / rect.height) * H
+    };
+}
+
+function findBasketAt(x, y, extraPadding = 28) {
+    for (const b of baskets) {
+        if (x >= b.x - extraPadding && x <= b.x + b.w + extraPadding &&
+            y >= b.y - extraPadding - 35 && y <= b.y + b.h + extraPadding) {
+            return b;
+        }
+    }
+    return null;
+}
+
+function onPointerDown(e) {
+    if (!gameStarted || settingsOpen) return;
+    e.preventDefault();
+    ensureAudio();
+
+    const pos = getCanvasPos(e.clientX, e.clientY);
+
+    // Feestmodus: ballonnen knallen + NOG EEN KEER knop + Alle spellen knop
+    if (phase === 'celebrate') {
+        // Check "Alle spellen" knop
+        if (pos.x >= homeCelebrationRect.x && pos.x <= homeCelebrationRect.x + homeCelebrationRect.w &&
+            pos.y >= homeCelebrationRect.y && pos.y <= homeCelebrationRect.y + homeCelebrationRect.h) {
+            window.location.href = 'index.html';
+            return;
+        }
+        // Check "Nog een keer" knop
+        if (pos.x >= replayBtnRect.x && pos.x <= replayBtnRect.x + replayBtnRect.w &&
+            pos.y >= replayBtnRect.y && pos.y <= replayBtnRect.y + replayBtnRect.h) {
+            soundPickup();
+            startNewRound();
+            return;
+        }
+        // Check ballonnen!
+        for (const bl of balloons) {
+            if (bl.popped) continue;
+            const bx = bl.x + Math.sin(time * 2.4 + bl.sway) * 16;
+            if (Math.hypot(pos.x - bx, pos.y - bl.y) <= bl.r + 24) {
+                bl.popped = true;
+                soundPop();
+                spawnSparkles(bx, bl.y, bl.color.main, 24);
+                speakDutch(bl.color.spoken);
+                return;
+            }
+        }
+        // Tik ergens anders = extra sparkles!
+        spawnSparkles(pos.x, pos.y, '#ffd32a', 14);
+        soundPop();
+        return;
+    }
+
+    if (phase !== 'play' || !activeItem) return;
+
+    // Check luidspreker-knopje (herhaal de kleur!)
+    if (Math.hypot(pos.x - speakerBtn.x, pos.y - speakerBtn.y) <= speakerBtn.r + 14) {
+        soundPickup();
+        speakDutch(`Waar hoort ${activeItem.color.spoken}? ${activeItem.spoken}!`);
+        spawnSparkles(speakerBtn.x, speakerBtn.y, activeItem.color.main, 12);
+        return;
+    }
+
+    // Check of ze direct op het plaatje tikt (om te slepen!)
+    const distItem = Math.hypot(pos.x - activeItem.x, pos.y - activeItem.y);
+    if (distItem <= activeItem.radius + 38) {
+        pointerDown = true;
+        pointerId = e.pointerId;
+        isDraggingItem = true;
+        activeItem.returning = false;
+        activeItem.entering = false;
+        dragStartX = pos.x;
+        dragStartY = pos.y;
+        dragOffsetX = activeItem.x - pos.x;
+        dragOffsetY = activeItem.y - pos.y;
+        soundPickup();
+        canvas.setPointerCapture?.(e.pointerId);
+        return;
+    }
+
+    // Check of ze direct op een mandje tikt (tik-om-te-sorteren!)
+    const tappedBasket = findBasketAt(pos.x, pos.y, 24);
+    if (tappedBasket) {
+        tryBasket(tappedBasket, false);
+    }
+}
+
+function onPointerMove(e) {
+    if (!pointerDown || !isDraggingItem || !activeItem || phase !== 'play') return;
+    if (pointerId !== null && e.pointerId !== pointerId) return;
+    e.preventDefault();
+
+    const pos = getCanvasPos(e.clientX, e.clientY);
+    activeItem.x = Math.max(70, Math.min(W - 70, pos.x + dragOffsetX));
+    activeItem.y = Math.max(70, Math.min(H - 70, pos.y + dragOffsetY));
+    hoveredBasket = findBasketAt(activeItem.x, activeItem.y, 42);
+}
+
+function onPointerUp(e) {
+    if (!pointerDown) return;
+    if (pointerId !== null && e.pointerId !== pointerId) return;
+    pointerDown = false;
+    pointerId = null;
+
+    if (isDraggingItem && activeItem && phase === 'play') {
+        const dropBasket = findBasketAt(activeItem.x, activeItem.y, 55);
+        const movedDist = Math.hypot(activeItem.x - activeItem.homeX, activeItem.y - activeItem.homeY);
+
+        if (dropBasket) {
+            tryBasket(dropBasket, true);
+        } else if (movedDist < 28) {
+            // Ze tikte zachtjes op het plaatje zelf -> zeg de naam & kleur + vrolijk sprongetje!
+            speakDutch(`${activeItem.spoken}! Waar is ${activeItem.color.spoken}?`);
+            spawnSparkles(activeItem.x, activeItem.y, activeItem.color.main, 12);
+            activeItem.returning = true;
+        } else {
+            // Terugveren naar het wolkje
+            activeItem.returning = true;
+        }
+    }
+
+    isDraggingItem = false;
+    hoveredBasket = null;
+}
+
+canvas.addEventListener('pointerdown', onPointerDown);
+canvas.addEventListener('pointermove', onPointerMove);
+canvas.addEventListener('pointerup', onPointerUp);
+canvas.addEventListener('pointercancel', onPointerUp);
+
+// Toetsenbord-ondersteuning voor desktop testen (1-4 kiest mandje, Spatie herhaalt/speelt opnieuw)
+window.addEventListener('keydown', (e) => {
+    if (!gameStarted || settingsOpen) return;
+    if (phase === 'play' && ['1', '2', '3', '4'].includes(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        if (baskets[idx]) tryBasket(baskets[idx], false);
+    } else if (phase === 'celebrate' && (e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        startNewRound();
+    }
+});
+
+// --- UI / Instellingen Functies ---
+function startGame() {
+    ensureAudio();
+    soundPickup();
+    document.getElementById('start-overlay').style.display = 'none';
+    document.getElementById('parent-gear-btn').style.display = 'flex';
+    gameStarted = true;
+    startNewRound();
+}
+
+function openSettings() {
+    settingsOpen = true;
+    document.getElementById('settings-overlay').style.display = 'flex';
+}
+
+function closeSettings() {
+    settingsOpen = false;
+    document.getElementById('settings-overlay').style.display = 'none';
+}
+
+function setColorCount(n) {
+    colorCountSetting = n;
+    [3, 4, 6].forEach(v => document.getElementById(`mode-${v}`).classList.toggle('selected', v === n));
+    soundPickup();
+}
+
+function setVoiceEnabled(on) {
+    voiceEnabled = on;
+    document.getElementById('voice-on').classList.toggle('selected', on);
+    document.getElementById('voice-off').classList.toggle('selected', !on);
+    soundPickup();
+    if (on) speakDutch('Hallo! Zullen we kleuren zoeken?');
+}
+
+function setRoundLength(n) {
+    roundTarget = n;
+    [5, 6, 8].forEach(v => document.getElementById(`round-${v}`).classList.toggle('selected', v === n));
+    soundPickup();
+}
+
+function applySettingsAndResume() {
+    closeSettings();
+    if (!gameStarted) {
+        startGame();
+    } else {
+        startNewRound();
+    }
+}
+
+// ============================================================================
+// TEKENFUNCTIES (Grote, vrolijke, direct herkenbare peuter-illustraties)
+// ============================================================================
+
+function drawRoundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
+
+function drawStarShape(cx, cy, spikes, outerR, innerR) {
+    let rot = (Math.PI / 2) * 3;
+    const step = Math.PI / spikes;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - outerR);
+    for (let i = 0; i < spikes; i++) {
+        ctx.lineTo(cx + Math.cos(rot) * outerR, cy + Math.sin(rot) * outerR);
+        rot += step;
+        ctx.lineTo(cx + Math.cos(rot) * innerR, cy + Math.sin(rot) * innerR);
+        rot += step;
+    }
+    ctx.closePath();
+}
+
+function drawHeartShape(cx, cy, size) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + size * 0.35);
+    ctx.bezierCurveTo(cx - size * 0.9, cy - size * 0.25, cx - size * 0.5, cy - size * 0.95, cx, cy - size * 0.35);
+    ctx.bezierCurveTo(cx + size * 0.5, cy - size * 0.95, cx + size * 0.9, cy - size * 0.25, cx, cy + size * 0.35);
+    ctx.closePath();
+}
+
+function drawCuteFace(x, y, scale = 1, happy = false, openMouth = false, blink = false) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    // Wangetjes
+    ctx.fillStyle = 'rgba(255, 130, 170, 0.45)';
+    ctx.beginPath(); ctx.ellipse(-26, 8, 9, 6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(26, 8, 9, 6, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Oogjes
+    ctx.strokeStyle = '#2d2038';
+    ctx.fillStyle = '#2d2038';
+    ctx.lineWidth = 4.5;
+    ctx.lineCap = 'round';
+
+    if (happy) {
+        // Blije boogjes ^ ^
+        [-17, 17].forEach(ex => {
+            ctx.beginPath();
+            ctx.arc(ex, -2, 8, Math.PI * 1.1, Math.PI * 1.9);
+            ctx.stroke();
+        });
+    } else if (blink) {
+        [-17, 17].forEach(ex => {
+            ctx.beginPath();
+            ctx.moveTo(ex - 7, -4);
+            ctx.lineTo(ex + 7, -4);
+            ctx.stroke();
+        });
+    } else {
+        [-17, 17].forEach(ex => {
+            ctx.beginPath();
+            ctx.arc(ex, -5, 7.5, 0, Math.PI * 2);
+            ctx.fill();
+            // Glinstering in oogjes
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(ex - 2.5, -7.5, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#2d2038';
+        });
+    }
+
+    // Mondje
+    if (openMouth) {
+        ctx.fillStyle = '#5a1e30';
+        ctx.beginPath();
+        ctx.arc(0, 12, 11, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ff7999';
+        ctx.beginPath();
+        ctx.ellipse(0, 17, 7, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+    } else if (happy) {
+        ctx.fillStyle = '#5a1e30';
+        ctx.beginPath();
+        ctx.arc(0, 8, 14, 0, Math.PI);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ff7999';
+        ctx.beginPath();
+        ctx.ellipse(0, 16, 8, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+    } else {
+        ctx.beginPath();
+        ctx.arc(0, 7, 10, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+// Teken een groot, schattig, kleur-onmiskenbaar voorwerp!
+function drawColoredObject(type, color, x, y, scale = 1, animTime = 0) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    const outline = '#2d2038';
+    const blink = Math.sin(animTime * 1.4) > 0.96;
+
+    switch (type) {
+        case 'strawberry': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(0, 62);
+            ctx.bezierCurveTo(-56, 36, -64, -22, -32, -46);
+            ctx.bezierCurveTo(-10, -56, 10, -56, 32, -46);
+            ctx.bezierCurveTo(64, -22, 56, 36, 0, 62);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            // Glans & pitjes
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-25, -18, 10, 18, -0.35, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#ffeaa7';
+            [[-28, 14], [28, 14], [-14, 38], [14, 38], [0, 46]].forEach(([px, py]) => {
+                ctx.beginPath(); ctx.ellipse(px, py, 3.5, 5.5, 0, 0, Math.PI * 2); ctx.fill();
+            });
+            // Kroontje bovenop
+            ctx.fillStyle = '#2ed573';
+            ctx.beginPath();
+            ctx.moveTo(0, -40); ctx.lineTo(-28, -56); ctx.lineTo(-10, -52);
+            ctx.lineTo(0, -68); ctx.lineTo(10, -52); ctx.lineTo(28, -56);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, 2, 0.9, false, false, blink);
+            break;
+        }
+        case 'heart': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            drawHeartShape(0, 24, 96);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-28, -24, 12, 18, -0.5, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, -2, 0.9, true, false, blink);
+            break;
+        }
+        case 'ladybug': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.arc(0, 8, 56, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Zwarte stipjes op rode schild
+            ctx.fillStyle = outline;
+            ctx.beginPath(); ctx.moveTo(0, -24); ctx.lineTo(0, 62); ctx.stroke();
+            [[-26, 8], [26, 8], [-20, 36], [20, 36]].forEach(([sx, sy]) => {
+                ctx.beginPath(); ctx.arc(sx, sy, 8, 0, Math.PI * 2); ctx.fill();
+            });
+            // Kopje bovenop (klein en schattig)
+            ctx.fillStyle = '#3a2c47';
+            ctx.beginPath(); ctx.arc(0, -34, 28, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Sprietjes
+            ctx.beginPath(); ctx.moveTo(-12, -56); ctx.quadraticCurveTo(-24, -74, -32, -68); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(12, -56); ctx.quadraticCurveTo(24, -74, 32, -68); ctx.stroke();
+            // Oogjes op kopje
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(-10, -36, 7, 0, Math.PI * 2); ctx.arc(10, -36, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(-9, -36, 3.8, 0, Math.PI * 2); ctx.arc(11, -36, 3.8, 0, Math.PI * 2); ctx.fill();
+            break;
+        }
+        case 'apple': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(0, -40);
+            ctx.bezierCurveTo(-48, -62, -68, -6, -48, 36);
+            ctx.bezierCurveTo(-32, 66, -6, 62, 0, 52);
+            ctx.bezierCurveTo(6, 62, 32, 66, 48, 36);
+            ctx.bezierCurveTo(68, -6, 48, -62, 0, -40);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Glans
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-28, -14, 9, 17, -0.3, 0, Math.PI * 2); ctx.fill();
+            // Steeltje + blaadje
+            ctx.strokeStyle = '#795548'; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.moveTo(0, -40); ctx.quadraticCurveTo(4, -62, 12, -68); ctx.stroke();
+            ctx.fillStyle = '#2ed573'; ctx.strokeStyle = outline; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.ellipse(22, -54, 16, 9, -0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, 8, 0.9, false, false, blink);
+            break;
+        }
+        case 'star': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            drawStarShape(0, 4, 5, 68, 36);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.arc(-14, -18, 12, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, 6, 0.85, true, false, blink);
+            break;
+        }
+        case 'sun': {
+            // Draaiende zonnestralen
+            ctx.save();
+            ctx.rotate(animTime * 0.45);
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 4.5;
+            for (let i = 0; i < 10; i++) {
+                ctx.rotate((Math.PI * 2) / 10);
+                ctx.beginPath();
+                ctx.moveTo(-10, -48);
+                ctx.lineTo(0, -72);
+                ctx.lineTo(10, -48);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+            }
+            ctx.restore();
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-18, -20, 12, 8, -0.5, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, 3, 0.85, true, false, blink);
+            break;
+        }
+        case 'chick': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            // Vleugeltjes wapperen!
+            const flap = Math.sin(animTime * 8) * 0.25;
+            ctx.save(); ctx.translate(-46, 10); ctx.rotate(-0.3 + flap);
+            ctx.beginPath(); ctx.ellipse(0, 0, 18, 12, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+            ctx.save(); ctx.translate(46, 10); ctx.rotate(0.3 - flap);
+            ctx.beginPath(); ctx.ellipse(0, 0, 18, 12, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+            // Lijfje
+            ctx.beginPath(); ctx.arc(0, 6, 52, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Kuifje
+            ctx.beginPath(); ctx.ellipse(-6, -50, 7, 14, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(8, -48, 7, 12, 0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Snaveltje
+            ctx.fillStyle = '#ff9f1a';
+            ctx.beginPath(); ctx.moveTo(-10, 6); ctx.lineTo(10, 6); ctx.lineTo(0, 20); ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Oogjes
+            ctx.fillStyle = outline;
+            ctx.beginPath(); ctx.arc(-18, -8, 7, 0, Math.PI * 2); ctx.arc(18, -8, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(-20, -10, 2.6, 0, Math.PI * 2); ctx.arc(16, -10, 2.6, 0, Math.PI * 2); ctx.fill();
+            break;
+        }
+        case 'banana': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(-46, -24);
+            ctx.quadraticCurveTo(-52, 46, 14, 54);
+            ctx.quadraticCurveTo(56, 54, 62, 16);
+            ctx.quadraticCurveTo(22, 28, -10, 4);
+            ctx.quadraticCurveTo(-24, -14, -30, -34);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-10, 28, 22, 7, 0.4, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(4, 24, 0.72, false, false, blink);
+            break;
+        }
+        case 'whale': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            // Staartje
+            ctx.beginPath();
+            ctx.moveTo(38, 12);
+            ctx.quadraticCurveTo(64, 4, 68, -20);
+            ctx.quadraticCurveTo(54, -18, 48, -6);
+            ctx.quadraticCurveTo(44, -22, 32, -26);
+            ctx.quadraticCurveTo(36, 0, 28, 16);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Lijf
+            ctx.beginPath(); ctx.ellipse(-8, 12, 54, 40, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Buikje lichtblauw
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-18, 30, 34, 16, 0, 0, Math.PI); ctx.fill();
+            // Fonteintje bovenop!
+            ctx.strokeStyle = color.light; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(-12, -28); ctx.quadraticCurveTo(-22, -58, -36, -50); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-12, -28); ctx.quadraticCurveTo(0, -60, 14, -50); ctx.stroke();
+            drawCuteFace(-22, 8, 0.82, false, false, blink);
+            break;
+        }
+        case 'butterfly': {
+            const wing = 0.88 + Math.sin(animTime * 9) * 0.14;
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.save(); ctx.scale(wing, 1);
+            // Bovenste vleugels
+            ctx.beginPath(); ctx.ellipse(-34, -18, 34, 28, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(34, -18, 34, 28, 0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Onderste vleugels
+            ctx.beginPath(); ctx.ellipse(-28, 24, 24, 22, 0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(28, 24, 24, 22, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Stippen op vleugels
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.arc(-38, -20, 12, 0, Math.PI * 2); ctx.arc(38, -20, 12, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+            // Lijfje
+            ctx.fillStyle = color.dark;
+            ctx.beginPath(); ctx.ellipse(0, 4, 13, 38, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Sprietjes
+            ctx.beginPath(); ctx.moveTo(-4, -32); ctx.quadraticCurveTo(-18, -56, -24, -48); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(4, -32); ctx.quadraticCurveTo(18, -56, 24, -48); ctx.stroke();
+            drawCuteFace(0, -6, 0.55, true, false, blink);
+            break;
+        }
+        case 'drop': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(0, -64);
+            ctx.bezierCurveTo(48, -10, 56, 36, 0, 58);
+            ctx.bezierCurveTo(-56, 36, -48, -10, 0, -64);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-18, 4, 9, 18, 0.25, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, 18, 0.85, false, false, blink);
+            break;
+        }
+        case 'balloon': {
+            ctx.strokeStyle = outline; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(0, 46); ctx.quadraticCurveTo(10, 62, -4, 74); ctx.stroke();
+            ctx.fillStyle = color.main; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.ellipse(0, -6, 48, 56, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-18, -26, 11, 18, -0.35, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, -4, 0.85, true, false, blink);
+            break;
+        }
+        case 'frog': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            // Grote kikkeroog-bulten
+            ctx.beginPath(); ctx.arc(-28, -36, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(28, -36, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Hoofd/lijf
+            ctx.beginPath(); ctx.ellipse(0, 12, 58, 44, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Lichtgroen buikje
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(0, 28, 34, 18, 0, 0, Math.PI * 2); ctx.fill();
+            // Oogjes in de bulten
+            [-28, 28].forEach(ex => {
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(ex, -36, 13, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = outline;
+                ctx.beginPath(); ctx.arc(ex, -36, 6.5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(ex - 2, -38, 2.5, 0, Math.PI * 2); ctx.fill();
+            });
+            // Brede kikkerglimlach
+            ctx.strokeStyle = outline; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.arc(0, 4, 24, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+            break;
+        }
+        case 'turtle': {
+            ctx.fillStyle = color.light;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            // Pootjes & kopje
+            ctx.beginPath(); ctx.arc(-32, 34, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(26, 34, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(-50, 8, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Schild (helder groen!)
+            ctx.fillStyle = color.main;
+            ctx.beginPath(); ctx.arc(6, 22, 48, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Schild-patroon
+            ctx.fillStyle = color.dark;
+            ctx.beginPath(); ctx.arc(6, 0, 16, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(-50, 8, 0.55, false, false, blink);
+            break;
+        }
+        case 'clover': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            // Steeltje
+            ctx.strokeStyle = color.dark; ctx.lineWidth = 9;
+            ctx.beginPath(); ctx.moveTo(0, 10); ctx.quadraticCurveTo(6, 48, 20, 62); ctx.stroke();
+            ctx.strokeStyle = outline; ctx.lineWidth = 5;
+            // 4 klaverblaadjes
+            [[-26, -24], [26, -24], [-26, 22], [26, 22]].forEach(([lx, ly]) => {
+                ctx.beginPath(); ctx.arc(lx, ly, 28, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            });
+            ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, 2, 0.82, true, false, blink);
+            break;
+        }
+        case 'pear': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(0, -56);
+            ctx.bezierCurveTo(26, -56, 32, -22, 44, 6);
+            ctx.bezierCurveTo(56, 38, 34, 60, 0, 60);
+            ctx.bezierCurveTo(-34, 60, -56, 38, -44, 6);
+            ctx.bezierCurveTo(-32, -22, -26, -56, 0, -56);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-20, 16, 9, 16, -0.25, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#795548'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(0, -56); ctx.lineTo(6, -72); ctx.stroke();
+            drawCuteFace(0, 18, 0.85, false, false, blink);
+            break;
+        }
+        case 'flower': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            for (let i = 0; i < 6; i++) {
+                const a = (Math.PI * 2 * i) / 6 + animTime * 0.25;
+                ctx.beginPath();
+                ctx.arc(Math.cos(a) * 34, Math.sin(a) * 34, 26, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+            }
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, 2, 0.78, true, false, blink);
+            break;
+        }
+        case 'bow': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.ellipse(-36, 0, 34, 28, -0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(36, 0, 34, 28, 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, 2, 0.55, true, false, blink);
+            break;
+        }
+        case 'cupcake': {
+            ctx.fillStyle = color.dark;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(-40, 8); ctx.lineTo(40, 8); ctx.lineTo(30, 56); ctx.lineTo(-30, 56);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Roze toef
+            ctx.fillStyle = color.main;
+            ctx.beginPath(); ctx.arc(-24, 0, 26, 0, Math.PI * 2); ctx.arc(24, 0, 26, 0, Math.PI * 2);
+            ctx.arc(0, -18, 32, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.arc(0, -48, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, -6, 0.8, true, false, blink);
+            break;
+        }
+        case 'piggy': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.ellipse(-36, -38, 16, 22, -0.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(36, -38, 16, 22, 0.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 6, 52, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // Snuitje
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(0, 18, 22, 16, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.dark;
+            ctx.beginPath(); ctx.ellipse(-7, 18, 4, 6, 0, 0, Math.PI * 2); ctx.ellipse(7, 18, 4, 6, 0, 0, Math.PI * 2); ctx.fill();
+            // Oogjes
+            ctx.fillStyle = outline;
+            ctx.beginPath(); ctx.arc(-20, -10, 7, 0, Math.PI * 2); ctx.arc(20, -10, 7, 0, Math.PI * 2); ctx.fill();
+            break;
+        }
+        case 'grapes': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 4.5;
+            const berries = [
+                [-24, -22], [0, -24], [24, -22],
+                [-32, 2], [-10, 2], [12, 2], [32, 2],
+                [-18, 26], [4, 26], [22, 26],
+                [0, 48]
+            ];
+            berries.forEach(([bx, by]) => {
+                ctx.beginPath(); ctx.arc(bx, by, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            });
+            ctx.fillStyle = '#2ed573';
+            ctx.beginPath(); ctx.ellipse(14, -48, 18, 9, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, 2, 0.8, true, false, blink);
+            break;
+        }
+        case 'octopus': {
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            // Tentakeltjes
+            for (let i = -2; i <= 2; i++) {
+                const wave = Math.sin(animTime * 5 + i) * 6;
+                ctx.beginPath();
+                ctx.ellipse(i * 22, 42 + wave * 0.4, 12, 22, i * 0.18, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+            }
+            ctx.beginPath(); ctx.arc(0, -2, 48, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.ellipse(-18, -22, 10, 14, -0.4, 0, Math.PI * 2); ctx.fill();
+            drawCuteFace(0, 2, 0.85, false, false, blink);
+            break;
+        }
+        case 'umbrella': {
+            ctx.strokeStyle = outline; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(0, 48); ctx.arc(-12, 48, 12, 0, Math.PI); ctx.stroke();
+            ctx.fillStyle = color.main; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.arc(0, 6, 58, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+            drawCuteFace(0, -16, 0.78, true, false, blink);
+            break;
+        }
+        default: { // gem / fallback
+            ctx.fillStyle = color.main;
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(0, 60); ctx.lineTo(-56, -8); ctx.lineTo(-32, -48);
+            ctx.lineTo(32, -48); ctx.lineTo(56, -8); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color.light;
+            ctx.beginPath(); ctx.moveTo(0, -48); ctx.lineTo(-22, -8); ctx.lineTo(22, -8); ctx.closePath(); ctx.fill();
+            drawCuteFace(0, 4, 0.82, true, false, blink);
+        }
+    }
+    ctx.restore();
+}
+
+// --- Achtergrond (zonnige bloemenweide + groeiende regenboog!) ---
+function drawBackground() {
+    // Hemel
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#6ed3ff');
+    sky.addColorStop(0.65, '#c7f2ff');
+    sky.addColorStop(1, '#e8ffd8');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // Groeiende regenboog in de lucht!
+    const rainbowColors = ['#ff3b4e', '#ff9f1a', '#ffd000', '#26cc67', '#1e90ff', '#9b59ff'];
+    const fillRatio = Math.min(1, sortedCount / Math.max(1, roundTarget));
+    const endAngle = Math.PI + Math.PI * fillRatio;
+
+    ctx.save();
+    rainbowColors.forEach((rc, idx) => {
+        const radius = 380 - idx * 20;
+        // Zachte achtergrondboog (nog te vullen)
+        ctx.beginPath();
+        ctx.arc(W / 2, 430, radius, Math.PI, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+        ctx.lineWidth = 18;
+        ctx.stroke();
+
+        // Gevulde regenboog!
+        if (fillRatio > 0) {
+            ctx.beginPath();
+            ctx.arc(W / 2, 430, radius, Math.PI, endAngle);
+            ctx.strokeStyle = rc;
+            ctx.lineWidth = 18;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+    });
+    ctx.restore();
+
+    // Zachte drijvende wolken
+    bgClouds.forEach(c => {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.scale(c.s, c.s);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.beginPath();
+        ctx.arc(-32, 8, 28, 0, Math.PI * 2);
+        ctx.arc(0, -6, 36, 0, Math.PI * 2);
+        ctx.arc(36, 8, 26, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    // Zachte groene heuvels
+    ctx.fillStyle = '#7bed9f';
+    ctx.beginPath();
+    ctx.moveTo(0, 500);
+    ctx.quadraticCurveTo(320, 420, 640, 485);
+    ctx.quadraticCurveTo(960, 430, W, 495);
+    ctx.lineTo(W, H);
+    ctx.lineTo(0, H);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#58d67a';
+    ctx.beginPath();
+    ctx.moveTo(0, 540);
+    ctx.quadraticCurveTo(420, 485, 860, 535);
+    ctx.quadraticCurveTo(1100, 505, W, 545);
+    ctx.lineTo(W, H);
+    ctx.lineTo(0, H);
+    ctx.closePath();
+    ctx.fill();
+
+    // Bloemetjes in het gras
+    meadowFlowers.forEach(f => {
+        const sway = Math.sin(time * 2 + f.phase) * 2.5;
+        ctx.save();
+        ctx.translate(f.x + sway, f.y);
+        ctx.fillStyle = f.color;
+        for (let p = 0; p < 5; p++) {
+            const a = (Math.PI * 2 * p) / 5;
+            ctx.beginPath();
+            ctx.arc(Math.cos(a) * f.size * 0.65, Math.sin(a) * f.size * 0.65, f.size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.fillStyle = '#ffd32a';
+        ctx.beginPath(); ctx.arc(0, 0, f.size * 0.42, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    });
+}
+
+// --- Sterren-voortgangsbalk bovenin ---
+function drawProgressBar() {
+    const startX = W / 2 - ((roundTarget - 1) * 52) / 2;
+    const y = 44;
+
+    // Achtergrondpil
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+    drawRoundedRect(startX - 42, y - 28, (roundTarget - 1) * 52 + 84, 56, 28);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 121, 176, 0.55)';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    for (let i = 0; i < roundTarget; i++) {
+        const sx = startX + i * 52;
+        const filled = i < sortedCount;
+        ctx.save();
+        if (filled) {
+            ctx.fillStyle = '#ffd000';
+            ctx.strokeStyle = '#e17055';
+            ctx.lineWidth = 3;
+        } else {
+            ctx.fillStyle = '#e5e9f0';
+            ctx.strokeStyle = '#c8d0dc';
+            ctx.lineWidth = 2.5;
+        }
+        drawStarShape(sx, y, 5, filled ? 20 : 16, filled ? 10 : 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
+    ctx.restore();
+}
+
+// --- Wolkje + Kleur-pil in het midden (waar het voorwerp wacht) ---
+function drawItemStage() {
+    const cx = W / 2;
+    const cy = 278;
+
+    // Zachte kleur-aura als er een actief voorwerp is
+    if (activeItem) {
+        const pulse = 1 + Math.sin(time * 4) * 0.05;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(pulse, pulse);
+        ctx.fillStyle = activeItem.color.soft;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath(); ctx.arc(0, 0, 118, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = activeItem.color.main;
+        ctx.lineWidth = 7;
+        ctx.setLineDash([16, 12]);
+        ctx.beginPath(); ctx.arc(0, 0, 118, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+    }
+
+    // Zacht wit wolk-kussentje onder het voorwerp
+    ctx.save();
+    ctx.translate(cx, cy + 72);
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,0,0,0.12)';
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.arc(-58, 4, 34, 0, Math.PI * 2);
+    ctx.arc(-18, -8, 42, 0, Math.PI * 2);
+    ctx.arc(24, -6, 40, 0, Math.PI * 2);
+    ctx.arc(62, 6, 32, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Luidspreker-knop rechts van het wolkje (tik om kleur nog eens te horen!)
+    if (activeItem && phase === 'play') {
+        ctx.save();
+        const sPulse = 1 + Math.sin(time * 3.5) * 0.05;
+        ctx.translate(speakerBtn.x, speakerBtn.y);
+        ctx.scale(sPulse, sPulse);
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = activeItem.color.main;
+        ctx.lineWidth = 5;
+        ctx.shadowColor = 'rgba(0,0,0,0.14)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.arc(0, 0, speakerBtn.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.font = '38px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔊', 0, 2);
+        ctx.restore();
+    }
+}
+
+// --- Feedback / Kleur-banner voor ouders op TV ---
+function drawFeedbackBanner() {
+    if (!feedbackBanner.text) return;
+    ctx.save();
+    ctx.font = '900 34px "Fredoka One", "Trebuchet MS", sans-serif';
+    const textW = ctx.measureText(feedbackBanner.text).width;
+    const pillW = Math.min(W - 140, Math.max(360, textW + 70));
+    const pillH = 60;
+    const x = (W - pillW) / 2;
+    const y = 92;
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+    ctx.shadowBlur = 12;
+    drawRoundedRect(x, y, pillW, pillH, 30);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = feedbackBanner.color;
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#2d2038';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(feedbackBanner.text, W / 2, y + pillH / 2 + 2);
+    ctx.restore();
+}
+
+// --- Grote, vrolijke, levende Kleuren-Mandjes! ---
+function drawBasket(b) {
+    const isHovered = hoveredBasket === b;
+    const isHinted = phase === 'play' && activeItem && wrongAttemptsOnCurrent >= 2 && b.color.id === activeItem.color.id;
+    const isHappy = b.happyTimer > 0;
+    const wiggle = b.wiggleTimer > 0 ? Math.sin(b.wiggleTimer * 42) * 10 : 0;
+    const hintPulse = isHinted ? 1 + Math.sin(time * 7) * 0.065 : 1;
+    const hoverScale = isHovered ? 1.09 : 1;
+    const happyJump = isHappy ? Math.sin((b.happyTimer / 0.85) * Math.PI) * 28 : 0;
+    const totalScale = hoverScale * hintPulse;
+
+    ctx.save();
+    ctx.translate(b.cx + wiggle, b.cy - happyJump);
+    ctx.scale(totalScale, totalScale);
+
+    // Zachte glow als hint of bij slepen eroverheen
+    if (isHinted || isHovered) {
+        ctx.save();
+        ctx.fillStyle = b.color.light;
+        ctx.globalAlpha = 0.45 + Math.sin(time * 8) * 0.15;
+        ctx.beginPath();
+        ctx.ellipse(0, 12, b.w * 0.62, b.h * 0.68, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    // Schaduw op het gras
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.16)';
+    ctx.beginPath();
+    ctx.ellipse(0, b.h / 2 - 4, b.w * 0.44, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Handvat van het mandje
+    ctx.strokeStyle = b.color.dark;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.arc(0, -b.h / 2 + 12, b.w * 0.34, Math.PI * 1.08, Math.PI * 1.92);
+    ctx.stroke();
+    ctx.strokeStyle = b.color.main;
+    ctx.lineWidth = 7;
+    ctx.stroke();
+
+    // Reeds verzamelde items die vrolijk uit het mandje piepen!
+    if (b.collected.length > 0) {
+        const showList = b.collected.slice(-3);
+        showList.forEach((itemType, idx) => {
+            const ox = (idx - (showList.length - 1) / 2) * 52;
+            const oy = -b.h / 2 + 6 + Math.sin(time * 4 + idx) * 3;
+            drawColoredObject(itemType, b.color, ox, oy, 0.42, time + idx);
+        });
+    }
+
+    // Mandje basis (trapezium met zachte ronde hoeken)
+    const topHalf = b.w * 0.48;
+    const botHalf = b.w * 0.37;
+    const topY = -b.h / 2 + 18;
+    const botY = b.h / 2 - 8;
+
+    ctx.fillStyle = b.color.main;
+    ctx.strokeStyle = '#2d2038';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(-topHalf, topY);
+    ctx.lineTo(topHalf, topY);
+    ctx.quadraticCurveTo(topHalf - 4, botY, botHalf, botY);
+    ctx.lineTo(-botHalf, botY);
+    ctx.quadraticCurveTo(-topHalf + 4, botY, -topHalf, topY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Gevlochten patroonstrepen (subtiel, kleur blijft dominant!)
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = b.color.dark;
+    ctx.globalAlpha = 0.25;
+    ctx.lineWidth = 5;
+    for (let y = topY + 26; y < botY; y += 28) {
+        ctx.beginPath(); ctx.moveTo(-topHalf, y); ctx.lineTo(topHalf, y); ctx.stroke();
+    }
+    for (let x = -topHalf + 30; x < topHalf; x += 38) {
+        ctx.beginPath(); ctx.moveTo(x, topY); ctx.lineTo(x * 0.82, botY); ctx.stroke();
+    }
+    ctx.restore();
+
+    // Dikke bovenrand van het mandje
+    ctx.fillStyle = b.color.light;
+    ctx.strokeStyle = '#2d2038';
+    ctx.lineWidth = 5.5;
+    drawRoundedRect(-topHalf - 10, topY - 12, (topHalf + 10) * 2, 30, 15);
+    ctx.fill();
+    ctx.stroke();
+
+    // Schattig levend gezichtje op het mandje!
+    const blink = Math.sin(time * 1.1 + b.x) > 0.96;
+    drawCuteFace(0, 12, 1.05, isHappy, isHovered, blink);
+
+    // Grote, duidelijke kleurnaam onderaan op een badge (handig voor ouders & meelezen!)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+    drawRoundedRect(-64, botY - 34, 128, 30, 15);
+    ctx.fill();
+    ctx.strokeStyle = b.color.dark;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = '#2d2038';
+    ctx.font = '900 20px "Fredoka One", "Trebuchet MS", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(b.color.name, 0, botY - 18);
+
+    ctx.restore();
+}
+
+// --- Vliegende regenboog-eenhoorn tijdens het feestje! ---
+function drawUnicorn(x, y) {
+    ctx.save();
+    ctx.translate(x, y + Math.sin(time * 5) * 14);
+
+    // Regenboogstaart
+    const tailCols = ['#ff3b4e', '#ffd000', '#26cc67', '#1e90ff', '#ff66a6'];
+    tailCols.forEach((tc, i) => {
+        ctx.strokeStyle = tc;
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-48, 4 + i * 4);
+        ctx.quadraticCurveTo(-92, 10 + Math.sin(time * 8 + i) * 12, -118, 2 + i * 5);
+        ctx.stroke();
+    });
+
+    // Lijfje
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#2d2038';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.ellipse(0, 10, 56, 34, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Vleugeltje
+    ctx.fillStyle = '#ffe3f0';
+    ctx.save();
+    ctx.translate(-4, -10);
+    ctx.rotate(-0.35 + Math.sin(time * 12) * 0.25);
+    ctx.beginPath(); ctx.ellipse(0, -14, 24, 14, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    // Hoofdje
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.ellipse(54, -18, 30, 24, 0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Roze manen
+    ctx.fillStyle = '#ff66a6';
+    ctx.beginPath(); ctx.arc(32, -30, 14, 0, Math.PI * 2); ctx.arc(20, -18, 13, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Gouden hoorn!
+    ctx.fillStyle = '#ffd000';
+    ctx.beginPath(); ctx.moveTo(58, -38); ctx.lineTo(82, -68); ctx.lineTo(72, -30); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // Blij oogje
+    ctx.strokeStyle = '#2d2038'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(58, -22, 6, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    ctx.restore();
+}
+
+// --- Feestballonnen & knoppen tijdens viering ---
+function drawCelebrationUI() {
+    // Ballonnen
+    balloons.forEach(bl => {
+        if (bl.popped) return;
+        const bx = bl.x + Math.sin(time * 2.4 + bl.sway) * 16;
+        const by = bl.y;
+        ctx.save();
+        // Touwtje
+        ctx.strokeStyle = '#57606f';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(bx, by + bl.r);
+        ctx.quadraticCurveTo(bx + 12, by + bl.r + 36, bx - 6, by + bl.r + 68);
+        ctx.stroke();
+
+        // Ballon
+        ctx.fillStyle = bl.color.main;
+        ctx.strokeStyle = '#2d2038';
+        ctx.lineWidth = 4.5;
+        ctx.beginPath();
+        ctx.ellipse(bx, by, bl.r * 0.88, bl.r, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Glans
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.beginPath();
+        ctx.ellipse(bx - bl.r * 0.28, by - bl.r * 0.28, bl.r * 0.18, bl.r * 0.3, -0.35, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawCuteFace(bx, by + 4, 0.72, true, false, false);
+        ctx.restore();
+    });
+
+    // Grote "NOG EEN KEER!" knop
+    const pulse = 1 + Math.sin(time * 4.5) * 0.04;
+    ctx.save();
+    ctx.translate(replayBtnRect.x + replayBtnRect.w / 2, replayBtnRect.y + replayBtnRect.h / 2);
+    ctx.scale(pulse, pulse);
+    ctx.fillStyle = '#26cc67';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 7;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
+    ctx.shadowBlur = 16;
+    drawRoundedRect(-replayBtnRect.w / 2, -replayBtnRect.h / 2, replayBtnRect.w, replayBtnRect.h, 36);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 42px "Fredoka One", "Trebuchet MS", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('▶ NOG EEN KEER!', 0, 3);
+    ctx.restore();
+
+    // Linksboven: "← 🏠 Alle spellen" knop op het feestscherm
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+    ctx.strokeStyle = '#ced6e0';
+    ctx.lineWidth = 4;
+    drawRoundedRect(homeCelebrationRect.x, homeCelebrationRect.y, homeCelebrationRect.w, homeCelebrationRect.h, 20);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#2d3436';
+    ctx.font = '900 24px "Nunito", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('← 🏠 Alle spellen', homeCelebrationRect.x + homeCelebrationRect.w / 2, homeCelebrationRect.y + homeCelebrationRect.h / 2 + 1);
+    ctx.restore();
+}
+
+function drawParticles() {
+    particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        if (p.shape === 'star') {
+            drawStarShape(0, 0, 5, p.size, p.size * 0.45);
+            ctx.fill();
+        } else if (p.shape === 'heart') {
+            drawHeartShape(0, 0, p.size * 1.4);
+            ctx.fill();
+        } else if (p.shape === 'rect') {
+            ctx.fillRect(-p.size / 2, -p.size * 0.32, p.size, p.size * 0.64);
+        } else {
+            ctx.beginPath(); ctx.arc(0, 0, p.size * 0.5, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+    });
+}
+
+// ============================================================================
+// HOOFDLUS (UPDATE + RENDER)
+// ============================================================================
+
+let lastTs = 0;
+function loop(ts) {
+    const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0.016);
+    lastTs = ts;
+    time += dt;
+
+    // Update wolken
+    bgClouds.forEach(c => {
+        c.x += c.spd * dt;
+        if (c.x > W + 120) c.x = -120;
+    });
+
+    // Update mandjes-animaties
+    baskets.forEach(b => {
+        if (b.happyTimer > 0) b.happyTimer = Math.max(0, b.happyTimer - dt);
+        if (b.wiggleTimer > 0) b.wiggleTimer = Math.max(0, b.wiggleTimer - dt);
+    });
+
+    // Update actief voorwerp
+    if (activeItem && phase === 'play') {
+        activeItem.bobPhase += dt * 3.4;
+        if (activeItem.entering) {
+            activeItem.y += (activeItem.homeY - activeItem.y) * Math.min(1, dt * 9);
+            activeItem.scale += (1.18 - activeItem.scale) * Math.min(1, dt * 8);
+            if (Math.abs(activeItem.y - activeItem.homeY) < 2) {
+                activeItem.y = activeItem.homeY;
+                activeItem.scale = 1.18;
+                activeItem.entering = false;
+            }
+        } else if (activeItem.returning && !isDraggingItem) {
+            activeItem.x += (activeItem.homeX - activeItem.x) * Math.min(1, dt * 11);
+            activeItem.y += (activeItem.homeY - activeItem.y) * Math.min(1, dt * 11);
+            if (Math.hypot(activeItem.x - activeItem.homeX, activeItem.y - activeItem.homeY) < 3) {
+                activeItem.x = activeItem.homeX;
+                activeItem.y = activeItem.homeY;
+                activeItem.returning = false;
+            }
+        }
+    }
+
+    // Update vliegend voorwerp naar het mandje
+    if (flyingItem && phase === 'flyToBasket') {
+        flyingItem.t += dt / flyingItem.duration;
+        const p = Math.min(1, flyingItem.t);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const tx = flyingItem.targetBasket.cx;
+        const ty = flyingItem.targetBasket.y + 18;
+        flyingItem.x = flyingItem.startX + (tx - flyingItem.startX) * ease;
+        flyingItem.y = flyingItem.startY + (ty - flyingItem.startY) * ease - Math.sin(p * Math.PI) * 140;
+        flyingItem.scale = 1.18 - 0.55 * ease;
+
+        if (p >= 1) {
+            const b = flyingItem.targetBasket;
+            const t = flyingItem.type;
+            const c = flyingItem.color;
+            flyingItem = null;
+            completeItemLanding(b, t, c);
+        }
+    }
+
+    // Update regenboog-sterren
+    for (let i = rainbowStars.length - 1; i >= 0; i--) {
+        const s = rainbowStars[i];
+        s.t += dt * 1.8;
+        const p = Math.min(1, s.t);
+        s.x = s.startX + (s.targetX - s.startX) * p;
+        s.y = s.startY + (s.targetY - s.startY) * p - Math.sin(p * Math.PI) * 70;
+        if (p >= 1) {
+            spawnSparkles(s.targetX, s.targetY, '#ffd000', 10);
+            rainbowStars.splice(i, 1);
+        }
+    }
+
+    // Update eenhoorn & ballonnen in feestmodus
+    if (phase === 'celebrate') {
+        if (unicorn.active) {
+            unicorn.x += 170 * dt;
+            if (Math.random() < 0.35) {
+                particles.push({
+                    x: unicorn.x - 95,
+                    y: unicorn.y + 12 + (Math.random() - 0.5) * 20,
+                    vx: -1.5, vy: (Math.random() - 0.5) * 1.2,
+                    size: 11, color: ['#ff3b4e', '#ffd000', '#1e90ff', '#ff66a6'][Math.floor(Math.random() * 4)],
+                    shape: 'star', rot: 0, vrot: 0.1, life: 0.9, decay: 0.025, gravity: 0
+                });
+            }
+            if (unicorn.x > W + 180) unicorn.x = -180;
+        }
+        balloons.forEach(bl => {
+            if (bl.popped) return;
+            bl.y -= bl.vy * 60 * dt;
+            if (bl.y < -110) bl.y = H + 110;
+        });
+    }
+
+    // Update partikels
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.rot += p.vrot;
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    // --- TEKENEN ---
+    drawBackground();
+    drawProgressBar();
+    drawFeedbackBanner();
+
+    if (phase !== 'celebrate') {
+        drawItemStage();
+        baskets.forEach(drawBasket);
+
+        // Huidig voorwerp (bovenop de mandjes zodat het zichtbaar blijft bij slepen!)
+        if (activeItem) {
+            const bobY = isDraggingItem ? 0 : Math.sin(activeItem.bobPhase) * 9;
+            const drawScale = isDraggingItem ? activeItem.scale * 1.12 : activeItem.scale;
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+            ctx.shadowBlur = isDraggingItem ? 22 : 12;
+            ctx.shadowOffsetY = isDraggingItem ? 14 : 6;
+            drawColoredObject(activeItem.type, activeItem.color, activeItem.x, activeItem.y + bobY, drawScale, time);
+            ctx.restore();
+        }
+
+        // Vliegend voorwerp
+        if (flyingItem) {
+            drawColoredObject(flyingItem.type, flyingItem.color, flyingItem.x, flyingItem.y, flyingItem.scale, time);
+        }
+    } else {
+        if (unicorn.active) drawUnicorn(unicorn.x, unicorn.y);
+        drawCelebrationUI();
+    }
+
+    // Vliegende sterren naar de voortgangsbalk
+    rainbowStars.forEach(s => {
+        ctx.save();
+        ctx.fillStyle = s.color;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        drawStarShape(s.x, s.y, 5, 22, 10);
+        ctx.fill(); ctx.stroke();
+        ctx.restore();
+    });
+
+    drawParticles();
+
+    requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>

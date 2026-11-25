@@ -24,6 +24,7 @@ This document describes the purpose, architecture, and strict requirements for b
    - Put all HTML, CSS, JavaScript, Canvas/SVG graphics, and Web Audio sound synthesis inside one `.html` file.
    - Do **not** rely on external image, sprite, or audio files.
    - Google Fonts (`Fredoka One` + `Nunito`, matching existing pages) may be linked, but always include clean system fallback fonts so games work offline.
+   - Include an inline SVG data-URI favicon (`<link rel="icon" href="data:image/svg+xml,...">`) to avoid `favicon.ico` 404 console errors.
 2. **Dutch Language Everywhere**
    - Always set `<html lang="nl">`.
    - All visible UI text, feedback messages, menus, and buttons must be in Dutch.
@@ -79,11 +80,13 @@ This document describes the purpose, architecture, and strict requirements for b
        soft: '#fff0f6'
    }
    ```
-5. **Test across viewports** before finishing:
-   - Phone landscape (Chromecast-to-TV mode, e.g. `844×390`)
-   - Phone portrait (e.g. `390×844`)
-   - TV / desktop 16:9 (`1280×720`)
-   - Verify back-navigation to `index.html` and zero console errors.
+5. **Test live in Chrome via Chrome DevTools MCP** before finishing:
+   - Serve the repo locally (e.g., `python -m http.server 8765 --bind 127.0.0.1`) and verify the game live using **Chrome DevTools MCP** (`browser` subagent — requires Google Chrome running with remote debugging enabled at `chrome://inspect/#remote-debugging`). Stop the local server when done.
+   - Verify across all three target viewports:
+     - Phone landscape (Chromecast-to-TV mode, e.g. `844×390`)
+     - Phone portrait (e.g. `390×844`)
+     - TV / desktop 16:9 (`1280×720`)
+   - Verify interactive gameplay, responsive scrolling/backgrounds, back-navigation to `index.html`, and **zero** console/network errors.
 6. **Update `README.md`** to list the new game if helpful.
 
 ## 6. Current Games Inventory
@@ -91,4 +94,4 @@ This document describes the purpose, architecture, and strict requirements for b
 | Side / Age | Title | File | Learning Focus |
 | :--- | :--- | :--- | :--- |
 | Left — 7 jaar | Boerderij Reken-Avontuur | `boerderij-reken-avontuur.html` | Tafels van 1 t/m 10 (8-level platformspel) |
-| Right — 3 jaar | *(nog geen spellen)* | — | Klaar voor eerste peuterspellen |
+| Right — 3 jaar | Kleuren Mandjes | `kleuren-mandjes.html` | Kleuren herkennen & sorteren (slepen of tikken, Nederlandse stem, ballonnenfeest) |
