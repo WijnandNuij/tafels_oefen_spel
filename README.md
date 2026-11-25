@@ -10,6 +10,8 @@ Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
 ## Spellen
 
 ### 🚀 7 jaar (links)
+> 💡 **Anti-gok pauze:** Bij een fout antwoord in alle spellen voor 7 jaar (en tijdens de beurt van 7 jaar in de samen-spellen) verschijnt een zichtbare aftelbalk van **3 seconden** (*“⏳ Even rustig nadenken… 3 → 2 → 1”*). De knoppen staan even op pauze zodat snel door-gokken niet werkt, terwijl de vraag, tip én alle antwoordopties scherp en volledig zichtbaar blijven om rustig na te denken.
+
 - **[Boerderij Reken-Avontuur](boerderij-reken-avontuur.html)** 🚜🌾  
   Een kindvriendelijk 2D-platformspel met 8 unieke boerderijlevels om de tafels van 1 t/m 10 te oefenen. Met kiesbare boer (Boer Teun / Boerin Saar), instelbare tafels en moeilijkheidsgraad, bonus `?-kisten`, hartjes met reddings-som en grote knoppen voor telefoon & TV.
 - **[De Grote Klus- & Bak-Bouwer](klus-en-bak-bouwer.html)** 🏗️🧁  

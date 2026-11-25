@@ -57,6 +57,11 @@ This document describes the purpose, architecture, and strict requirements for b
 - **Gameplay style:** Platformers, adventures, quests, puzzle rounds, multiple-choice challenges, levels, scores/stars, diplomas.
 - **Parent controls:** Start menu may include quick parent-friendly settings (e.g., selecting specific tables, difficulty, or starting level).
 - **Failure handling:** Never overly punishing — use encouraging retries, hints, or rescue challenges (like the *reddings-som* in *Boerderij Reken-Avontuur*) instead of hard resets.
+- **Anti-guessing wrong-answer cooldown (3 seconds):** To prevent rapid blind guessing after a mistake, every `age7` game (and the 7-year-old's turn in `coop` games — **never** apply to the 3-year-old's controls) **must** enforce a **3-second (`3000ms`) visible cooldown** after each wrong answer:
+  - Immediately lock all answer inputs (touch, mouse clicks, and keyboard shortcuts `1–4`) until the cooldown finishes; in arcade/shooter games, also prevent firing multiple shots while a projectile is still in flight.
+  - Display an unmistakable, couch-readable Dutch countdown banner with a smooth draining progress bar (`⏳ Even rustig nadenken… 3 → 2 → 1`).
+  - Keep the question, any learning tip, and **all answer options 100% unobstructed and crisp/fully readable** during the 3 seconds (highlight the wrong choice in red and style the other locked choices in full-contrast muted grey rather than heavily fading them or covering them) so the child can actually think and find the right answer.
+  - Cancel any active cooldown cleanly when advancing questions, skipping, restarting, or returning to the menu/lobby.
 
 ### Right Side: 3-Year-Old Girl (`age3`, Peuter)
 - **Learning topics:** Colors (`kleuren`), shapes (`vormen`), animals & animal sounds (`dieren & geluiden`), counting 1–5 / 1–10 (`tellen`), matching/sorting (`bij elkaar zoeken`), letters/first sounds, size comparisons (`groot & klein`), music & rhythm.
