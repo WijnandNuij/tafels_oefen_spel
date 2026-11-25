@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Woord-Detective: Kraak de Kluis!</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#14192b">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -18,6 +22,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
             background: #14192b;
             font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
             overflow: hidden;
@@ -26,13 +31,15 @@
             align-items: center;
         }
 
-        /* 16:9 TV & Chromecast speelveld */
+        /* 16:9 TV & Chromecast speelveld (vult op telefoon-landschap volledig rand-tot-rand!) */
         #game-stage {
             position: relative;
             width: 100vw;
             height: 56.25vw;
             max-height: 100vh;
+            max-height: 100dvh;
             max-width: 177.78vh;
+            max-width: 177.78dvh;
             background: radial-gradient(circle at 50% 25%, #2d3a68 0%, #161d38 100%);
             box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
             overflow: hidden;
@@ -42,6 +49,16 @@
             padding: 1.4% 2%;
             gap: 1.4%;
             color: #fff;
+        }
+        :fullscreen #game-stage { border-radius: 0; box-shadow: none; }
+        @media (max-height: 520px) and (orientation: landscape) {
+            #game-stage {
+                width: 100vw;
+                height: 100dvh;
+                max-width: 100vw;
+                max-height: 100dvh;
+                border-radius: 0;
+            }
         }
 
         /* Bovenbalk: Kluis-sloten + Karel de Knoeier */
@@ -550,7 +567,10 @@
     <div class="card">
         <div class="top-row">
             <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
-            <span style="font-weight:900; color:#57606f; font-size:0.9rem;" id="badges-count">🏅 0 / 4 kluizen gekraakt</span>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                <button class="home-link" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
+                <span style="font-weight:900; color:#57606f; font-size:0.9rem;" id="badges-count">🏅 0 / 4 kluizen gekraakt</span>
+            </div>
         </div>
 
         <h1>🕵️ Woord-Detective: Kraak de Kluis! 🔐</h1>
@@ -787,7 +807,42 @@ function openMenu() {
     document.getElementById('menu-overlay').style.display = 'flex';
 }
 
+function isStandaloneApp() {
+    return window.matchMedia('(display-mode: fullscreen)').matches
+        || window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+}
+function enterFullscreen() {
+    if (isStandaloneApp()) return;
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        Promise.resolve(req.call(el)).catch(() => {});
+    }
+}
+function toggleFullscreen() {
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsEl) {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) Promise.resolve(ex.call(document)).catch(() => {});
+    } else {
+        enterFullscreen();
+    }
+}
+function updateFsBtn() {
+    const b = document.getElementById('fs-btn');
+    if (!b) return;
+    const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+    if (isStandaloneApp() || !canFs) { b.style.display = 'none'; return; }
+    const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    b.textContent = active ? '✕ Sluit volledig scherm' : '⛶ Volledig scherm';
+}
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+updateFsBtn();
+
 function startVault() {
+    enterFullscreen();
     document.getElementById('menu-overlay').style.display = 'none';
     document.getElementById('win-overlay').style.display = 'none';
 

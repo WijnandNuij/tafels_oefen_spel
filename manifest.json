@@ -1,0 +1,21 @@
+{
+  "name": "Spelletjes Kiezen!",
+  "short_name": "Spelletjes",
+  "description": "Leerzame Nederlandse kinderspelletjes voor telefoon en TV (Chromecast).",
+  "lang": "nl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#5f27cd",
+  "theme_color": "#5f27cd",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%235f27cd'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='310'>🎮</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

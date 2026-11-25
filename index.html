@@ -6,6 +6,10 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Spelletjes Kiezen!</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#5f27cd">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"
@@ -84,9 +88,31 @@
 
         /* Kopbalk */
         .picker-header {
+            position: relative;
             text-align: center;
             color: #fff;
             padding: 4px 10px 0 10px;
+        }
+        .fs-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(255, 255, 255, 0.22);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.72);
+            border-radius: 999px;
+            padding: 6px 13px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 0.85rem;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: transform 0.1s, background-color 0.15s;
+        }
+        .fs-btn:hover { background: rgba(255, 255, 255, 0.34); }
+        .fs-btn:active { transform: scale(0.94); }
+        @media (max-width: 640px) {
+            .fs-btn { position: static; margin-top: 8px; }
         }
 
         .picker-header h1 {
@@ -521,6 +547,7 @@
         <header class="picker-header">
             <h1>🎮 Spelletjes Kiezen!</h1>
             <p>Tik op een spelletje om samen op telefoon &amp; TV te spelen</p>
+            <button class="fs-btn" id="fs-toggle-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
         </header>
 
         <main class="sides-grid">
@@ -708,6 +735,38 @@
             title: 'Binnenkort komen hier jouw spelletjes!',
             text: 'Dieren, kleuren, vormen, tellen en nog veel meer om samen te ontdekken.'
         });
+
+        // Volledig scherm ondersteuning voor Android Chrome (Chromecast naar TV)
+        function isStandaloneApp() {
+            return window.matchMedia('(display-mode: fullscreen)').matches
+                || window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone === true;
+        }
+        function updateFsButton() {
+            const btn = document.getElementById('fs-toggle-btn');
+            if (!btn) return;
+            const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+            if (isStandaloneApp() || !canFs) {
+                btn.style.display = 'none';
+                return;
+            }
+            const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            btn.textContent = active ? '✕ Sluit volledig scherm' : '⛶ Volledig scherm';
+        }
+        function toggleFullscreen() {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            if (fsEl) {
+                const ex = document.exitFullscreen || document.webkitExitFullscreen;
+                if (ex) Promise.resolve(ex.call(document)).catch(() => {});
+            } else {
+                const el = document.documentElement;
+                const req = el.requestFullscreen || el.webkitRequestFullscreen;
+                if (req) Promise.resolve(req.call(el)).catch(() => {});
+            }
+        }
+        document.addEventListener('fullscreenchange', updateFsButton);
+        document.addEventListener('webkitfullscreenchange', updateFsButton);
+        updateFsButton();
     </script>
 
 </body>

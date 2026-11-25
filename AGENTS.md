@@ -14,6 +14,7 @@ This document describes the purpose, architecture, and strict requirements for b
 - `index.html` — The **begin-screen / game-picker** with two sides:
   - **Left side (`age7`):** Games for the **7-year-old**.
   - **Right side (`age3`):** Games for the **3-year-old (girl)**.
+- `manifest.json` — Lightweight PWA manifest (`display: "fullscreen"` / `"standalone"`) so adding the site to an Android phone's Home Screen launches the picker and every game with **zero browser URL bar** when casting to a TV.
 - `<game-slug>.html` — Individual standalone single-HTML games in lowercase Dutch kebab-case (e.g. `boerderij-reken-avontuur.html`).
 - `AGENTS.md` — These requirements and conventions.
 - `README.md` — Human-readable overview of the collection.
@@ -30,7 +31,10 @@ This document describes the purpose, architecture, and strict requirements for b
    - All visible UI text, feedback messages, menus, and buttons must be in Dutch.
    - Keep copy short, encouraging, and age-appropriate.
 3. **Phone + Chromecast-to-TV Ergonomics**
-   - **16:9 TV-Friendly Stage:** Keep the active game stage optimized for a 16:9 landscape aspect ratio (e.g., `1280×720` logical canvas or responsive 16:9 container) so it fills a TV screen cleanly when cast from a phone.
+   - **16:9 TV-Friendly Stage & True Fullscreen (No URL Bar):**
+     - Keep the active game stage optimized for a 16:9 landscape aspect ratio (`1280×720` logical canvas or responsive stage using `100dvh` so it expands immediately when Chrome's URL bar hides), and let DOM-layout stages expand edge-to-edge on phone landscape/portrait so controls never clip.
+     - Link `<link rel="manifest" href="manifest.json">` + `<meta name="mobile-web-app-capable" content="yes">` so launching from the Android Home Screen hides the URL bar permanently across all games.
+     - Call `document.documentElement.requestFullscreen()` on the primary "START" click (when not already in standalone/fullscreen app mode) and provide a `⛶ Volledig scherm` toggle button on start menus so regular Android Chrome also hides the URL bar during Chromecast play.
    - **Couch-Distance Readability:** Parents watch on the TV from several meters away. Use large, bold typography, high-contrast colors, clear numbers/symbols/pictures, and expressive visual feedback (particles, animations, highlights) so every prompt and answer is readable from the couch.
    - **Smartphone Touch Controls First:**
      - Use generous, easy-to-tap touch targets (`>= 64px` for controls; even larger for 3-year-old games).

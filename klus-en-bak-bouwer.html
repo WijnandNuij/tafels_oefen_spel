@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>De Grote Klus- &amp; Bak-Bouwer</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1b2a4a">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -18,6 +22,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
             background: #1b2a4a;
             font-family: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
             overflow: hidden;
@@ -26,13 +31,15 @@
             align-items: center;
         }
 
-        /* 16:9 TV & Chromecast speelveld */
+        /* 16:9 TV & Chromecast speelveld (vult op telefoon-landschap volledig rand-tot-rand!) */
         #game-stage {
             position: relative;
             width: 100vw;
             height: 56.25vw;
             max-height: 100vh;
+            max-height: 100dvh;
             max-width: 177.78vh;
+            max-width: 177.78dvh;
             background: #dff6ff;
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
             overflow: hidden;
@@ -40,6 +47,7 @@
             display: flex;
             flex-direction: column;
         }
+        :fullscreen #game-stage { border-radius: 0; box-shadow: none; }
 
         /* Bovenste helft: live geanimeerde cartoon bouw-/bakscène */
         #scene-wrap {
@@ -452,8 +460,15 @@
             .choice-btn.is-word { font-size: 1.12rem; }
         }
 
-        /* Telefoon landschap (bijv. 844×390 Chromecast): compact zodat rij 2 nooit afknipt */
-        @media (max-height: 460px) and (orientation: landscape) {
+        /* Telefoon landschap (bijv. 844×390 Chromecast): rand-tot-rand volledig scherm + compact */
+        @media (max-height: 520px) and (orientation: landscape) {
+            #game-stage {
+                width: 100vw;
+                height: 100dvh;
+                max-width: 100vw;
+                max-height: 100dvh;
+                border-radius: 0;
+            }
             #scene-wrap { flex: 0 0 38%; }
             #hud-top { top: 4px; left: 6px; right: 6px; }
             .hud-pill { padding: 2px 9px; font-size: 0.74rem; border-width: 2px; }
@@ -534,7 +549,10 @@
     <div class="menu-card">
         <div class="top-row">
             <a class="home-link" href="index.html">← 🏠 Alle spellen</a>
-            <span style="font-weight:900; font-size:0.9rem; color:#636e72;" id="total-mastered-badge">⭐ 0 / 36 woorden</span>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                <button class="home-link" id="fs-btn" onclick="toggleFullscreen()">⛶ Volledig scherm</button>
+                <span style="font-weight:900; font-size:0.9rem; color:#636e72;" id="total-mastered-badge">⭐ 0 / 36 woorden</span>
+            </div>
         </div>
 
         <h1>🏗️ De Grote Klus- &amp; Bak-Bouwer 🧁</h1>
@@ -774,7 +792,42 @@ function openMenu() {
     document.getElementById('menu-overlay').style.display = 'flex';
 }
 
+function isStandaloneApp() {
+    return window.matchMedia('(display-mode: fullscreen)').matches
+        || window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+}
+function enterFullscreen() {
+    if (isStandaloneApp()) return;
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        Promise.resolve(req.call(el)).catch(() => {});
+    }
+}
+function toggleFullscreen() {
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsEl) {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) Promise.resolve(ex.call(document)).catch(() => {});
+    } else {
+        enterFullscreen();
+    }
+}
+function updateFsBtn() {
+    const b = document.getElementById('fs-btn');
+    if (!b) return;
+    const canFs = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+    if (isStandaloneApp() || !canFs) { b.style.display = 'none'; return; }
+    const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    b.textContent = active ? '✕ Sluit volledig scherm' : '⛶ Volledig scherm';
+}
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+updateFsBtn();
+
 function startEpisode() {
+    enterFullscreen();
     document.getElementById('menu-overlay').style.display = 'none';
     document.getElementById('win-overlay').style.display = 'none';
 

@@ -23,8 +23,11 @@ Open [`index.html`](index.html) om naar het keuzescherm met twee kanten te gaan:
 - **[Kleuren Mandjes](kleuren-mandjes.html)** 🧺🌈  
   Een vrolijk kleurensorteerspel speciaal voor peuters (geen lezen nodig!). Sleep of tik schattige gekleurde plaatjes (aardbei, sterretje, walvis, kikker, bloem en meer) naar het juiste levende kleuren-mandje. Met Nederlandse stem, groeiende regenboog, eenhoorn-feestje met ballonnen om kapot te tikken en ouder-instellingen (3, 4 of 6 kleuren).
 
-## Spelen
+## Spelen (Tip voor Android + Chromecast naar TV!)
 Open [`index.html`](index.html) direct in je browser, of activeer **GitHub Pages** in de repository-instellingen om alle spellen direct online op telefoon en Chromecast/TV te spelen.
+
+- **Zonder URL-balk op TV:** Tik in Android Chrome eenmalig op **⋮ → "Toevoegen aan startscherm"** om het keuzescherm als app-icoon op je telefoon te zetten — daarna openen alle spellen volledig zonder adresbalk!
+- **In gewone Chrome:** Alle spellen gaan bij het starten automatisch naar volledig scherm (met een eigen `⛶ Volledig scherm`-knop op elk startscherm).
 
 ## Nieuwe spellen toevoegen
 Zie [`AGENTS.md`](AGENTS.md) voor alle spelvereisten, doelgroeprichtlijnen (7 jaar & 3 jaar) en het stappenplan om nieuwe single-HTML spellen toe te voegen aan het keuzescherm.
